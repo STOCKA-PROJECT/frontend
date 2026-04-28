@@ -10,6 +10,7 @@ const here = computed(() => {
   if (last === 'dashboard') return t('dashboard.summary')
   if (last === 'crear-organizacion') return t('dashboard.create_organization')
   if (last === 'ajustes-organizacion') return t('dashboard.org_settings.breadcrumb')
+  if (last === 'ubicaciones') return t('dashboard.nav.locations')
   return ''
 })
 

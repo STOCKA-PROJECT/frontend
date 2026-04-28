@@ -91,8 +91,9 @@ export const useAuthStore = defineStore('auth', () => {
   function clearLocalSession() {
     tokenCookie.value = null
     userCookie.value = null
-    const orgs = useOrganizationsStore()
-    orgs.reset()
+    useOrganizationsStore().reset()
+    useLocationsStore().reset()
+    usePiecesStore().reset()
   }
 
   async function logout() {

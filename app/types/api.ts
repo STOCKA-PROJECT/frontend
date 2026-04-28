@@ -148,6 +148,24 @@ export interface LocationResponseDto {
   breadcrumb: LocationBreadcrumbItemDto[]
 }
 
+export interface CreateLocationDto {
+  name: string
+  description?: string
+  parentId?: number
+}
+
+export interface UpdateLocationDto {
+  name?: string
+  description?: string
+  parentId?: number
+  moveToRoot?: boolean
+}
+
+export interface UpdatePieceLocationDto {
+  locationId?: number
+  clearLocation?: boolean
+}
+
 export interface MemberResponseDto {
   id: number
   userId: number

@@ -20,7 +20,6 @@ const userMenuRef = ref<HTMLElement | null>(null)
 
 const inactiveItems = computed(() => [
   { label: t('dashboard.nav.items'), icon: 'box' },
-  { label: t('dashboard.nav.locations'), icon: 'building' },
   { label: t('dashboard.nav.types'), icon: 'list' }
 ])
 const orgInactive = computed(() => [
@@ -80,6 +79,12 @@ async function handleLogout() {
           <rect x="3" y="14" width="7" height="7" rx="1" />
         </svg>
         <span>{{ t('dashboard.summary') }}</span>
+      </NuxtLink>
+
+      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/ubicaciones')" exact-active-class="is-active"
+        class="nav-item">
+        <DashboardIcon name="building" />
+        <span>{{ t('dashboard.nav.locations') }}</span>
       </NuxtLink>
 
       <button v-for="item in inactiveItems" :key="item.label" type="button" class="nav-item is-disabled"

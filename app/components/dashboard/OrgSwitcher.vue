@@ -4,7 +4,10 @@ import type { OrganizationRole } from '~/types/api'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
+const router = useRouter()
 const orgs = useOrganizationsStore()
+const locations = useLocationsStore()
+const pieces = usePiecesStore()
 
 const open = shallowRef(false)
 const rootRef = ref<HTMLElement | null>(null)
@@ -23,8 +26,12 @@ function roleLabel(role: OrganizationRole): string {
 }
 
 function pickOrg(id: number) {
-  orgs.setCurrent(id)
   open.value = false
+  if (orgs.currentId === id) return
+  orgs.setCurrent(id)
+  locations.reset()
+  pieces.reset()
+  router.push(localePath('/dashboard'))
 }
 
 function closeMenu() {
