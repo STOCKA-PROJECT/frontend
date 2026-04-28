@@ -1,0 +1,355 @@
+{
+  "site": {
+    "name": "Stocka",
+    "description": "A clear inventory for your items: what they are, where they are and who owns them. No spreadsheets, no chaos."
+  },
+  "mock": {
+    "header_title": "Inventory",
+    "header_count": "· 248 items",
+    "synced": "Synced",
+    "stats": {
+      "items": "Items",
+      "locations": "Locations",
+      "owners": "Owners"
+    },
+    "status": {
+      "active": "Active",
+      "review": "Review"
+    }
+  },
+  "common": {
+    "skip_to_content": "Skip to content",
+    "loading": "Loading…",
+    "back": "Back",
+    "close": "Close",
+    "open": "Open",
+    "open_menu": "Open menu",
+    "close_menu": "Close menu",
+    "main_nav": "Main navigation",
+    "user_fallback": "User",
+    "comingSoon": "Coming soon",
+    "comingSoonShort": "Soon",
+    "language": "Language",
+    "change_language": "Change language"
+  },
+  "nav": {
+    "features": "Features",
+    "how": "How it works",
+    "signin": "Sign in",
+    "signup": "Sign up",
+    "my_portal": "My portal"
+  },
+  "hero": {
+    "eyebrow": "Inventory, not sales",
+    "title_a": "Know what you have,",
+    "title_b": "where",
+    "title_c": "and whose.",
+    "sub": "Stocka is a clear inventory for your items: what they are, where they're located, who really owns them and all their information. No spreadsheets, no chaos.",
+    "cta_primary": "Start free",
+    "cta_secondary": "See how it works",
+    "trial": "14-day trial",
+    "no_card": "No credit card",
+    "cancel": "Cancel anytime"
+  },
+  "features": {
+    "eyebrow": "Features",
+    "title": "Everything you need to take control of your inventory.",
+    "sub": "Built for teams that need to know what they have and where, without setting up an entire ERP.",
+    "items": {
+      "item": {
+        "title": "Complete record per item",
+        "body": "Name, description, serial number, photos and documents. All the information in one place."
+      },
+      "location": {
+        "title": "Physical location",
+        "body": "Room, shelf, drawer… Define the hierarchy that fits best and find any item instantly."
+      },
+      "owner": {
+        "title": "Real owner",
+        "body": "Track who actually owns each item, not just who keeps it. Ideal for shared assets."
+      },
+      "category": {
+        "title": "Types and categories",
+        "body": "Group by item type and add custom fields to match each kind. No rigid forms."
+      },
+      "label": {
+        "title": "Codes and labels",
+        "body": "Generate and print labels with QR or barcode. Scan with your phone to view the record instantly."
+      },
+      "history": {
+        "title": "History and audit",
+        "body": "Every move, transfer or change of owner is recorded with date and responsible party."
+      }
+    }
+  },
+  "how": {
+    "eyebrow": "How it works",
+    "title": "Start tracking your inventory in 10 minutes.",
+    "sub": "Import your list, invite your team and start logging items. Just like that.",
+    "steps": {
+      "create": {
+        "title": "Create your items",
+        "body": "Upload a CSV or add them by hand. Define the types, locations and owners that match your case."
+      },
+      "invite": {
+        "title": "Invite your team",
+        "body": "Add your teammates with roles and permissions. Each person sees and edits what is theirs."
+      },
+      "maintain": {
+        "title": "Keep the record alive",
+        "body": "Transfers, owner changes and updates from mobile or desktop. Everything is audited."
+      }
+    }
+  },
+  "testimonial": {
+    "eyebrow": "Testimonial",
+    "label": "Testimonial",
+    "quote": "“We had assets scattered across offices and nobody knew whose was whose. With Stocka we find any item in seconds and we always know who it belongs to.”",
+    "author": "Laura Méndez",
+    "role": "Operations Lead · Roble & Co."
+  },
+  "cta": {
+    "label": "Call to action",
+    "title": "Bring order to your inventory today.",
+    "sub": "Start free, no card needed. Create your first item in a couple of minutes and see if it fits.",
+    "primary": "Create a free account",
+    "secondary": "Sign in"
+  },
+  "footer": {
+    "tagline": "Simple, honest inventory for teams who want to know what they have, where it is and whose it is.",
+    "product": "Product",
+    "company": "Company",
+    "account": "Account",
+    "legal": "Legal",
+    "links": {
+      "features": "Features",
+      "integrations": "Integrations",
+      "changelog": "Changelog",
+      "about": "About us",
+      "blog": "Blog",
+      "contact": "Contact",
+      "support": "Support",
+      "signin": "Sign in",
+      "signup": "Sign up",
+      "forgot": "Recover access",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "cookies": "Cookies"
+    },
+    "copyright": "© {year} Stocka · Made with care"
+  },
+  "auth": {
+    "header": {
+      "new_here": "New here?",
+      "already_customer": "Already a customer?"
+    },
+    "footer_short": "© {year} Stocka",
+    "show_password": "Show password",
+    "hide_password": "Hide password",
+    "strength": {
+      "label": "Strength",
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong"
+    },
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to Stocka to keep managing your inventory.",
+      "email": "Email",
+      "email_placeholder": "you\\@company.com",
+      "password": "Password",
+      "password_placeholder": "Your password",
+      "forgot": "Forgot it?",
+      "submit": "Sign in",
+      "no_account": "Don't have an account yet?",
+      "create_free": "Create one for free",
+      "errors": {
+        "invalid": "Wrong email or password.",
+        "generic": "Could not sign you in. Please try again."
+      },
+      "reset_ok": "Your password has been reset. Sign in with your new password.",
+      "page_title": "Sign in"
+    },
+    "signup": {
+      "title": "Create your account",
+      "subtitle": "Start organizing your items in minutes. No credit card.",
+      "first_name": "First name",
+      "first_name_placeholder": "Lucía",
+      "last_name": "Last name",
+      "last_name_placeholder": "Méndez García",
+      "username": "Username",
+      "username_placeholder": "luciamendez",
+      "username_available": "\\@{username} is available",
+      "username_hint": "Unique on Stocka. Letters and numbers only.",
+      "username_checking": "Checking availability…",
+      "username_taken": "That username is already taken",
+      "username_reserved": "That username is reserved",
+      "username_invalid": "Letters and numbers only (3 to 24 characters)",
+      "email": "Email",
+      "email_placeholder": "you\\@company.com",
+      "password": "Password",
+      "password_placeholder": "At least 8 characters",
+      "accept_pre": "I accept the",
+      "terms": "Terms",
+      "accept_mid": "and the",
+      "privacy": "Privacy Policy",
+      "accept_post": "of Stocka.",
+      "submit": "Create account",
+      "have_account": "Already have an account?",
+      "signin": "Sign in",
+      "errors": {
+        "conflict": "An account with that email or username already exists.",
+        "generic": "Could not create the account. Check the data and try again."
+      },
+      "page_title": "Sign up"
+    },
+    "forgot": {
+      "title": "Recover your access",
+      "subtitle": "Enter your email and we'll send you a link to create a new password.",
+      "submit": "Send link",
+      "remember_q": "Remember your password?",
+      "back_signin": "Sign in",
+      "errors": {
+        "generic": "Could not send the email. Try again in a few minutes."
+      },
+      "sent_title": "Check your email",
+      "sent_subtitle": "If {email} is registered, you'll receive a link to reset your password shortly. Check the spam folder too.",
+      "sent_back": "Back to sign in",
+      "no_email": "Didn't get it?",
+      "retry": "Try again",
+      "page_title": "Recover password"
+    },
+    "reset": {
+      "invalid_title": "Invalid link",
+      "invalid_subtitle": "This password reset link has expired or is not valid.",
+      "request_new": "Request a new one",
+      "title": "Create a new password",
+      "subtitle": "Pick a strong password for your Stocka account.",
+      "new_password": "New password",
+      "new_password_placeholder": "At least 8 characters",
+      "repeat_password": "Repeat password",
+      "repeat_password_placeholder": "Type it again",
+      "mismatch": "Passwords do not match.",
+      "submit": "Reset password",
+      "errors": {
+        "expired": "The link has expired or is not valid. Request a new one.",
+        "generic": "Could not reset the password. Please try again."
+      },
+      "page_title": "Reset password"
+    }
+  },
+  "dashboard": {
+    "page_title": "Overview",
+    "skip": "Skip to content",
+    "main_label": "Breadcrumbs",
+    "search_placeholder": "Search… (coming soon)",
+    "notifications": "Notifications (coming soon)",
+    "help": "Help",
+    "summary": "Overview",
+    "create_organization": "Create organization",
+    "logout": "Sign out",
+    "organization_label": "Organization",
+    "nav": {
+      "items": "Items",
+      "locations": "Locations",
+      "types": "Item types",
+      "team": "Team",
+      "settings": "Settings"
+    },
+    "header": {
+      "greeting_named": "Hi, {name} 👋",
+      "greeting_anonymous": "Welcome to Stocka 👋",
+      "context_named": "Here's what's been happening at {org}.",
+      "context_empty": "Create your organization to start managing your inventory.",
+      "import_csv": "Import CSV",
+      "new_item": "New item"
+    },
+    "stats": {
+      "items": "Items",
+      "items_meta": "In total",
+      "locations": "Locations",
+      "level_one": "level",
+      "level_many": "levels",
+      "site_one": "site",
+      "site_many": "sites",
+      "locations_empty": "Create the first one",
+      "pending": "Pending",
+      "pending_meta": "{count} under review",
+      "all_done": "All caught up"
+    },
+    "cards": {
+      "recent_items": "Recent items",
+      "last_changes": "Latest changes",
+      "locations": "Locations",
+      "recent_activity": "Recent activity"
+    },
+    "pieces_table": {
+      "col_item": "Item",
+      "col_type": "Type",
+      "col_status": "Status",
+      "col_updated": "Updated",
+      "status_pending": "Under review",
+      "status_active": "Active",
+      "empty": "You haven't added any items to this organization yet. When you create one, it will appear here.",
+      "now": "Now",
+      "minutes_ago": "{min} min ago",
+      "hours_ago": "{h}h ago",
+      "days_ago": "{d}d ago"
+    },
+    "locations_tree": {
+      "empty": "No locations yet. Create one to organize your inventory."
+    },
+    "activity": {
+      "soon_title": "Coming soon",
+      "soon_body": "The change history of your inventory will appear here."
+    },
+    "org": {
+      "switch_label": "Switch organization",
+      "no_org": "No organization",
+      "create_new": "New organization",
+      "start_first_cta": "Start by creating your first organization",
+      "roles": {
+        "OWNER": "Owner",
+        "MANAGER": "Manager",
+        "USER": "Member",
+        "SPECTATOR": "Read-only"
+      }
+    },
+    "org_settings": {
+      "breadcrumb": "Settings",
+      "title": "Organization settings",
+      "subtitle": "Change your organization's name or identifier. Only the owner can edit these details.",
+      "save": "Save changes",
+      "saved": "Changes saved.",
+      "slug_current": "This is the current identifier.",
+      "not_owner": "Only the organization owner can edit these settings.",
+      "errors": {
+        "forbidden": "You don't have permission to edit this organization.",
+        "generic": "Couldn't save the changes. Please try again."
+      }
+    },
+    "create_org": {
+      "first_title": "Create your first organization",
+      "first_subtitle": "Your inventory will live here. You can invite your team and create more organizations whenever you want.",
+      "title": "Create a new organization",
+      "subtitle": "Another independent space to manage inventory. You can switch between organizations from the side menu.",
+      "name": "Name",
+      "name_placeholder": "Atelier Méndez",
+      "slug": "Identifier",
+      "slug_placeholder": "ateliermendez",
+      "slug_available": "Available",
+      "slug_hint": "At least 3 characters. Letters, numbers and dashes only.",
+      "slug_checking": "Checking availability…",
+      "slug_taken": "That identifier is already taken",
+      "slug_reserved": "That identifier is reserved",
+      "slug_invalid": "Lowercase letters, numbers and dashes only (3 to 40 characters)",
+      "submit": "Create organization",
+      "cancel": "Cancel",
+      "errors": {
+        "conflict": "That identifier is already in use. Try another.",
+        "generic": "Could not create the organization. Please try again."
+      }
+    }
+  }
+}

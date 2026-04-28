@@ -1,0 +1,166 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --c-bg: #f4efe6;
+    --c-bg-card: #faf6ee;
+    --c-bg-alt: #ede7da;
+    --c-bg-soft: #efe9dc;
+    --c-field: #fffdf8;
+    --c-field-focus: #ffffff;
+
+    --c-ink: #2a2722;
+    --c-ink-soft: #6b655b;
+    --c-ink-muted: #9a9389;
+
+    --c-line: #e4ddce;
+    --c-line-strong: #d4ccba;
+
+    --c-accent: #6b8068;
+    --c-accent-ink: #3c5239;
+    --c-accent-soft: #d9e3d4;
+
+    --c-danger: #b5534b;
+    --c-danger-soft: #f1d7d3;
+    --c-warn: #c48c3a;
+    --c-warn-bg: #f3ddd5;
+    --c-warn-ink: #8f3e34;
+    --c-warn-soft: #f4e4c8;
+    --c-ok: var(--c-accent);
+
+    --shadow-sm: 0 1px 2px rgba(60, 50, 30, .04);
+    --shadow-md: 0 4px 20px rgba(60, 50, 30, .06), 0 1px 2px rgba(60, 50, 30, .04);
+    --shadow-lg: 0 20px 60px rgba(60, 50, 30, .08), 0 2px 6px rgba(60, 50, 30, .04);
+
+    --nav-h: 68px;
+    --sidebar-w: 248px;
+    --topbar-h: 60px;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-bg font-sans text-ink antialiased;
+    font-feature-settings: "cv11", "ss01", "ss03";
+    letter-spacing: -0.005em;
+  }
+
+  *:focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-bg rounded;
+  }
+
+  ::selection {
+    @apply bg-accent-soft text-accent-ink;
+  }
+}
+
+@layer components {
+  .wrap {
+    @apply mx-auto w-full max-w-wrap px-7 sm:px-7 max-sm:px-5;
+  }
+
+  .section {
+    @apply py-24 max-md:py-[72px];
+  }
+
+  .section-head {
+    @apply mx-auto mb-14 max-w-[620px] text-center;
+  }
+
+  .h-display {
+    @apply font-semibold leading-[1.1] tracking-tighter2;
+    font-size: clamp(30px, 3.6vw, 42px);
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[9px]
+           px-4 h-10 text-sm font-medium border-0 cursor-pointer
+           transition-[background,box-shadow,border-color,transform] duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed;
+    letter-spacing: -0.005em;
+  }
+
+  .btn-lg {
+    @apply h-12 px-[22px] text-[15px] rounded-[10px];
+  }
+
+  .btn-primary {
+    @apply relative overflow-hidden bg-ink text-bg-card shadow-soft hover:shadow-card;
+  }
+  .btn-primary:hover { background: color-mix(in oklab, var(--c-ink) 88%, #000); }
+  .btn-primary::before {
+    content: "";
+    position: absolute; top: 0; left: -60%;
+    width: 40%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .18), transparent);
+    transform: skewX(-20deg);
+    transition: left .55s ease;
+  }
+  .btn-primary:hover::before { left: 120%; }
+
+  .btn-outline {
+    @apply bg-transparent text-ink border border-line-strong hover:border-ink;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-ink;
+  }
+  .btn-ghost:hover { background: color-mix(in oklab, var(--c-ink) 6%, transparent); }
+}
+
+@layer utilities {
+  .skip-link {
+    @apply absolute left-3 -top-12 z-[100] rounded-md bg-ink px-4 py-2 text-bg-card text-sm
+           focus:top-3 transition-[top] duration-150;
+  }
+}
+
+/*
+ * Reveal-on-scroll animations.
+ *
+ * These rules live outside `@layer utilities` on purpose: Tailwind only emits
+ * `@keyframes` it sees referenced through generated animation utilities (e.g.
+ * `.animate-reveal`). Since `.in-view` is added by `useReveal()` at runtime
+ * and never appears in templates, both the keyframes and the rules that depend
+ * on them must be authored as plain CSS so JIT does not treat them as unused.
+ */
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes revealLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes revealRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.reveal,
+.reveal-left,
+.reveal-right { opacity: 0; }
+
+.in-view.reveal { animation: reveal .7s cubic-bezier(.2, .7, .2, 1) both; }
+.in-view.reveal-left { animation: revealLeft .75s cubic-bezier(.2, .7, .2, 1) both; }
+.in-view.reveal-right { animation: revealRight .75s cubic-bezier(.2, .7, .2, 1) both; }
+
+.in-view.reveal.d1, .in-view.reveal-left.d1, .in-view.reveal-right.d1 { animation-delay: .08s; }
+.in-view.reveal.d2, .in-view.reveal-left.d2, .in-view.reveal-right.d2 { animation-delay: .16s; }
+.in-view.reveal.d3, .in-view.reveal-left.d3, .in-view.reveal-right.d3 { animation-delay: .24s; }
+.in-view.reveal.d4, .in-view.reveal-left.d4, .in-view.reveal-right.d4 { animation-delay: .32s; }
+.in-view.reveal.d5 { animation-delay: .40s; }
+.in-view.reveal.d6 { animation-delay: .48s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001s !important;
+    animation-delay: 0s !important;
+    transition-duration: .001s !important;
+    scroll-behavior: auto !important;
+  }
+}

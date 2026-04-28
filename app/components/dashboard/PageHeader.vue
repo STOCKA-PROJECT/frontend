@@ -1,0 +1,72 @@
+<script setup lang="ts">
+const { t } = useI18n()
+const auth = useAuthStore()
+const orgs = useOrganizationsStore()
+
+const greeting = computed(() => {
+  const name = auth.user?.name?.trim()
+  return name ? t('dashboard.header.greeting_named', { name }) : t('dashboard.header.greeting_anonymous')
+})
+</script>
+
+<template>
+  <div class="flex flex-wrap items-end justify-between gap-6">
+    <div>
+      <h1 class="text-[26px] font-semibold leading-[1.15] tracking-[-0.025em] text-ink">
+        {{ greeting }}
+      </h1>
+      <p class="mt-1 text-[14px] leading-relaxed text-ink-soft">
+        <template v-if="orgs.current">
+          <i18n-t keypath="dashboard.header.context_named" tag="span">
+            <template #org>
+              <span class="font-medium text-ink">{{ orgs.current.name }}</span>
+            </template>
+          </i18n-t>
+        </template>
+        <template v-else>
+          {{ t('dashboard.header.context_empty') }}
+        </template>
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="header-btn header-btn-outline" disabled :title="t('common.comingSoon')">
+        <DashboardIcon name="upload" :size="14" />
+        {{ t('dashboard.header.import_csv') }}
+      </button>
+      <button class="header-btn header-btn-primary" disabled :title="t('common.comingSoon')">
+        <DashboardIcon name="plus" :size="14" />
+        {{ t('dashboard.header.new_item') }}
+      </button>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  border: 0;
+  cursor: not-allowed;
+  opacity: .65;
+  transition: background .15s, box-shadow .15s, border-color .15s;
+}
+.header-btn-primary {
+  background: var(--c-ink);
+  color: var(--c-bg-card);
+  box-shadow: var(--shadow-sm);
+}
+.header-btn-outline {
+  background: transparent;
+  color: var(--c-ink);
+  border: 1px solid var(--c-line-strong);
+}
+</style>

@@ -1,0 +1,355 @@
+{
+  "site": {
+    "name": "Stocka",
+    "description": "Inventari clar per als teus articles: què són, on són i de qui són. Sense fulls de càlcul, sense caos."
+  },
+  "mock": {
+    "header_title": "Inventari",
+    "header_count": "· 248 articles",
+    "synced": "Sincronitzat",
+    "stats": {
+      "items": "Articles",
+      "locations": "Ubicacions",
+      "owners": "Propietaris"
+    },
+    "status": {
+      "active": "Actiu",
+      "review": "Revisió"
+    }
+  },
+  "common": {
+    "skip_to_content": "Salta al contingut",
+    "loading": "Carregant…",
+    "back": "Tornar",
+    "close": "Tancar",
+    "open": "Obrir",
+    "open_menu": "Obrir menú",
+    "close_menu": "Tancar menú",
+    "main_nav": "Navegació principal",
+    "user_fallback": "Usuari",
+    "comingSoon": "Properament",
+    "comingSoonShort": "Aviat",
+    "language": "Idioma",
+    "change_language": "Canviar idioma"
+  },
+  "nav": {
+    "features": "Funcionalitats",
+    "how": "Com funciona",
+    "signin": "Inicia sessió",
+    "signup": "Crea un compte",
+    "my_portal": "El meu portal"
+  },
+  "hero": {
+    "eyebrow": "Inventari, no vendes",
+    "title_a": "Saber què tens,",
+    "title_b": "on",
+    "title_c": "i de qui.",
+    "sub": "Stocka és un inventari clar per als teus articles: què són, on estan ubicats, qui n'és el propietari real i tota la seva informació. Sense fulls de càlcul, sense caos.",
+    "cta_primary": "Comença gratis",
+    "cta_secondary": "Veure com funciona",
+    "trial": "14 dies de prova",
+    "no_card": "Sense targeta de crèdit",
+    "cancel": "Cancel·la quan vulguis"
+  },
+  "features": {
+    "eyebrow": "Funcionalitats",
+    "title": "Tot el que necessites per controlar el teu inventari.",
+    "sub": "Fet per a equips que necessiten saber què tenen i on ho tenen, sense muntar un ERP sencer.",
+    "items": {
+      "item": {
+        "title": "Fitxa completa per article",
+        "body": "Nom, descripció, número de sèrie, fotos i documents. Tota la informació en un sol lloc."
+      },
+      "location": {
+        "title": "Ubicació física",
+        "body": "Sala, prestatgeria, calaix… Defineix la jerarquia que millor encaixi i localitza qualsevol article a l'instant."
+      },
+      "owner": {
+        "title": "Propietari real",
+        "body": "Registra a qui pertany cada article, no només qui el custodia. Ideal per a actius compartits."
+      },
+      "category": {
+        "title": "Tipus i categories",
+        "body": "Classifica per tipus d'article i afegeix camps personalitzats segons la seva naturalesa. Sense rigideses."
+      },
+      "label": {
+        "title": "Codis i etiquetes",
+        "body": "Genera i imprimeix etiquetes amb QR o codi de barres. Escaneja amb el mòbil per veure la fitxa al moment."
+      },
+      "history": {
+        "title": "Historial i auditoria",
+        "body": "Cada moviment, trasllat o canvi de propietari queda registrat amb data i responsable."
+      }
+    }
+  },
+  "how": {
+    "eyebrow": "Com funciona",
+    "title": "Comença a inventariar en 10 minuts.",
+    "sub": "Importa el teu llistat, convida el teu equip i comença a registrar articles. Així de ràpid.",
+    "steps": {
+      "create": {
+        "title": "Crea els teus articles",
+        "body": "Puja un CSV o afegeix-los a mà. Defineix tipus, ubicacions i propietaris que s'ajustin al teu cas."
+      },
+      "invite": {
+        "title": "Convida el teu equip",
+        "body": "Afegeix els teus companys amb rols i permisos. Cadascú veu i edita el que li correspon."
+      },
+      "maintain": {
+        "title": "Mantén el registre viu",
+        "body": "Trasllats, canvis de propietari i actualitzacions des del mòbil o l'escriptori. Tot queda auditat."
+      }
+    }
+  },
+  "testimonial": {
+    "eyebrow": "Testimoni",
+    "label": "Testimoni",
+    "quote": "«Teníem el material repartit per oficines i ningú sabia què era de qui. Amb Stocka localitzem qualsevol article en segons i sempre sabem a qui pertany.»",
+    "author": "Laura Méndez",
+    "role": "Responsable d'operacions · Roble & Co."
+  },
+  "cta": {
+    "label": "Crida a l'acció",
+    "title": "Posa ordre al teu inventari avui.",
+    "sub": "Comença gratis, sense targeta. Crea el teu primer article en un parell de minuts i comprova si t'encaixa.",
+    "primary": "Crear compte gratis",
+    "secondary": "Inicia sessió"
+  },
+  "footer": {
+    "tagline": "Inventari senzill i honest per a equips que volen saber què tenen, on és i de qui és.",
+    "product": "Producte",
+    "company": "Empresa",
+    "account": "Compte",
+    "legal": "Legal",
+    "links": {
+      "features": "Funcionalitats",
+      "integrations": "Integracions",
+      "changelog": "Novetats",
+      "about": "Sobre nosaltres",
+      "blog": "Blog",
+      "contact": "Contacte",
+      "support": "Suport",
+      "signin": "Inicia sessió",
+      "signup": "Crea un compte",
+      "forgot": "Recuperar accés",
+      "privacy": "Privacitat",
+      "terms": "Termes",
+      "cookies": "Galetes"
+    },
+    "copyright": "© {year} Stocka · Fet amb cura"
+  },
+  "auth": {
+    "header": {
+      "new_here": "Nou per aquí?",
+      "already_customer": "Ja ets client?"
+    },
+    "footer_short": "© {year} Stocka",
+    "show_password": "Mostrar contrasenya",
+    "hide_password": "Ocultar contrasenya",
+    "strength": {
+      "label": "Seguretat",
+      "weak": "Feble",
+      "fair": "Acceptable",
+      "good": "Bona",
+      "strong": "Forta"
+    },
+    "login": {
+      "title": "Benvingut de nou",
+      "subtitle": "Accedeix a Stocka per continuar gestionant el teu inventari.",
+      "email": "Correu electrònic",
+      "email_placeholder": "tu\\@empresa.com",
+      "password": "Contrasenya",
+      "password_placeholder": "La teva contrasenya",
+      "forgot": "L'has oblidada?",
+      "submit": "Inicia sessió",
+      "no_account": "Encara no tens compte?",
+      "create_free": "Crea'n un de gratis",
+      "errors": {
+        "invalid": "Correu o contrasenya incorrectes.",
+        "generic": "No s'ha pogut iniciar sessió. Torna-ho a provar."
+      },
+      "reset_ok": "La teva contrasenya s'ha restablert. Inicia sessió amb la nova contrasenya.",
+      "page_title": "Inicia sessió"
+    },
+    "signup": {
+      "title": "Crea el teu compte",
+      "subtitle": "Comença a organitzar els teus articles en minuts. Sense targeta de crèdit.",
+      "first_name": "Nom",
+      "first_name_placeholder": "Lucía",
+      "last_name": "Cognoms",
+      "last_name_placeholder": "Méndez García",
+      "username": "Nom d'usuari",
+      "username_placeholder": "luciamendez",
+      "username_available": "\\@{username} està disponible",
+      "username_hint": "Únic a Stocka. Només lletres i nombres.",
+      "username_checking": "Comprovant disponibilitat…",
+      "username_taken": "Aquest nom d'usuari ja està en ús",
+      "username_reserved": "Aquest nom d'usuari està reservat",
+      "username_invalid": "Només lletres i nombres (3 a 24 caràcters)",
+      "email": "Correu electrònic",
+      "email_placeholder": "tu\\@empresa.com",
+      "password": "Contrasenya",
+      "password_placeholder": "Mínim 8 caràcters",
+      "accept_pre": "Accepto els",
+      "terms": "Termes",
+      "accept_mid": "i la",
+      "privacy": "Política de privacitat",
+      "accept_post": "de Stocka.",
+      "submit": "Crear compte",
+      "have_account": "Ja tens compte?",
+      "signin": "Inicia sessió",
+      "errors": {
+        "conflict": "Ja existeix un compte amb aquest correu o nom d'usuari.",
+        "generic": "No s'ha pogut crear el compte. Revisa les dades i torna-ho a provar."
+      },
+      "page_title": "Crear compte"
+    },
+    "forgot": {
+      "title": "Recupera l'accés",
+      "subtitle": "Introdueix el teu correu i t'enviarem un enllaç per crear una contrasenya nova.",
+      "submit": "Envia l'enllaç",
+      "remember_q": "Recordes la teva contrasenya?",
+      "back_signin": "Inicia sessió",
+      "errors": {
+        "generic": "No s'ha pogut enviar el correu. Torna-ho a provar en uns minuts."
+      },
+      "sent_title": "Revisa el teu correu",
+      "sent_subtitle": "Si {email} està registrat, rebràs en breu un enllaç per restablir la contrasenya. Revisa també la carpeta de correu brossa.",
+      "sent_back": "Tornar a l'inici de sessió",
+      "no_email": "No t'ha arribat?",
+      "retry": "Tornar-ho a provar",
+      "page_title": "Recuperar contrasenya"
+    },
+    "reset": {
+      "invalid_title": "Enllaç no vàlid",
+      "invalid_subtitle": "Aquest enllaç per restablir la contrasenya ha caducat o no és correcte.",
+      "request_new": "Sol·licitar-ne un de nou",
+      "title": "Crea una contrasenya nova",
+      "subtitle": "Tria una contrasenya segura per al teu compte de Stocka.",
+      "new_password": "Nova contrasenya",
+      "new_password_placeholder": "Mínim 8 caràcters",
+      "repeat_password": "Repeteix la contrasenya",
+      "repeat_password_placeholder": "Torna-la a escriure",
+      "mismatch": "Les contrasenyes no coincideixen.",
+      "submit": "Restablir contrasenya",
+      "errors": {
+        "expired": "L'enllaç ha caducat o no és vàlid. Sol·licita'n un de nou.",
+        "generic": "No s'ha pogut restablir la contrasenya. Torna-ho a provar."
+      },
+      "page_title": "Restablir contrasenya"
+    }
+  },
+  "dashboard": {
+    "page_title": "Resum",
+    "skip": "Salta al contingut",
+    "main_label": "Engrunes de pa",
+    "search_placeholder": "Cercar… (properament)",
+    "notifications": "Notificacions (properament)",
+    "help": "Ajuda",
+    "summary": "Resum",
+    "create_organization": "Crear organització",
+    "logout": "Tancar sessió",
+    "organization_label": "Organització",
+    "nav": {
+      "items": "Articles",
+      "locations": "Ubicacions",
+      "types": "Tipus d'article",
+      "team": "Equip",
+      "settings": "Configuració"
+    },
+    "header": {
+      "greeting_named": "Hola, {name} 👋",
+      "greeting_anonymous": "Benvingut a Stocka 👋",
+      "context_named": "Això és el que ha passat a {org}.",
+      "context_empty": "Crea la teva organització per començar a gestionar el teu inventari.",
+      "import_csv": "Importar CSV",
+      "new_item": "Nou article"
+    },
+    "stats": {
+      "items": "Articles",
+      "items_meta": "En total",
+      "locations": "Ubicacions",
+      "level_one": "nivell",
+      "level_many": "nivells",
+      "site_one": "seu",
+      "site_many": "seus",
+      "locations_empty": "Crea la primera",
+      "pending": "Pendents",
+      "pending_meta": "{count} en revisió",
+      "all_done": "Tot al dia"
+    },
+    "cards": {
+      "recent_items": "Articles recents",
+      "last_changes": "Últims canvis",
+      "locations": "Ubicacions",
+      "recent_activity": "Activitat recent"
+    },
+    "pieces_table": {
+      "col_item": "Article",
+      "col_type": "Tipus",
+      "col_status": "Estat",
+      "col_updated": "Actualitzat",
+      "status_pending": "En revisió",
+      "status_active": "Actiu",
+      "empty": "Encara no has afegit articles a aquesta organització. Quan en creïs algun, apareixerà aquí.",
+      "now": "Ara",
+      "minutes_ago": "Fa {min} min",
+      "hours_ago": "Fa {h} h",
+      "days_ago": "Fa {d} d"
+    },
+    "locations_tree": {
+      "empty": "Encara no hi ha ubicacions. Crea'n una per organitzar el teu inventari."
+    },
+    "activity": {
+      "soon_title": "Properament",
+      "soon_body": "L'historial de canvis del teu inventari apareixerà aquí."
+    },
+    "org": {
+      "switch_label": "Canviar organització",
+      "no_org": "Sense organització",
+      "create_new": "Nova organització",
+      "start_first_cta": "Comença creant la teva primera organització",
+      "roles": {
+        "OWNER": "Propietari",
+        "MANAGER": "Gestor",
+        "USER": "Membre",
+        "SPECTATOR": "Lectura"
+      }
+    },
+    "org_settings": {
+      "breadcrumb": "Configuració",
+      "title": "Configuració de l'organització",
+      "subtitle": "Canvia el nom o l'identificador de la teva organització. Només el propietari pot editar aquestes dades.",
+      "save": "Desar canvis",
+      "saved": "Canvis desats.",
+      "slug_current": "És l'identificador actual.",
+      "not_owner": "Només el propietari de l'organització pot editar aquests ajustaments.",
+      "errors": {
+        "forbidden": "No tens permisos per editar aquesta organització.",
+        "generic": "No s'han pogut desar els canvis. Torna-ho a provar."
+      }
+    },
+    "create_org": {
+      "first_title": "Crea la teva primera organització",
+      "first_subtitle": "El teu inventari viurà aquí. Podràs convidar el teu equip i crear més organitzacions quan vulguis.",
+      "title": "Crear nova organització",
+      "subtitle": "Un altre espai independent per gestionar inventari. Podràs canviar entre organitzacions des del menú lateral.",
+      "name": "Nom",
+      "name_placeholder": "Atelier Méndez",
+      "slug": "Identificador",
+      "slug_placeholder": "ateliermendez",
+      "slug_available": "Disponible",
+      "slug_hint": "Mínim 3 caràcters. Només lletres, nombres i guions.",
+      "slug_checking": "Comprovant disponibilitat…",
+      "slug_taken": "Aquest identificador ja està en ús",
+      "slug_reserved": "Aquest identificador està reservat",
+      "slug_invalid": "Només lletres minúscules, nombres i guions (3 a 40 caràcters)",
+      "submit": "Crear organització",
+      "cancel": "Cancel·la",
+      "errors": {
+        "conflict": "Aquest identificador ja està en ús. Prova'n un altre.",
+        "generic": "No s'ha pogut crear l'organització. Torna-ho a provar."
+      }
+    }
+  }
+}

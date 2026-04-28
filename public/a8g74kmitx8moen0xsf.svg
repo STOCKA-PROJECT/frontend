@@ -1,0 +1,5 @@
+<svg width="24" height="24" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Stocka">
+            <rect x="2" y="2" width="36" height="36" rx="6" stroke="currentColor" stroke-width="1.5" opacity="0.25" />
+            <rect x="8" y="8" width="24" height="24" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.55" />
+            <rect x="14" y="14" width="12" height="12" rx="2.5" fill="currentColor" />
+          </svg>

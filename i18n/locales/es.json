@@ -1,0 +1,355 @@
+{
+  "site": {
+    "name": "Stocka",
+    "description": "Inventario claro para tus artículos: qué son, dónde están y de quién son. Sin hojas de cálculo, sin caos."
+  },
+  "mock": {
+    "header_title": "Inventario",
+    "header_count": "· 248 artículos",
+    "synced": "Sincronizado",
+    "stats": {
+      "items": "Artículos",
+      "locations": "Ubicaciones",
+      "owners": "Propietarios"
+    },
+    "status": {
+      "active": "Activo",
+      "review": "Revisión"
+    }
+  },
+  "common": {
+    "skip_to_content": "Saltar al contenido",
+    "loading": "Cargando…",
+    "back": "Volver",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "open_menu": "Abrir menú",
+    "close_menu": "Cerrar menú",
+    "main_nav": "Navegación principal",
+    "user_fallback": "Usuario",
+    "comingSoon": "Próximamente",
+    "comingSoonShort": "Próx.",
+    "language": "Idioma",
+    "change_language": "Cambiar idioma"
+  },
+  "nav": {
+    "features": "Funcionalidades",
+    "how": "Cómo funciona",
+    "signin": "Iniciar sesión",
+    "signup": "Crear cuenta",
+    "my_portal": "Mi portal"
+  },
+  "hero": {
+    "eyebrow": "Inventario, no ventas",
+    "title_a": "Saber qué tienes,",
+    "title_b": "dónde",
+    "title_c": "y de quién.",
+    "sub": "Stocka es un inventario claro para tus artículos: qué son, dónde están ubicados, quién es el propietario real y toda su información. Sin hojas de cálculo, sin caos.",
+    "cta_primary": "Empieza gratis",
+    "cta_secondary": "Ver cómo funciona",
+    "trial": "14 días de prueba",
+    "no_card": "Sin tarjeta de crédito",
+    "cancel": "Cancela cuando quieras"
+  },
+  "features": {
+    "eyebrow": "Funcionalidades",
+    "title": "Todo lo que necesitas para controlar tu inventario.",
+    "sub": "Hecho para equipos que necesitan saber qué tienen y dónde lo tienen, sin montar un ERP entero.",
+    "items": {
+      "item": {
+        "title": "Ficha completa por artículo",
+        "body": "Nombre, descripción, número de serie, fotos y documentos. Toda la información en un solo sitio."
+      },
+      "location": {
+        "title": "Ubicación física",
+        "body": "Sala, estantería, cajón… Define la jerarquía que mejor encaje y localiza cualquier artículo al instante."
+      },
+      "owner": {
+        "title": "Propietario real",
+        "body": "Registra a quién pertenece cada artículo, no solo quién lo custodia. Ideal para activos compartidos."
+      },
+      "category": {
+        "title": "Tipos y categorías",
+        "body": "Clasifica por tipo de artículo y añade campos personalizados según su naturaleza. Sin rigideces."
+      },
+      "label": {
+        "title": "Códigos y etiquetas",
+        "body": "Genera e imprime etiquetas con QR o código de barras. Escanea con el móvil para ver la ficha al momento."
+      },
+      "history": {
+        "title": "Historial y auditoría",
+        "body": "Cada movimiento, traslado o cambio de propietario queda registrado con fecha y responsable."
+      }
+    }
+  },
+  "how": {
+    "eyebrow": "Cómo funciona",
+    "title": "Empieza a inventariar en 10 minutos.",
+    "sub": "Importa tu listado, invita a tu equipo y empieza a registrar artículos. Así de rápido.",
+    "steps": {
+      "create": {
+        "title": "Crea tus artículos",
+        "body": "Sube un CSV o añádelos a mano. Define tipos, ubicaciones y propietarios que se ajusten a tu caso."
+      },
+      "invite": {
+        "title": "Invita a tu equipo",
+        "body": "Añade a tus compañeros con roles y permisos. Cada uno ve y edita lo que le corresponde."
+      },
+      "maintain": {
+        "title": "Mantén el registro vivo",
+        "body": "Traslados, cambios de propietario y actualizaciones desde el móvil o el escritorio. Todo queda auditado."
+      }
+    }
+  },
+  "testimonial": {
+    "eyebrow": "Testimonio",
+    "label": "Testimonio",
+    "quote": "«Teníamos el material repartido por oficinas y nadie sabía qué era de quién. Con Stocka localizamos cualquier artículo en segundos y sabemos siempre a quién pertenece.»",
+    "author": "Laura Méndez",
+    "role": "Responsable de operaciones · Roble & Co."
+  },
+  "cta": {
+    "label": "Llamada a la acción",
+    "title": "Dale orden a tu inventario hoy.",
+    "sub": "Empieza gratis, sin tarjeta. Crea tu primer artículo en un par de minutos y comprueba si te encaja.",
+    "primary": "Crear cuenta gratis",
+    "secondary": "Iniciar sesión"
+  },
+  "footer": {
+    "tagline": "Inventario sencillo y honesto para equipos que quieren saber qué tienen, dónde está y de quién es.",
+    "product": "Producto",
+    "company": "Empresa",
+    "account": "Cuenta",
+    "legal": "Legal",
+    "links": {
+      "features": "Funcionalidades",
+      "integrations": "Integraciones",
+      "changelog": "Novedades",
+      "about": "Sobre nosotros",
+      "blog": "Blog",
+      "contact": "Contacto",
+      "support": "Soporte",
+      "signin": "Iniciar sesión",
+      "signup": "Crear cuenta",
+      "forgot": "Recuperar acceso",
+      "privacy": "Privacidad",
+      "terms": "Términos",
+      "cookies": "Cookies"
+    },
+    "copyright": "© {year} Stocka · Hecho con cuidado"
+  },
+  "auth": {
+    "header": {
+      "new_here": "¿Nuevo por aquí?",
+      "already_customer": "¿Ya eres cliente?"
+    },
+    "footer_short": "© {year} Stocka",
+    "show_password": "Mostrar contraseña",
+    "hide_password": "Ocultar contraseña",
+    "strength": {
+      "label": "Seguridad",
+      "weak": "Débil",
+      "fair": "Aceptable",
+      "good": "Buena",
+      "strong": "Fuerte"
+    },
+    "login": {
+      "title": "Bienvenido de vuelta",
+      "subtitle": "Accede a Stocka para seguir gestionando tu inventario.",
+      "email": "Correo electrónico",
+      "email_placeholder": "tu\\@empresa.com",
+      "password": "Contraseña",
+      "password_placeholder": "Tu contraseña",
+      "forgot": "¿La olvidaste?",
+      "submit": "Iniciar sesión",
+      "no_account": "¿Aún no tienes cuenta?",
+      "create_free": "Crea una gratis",
+      "errors": {
+        "invalid": "Correo o contraseña incorrectos.",
+        "generic": "No se ha podido iniciar sesión. Inténtalo de nuevo."
+      },
+      "reset_ok": "Tu contraseña se ha restablecido. Inicia sesión con tu nueva contraseña.",
+      "page_title": "Iniciar sesión"
+    },
+    "signup": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Empieza a organizar tus artículos en minutos. Sin tarjeta de crédito.",
+      "first_name": "Nombre",
+      "first_name_placeholder": "Lucía",
+      "last_name": "Apellidos",
+      "last_name_placeholder": "Méndez García",
+      "username": "Nombre de usuario",
+      "username_placeholder": "luciamendez",
+      "username_available": "\\@{username} está disponible",
+      "username_hint": "Único en Stocka. Solo letras y números.",
+      "username_checking": "Comprobando disponibilidad…",
+      "username_taken": "Ese nombre de usuario ya está en uso",
+      "username_reserved": "Ese nombre de usuario está reservado",
+      "username_invalid": "Solo letras y números (3 a 24 caracteres)",
+      "email": "Correo electrónico",
+      "email_placeholder": "tu\\@empresa.com",
+      "password": "Contraseña",
+      "password_placeholder": "Mínimo 8 caracteres",
+      "accept_pre": "Acepto los",
+      "terms": "Términos",
+      "accept_mid": "y la",
+      "privacy": "Política de privacidad",
+      "accept_post": "de Stocka.",
+      "submit": "Crear cuenta",
+      "have_account": "¿Ya tienes cuenta?",
+      "signin": "Inicia sesión",
+      "errors": {
+        "conflict": "Ya existe una cuenta con ese correo o nombre de usuario.",
+        "generic": "No se ha podido crear la cuenta. Revisa los datos e inténtalo de nuevo."
+      },
+      "page_title": "Crear cuenta"
+    },
+    "forgot": {
+      "title": "Recupera tu acceso",
+      "subtitle": "Introduce tu correo y te enviaremos un enlace para crear una nueva contraseña.",
+      "submit": "Enviar enlace",
+      "remember_q": "¿Recuerdas tu contraseña?",
+      "back_signin": "Inicia sesión",
+      "errors": {
+        "generic": "No se ha podido enviar el correo. Inténtalo en unos minutos."
+      },
+      "sent_title": "Revisa tu correo",
+      "sent_subtitle": "Si {email} está registrado, recibirás en un momento un enlace para restablecer tu contraseña. Revisa también la carpeta de spam.",
+      "sent_back": "Volver al inicio de sesión",
+      "no_email": "¿No te llegó?",
+      "retry": "Intentar de nuevo",
+      "page_title": "Recuperar contraseña"
+    },
+    "reset": {
+      "invalid_title": "Enlace no válido",
+      "invalid_subtitle": "Este enlace para restablecer la contraseña ha caducado o no es correcto.",
+      "request_new": "Solicitar uno nuevo",
+      "title": "Crea una nueva contraseña",
+      "subtitle": "Elige una contraseña segura para tu cuenta de Stocka.",
+      "new_password": "Nueva contraseña",
+      "new_password_placeholder": "Mínimo 8 caracteres",
+      "repeat_password": "Repite la contraseña",
+      "repeat_password_placeholder": "Vuelve a escribirla",
+      "mismatch": "Las contraseñas no coinciden.",
+      "submit": "Restablecer contraseña",
+      "errors": {
+        "expired": "El enlace ha caducado o no es válido. Solicita uno nuevo.",
+        "generic": "No se ha podido restablecer la contraseña. Inténtalo de nuevo."
+      },
+      "page_title": "Restablecer contraseña"
+    }
+  },
+  "dashboard": {
+    "page_title": "Resumen",
+    "skip": "Saltar al contenido",
+    "main_label": "Migas de pan",
+    "search_placeholder": "Buscar… (próximamente)",
+    "notifications": "Notificaciones (próximamente)",
+    "help": "Ayuda",
+    "summary": "Resumen",
+    "create_organization": "Crear organización",
+    "logout": "Cerrar sesión",
+    "organization_label": "Organización",
+    "nav": {
+      "items": "Artículos",
+      "locations": "Ubicaciones",
+      "types": "Tipos de artículo",
+      "team": "Equipo",
+      "settings": "Ajustes"
+    },
+    "header": {
+      "greeting_named": "Hola, {name} 👋",
+      "greeting_anonymous": "Bienvenido a Stocka 👋",
+      "context_named": "Esto es lo que ha pasado en {org}.",
+      "context_empty": "Crea tu organización para empezar a gestionar tu inventario.",
+      "import_csv": "Importar CSV",
+      "new_item": "Nuevo artículo"
+    },
+    "stats": {
+      "items": "Artículos",
+      "items_meta": "En total",
+      "locations": "Ubicaciones",
+      "level_one": "nivel",
+      "level_many": "niveles",
+      "site_one": "sede",
+      "site_many": "sedes",
+      "locations_empty": "Crea la primera",
+      "pending": "Pendientes",
+      "pending_meta": "{count} en revisión",
+      "all_done": "Todo al día"
+    },
+    "cards": {
+      "recent_items": "Artículos recientes",
+      "last_changes": "Últimos cambios",
+      "locations": "Ubicaciones",
+      "recent_activity": "Actividad reciente"
+    },
+    "pieces_table": {
+      "col_item": "Artículo",
+      "col_type": "Tipo",
+      "col_status": "Estado",
+      "col_updated": "Actualizado",
+      "status_pending": "En revisión",
+      "status_active": "Activo",
+      "empty": "Aún no has añadido artículos a esta organización. Cuando crees alguno, aparecerá aquí.",
+      "now": "Ahora",
+      "minutes_ago": "Hace {min} min",
+      "hours_ago": "Hace {h} h",
+      "days_ago": "Hace {d} d"
+    },
+    "locations_tree": {
+      "empty": "Aún no hay ubicaciones. Crea una para organizar tu inventario."
+    },
+    "activity": {
+      "soon_title": "Próximamente",
+      "soon_body": "El historial de cambios de tu inventario aparecerá aquí."
+    },
+    "org": {
+      "switch_label": "Cambiar organización",
+      "no_org": "Sin organización",
+      "create_new": "Nueva organización",
+      "start_first_cta": "Empieza creando tu primera organización",
+      "roles": {
+        "OWNER": "Propietario",
+        "MANAGER": "Gestor",
+        "USER": "Miembro",
+        "SPECTATOR": "Lectura"
+      }
+    },
+    "org_settings": {
+      "breadcrumb": "Ajustes",
+      "title": "Ajustes de la organización",
+      "subtitle": "Cambia el nombre o el identificador de tu organización. Solo el propietario puede editar estos datos.",
+      "save": "Guardar cambios",
+      "saved": "Cambios guardados.",
+      "slug_current": "Es el identificador actual.",
+      "not_owner": "Solo el propietario de la organización puede editar estos ajustes.",
+      "errors": {
+        "forbidden": "No tienes permisos para editar esta organización.",
+        "generic": "No se han podido guardar los cambios. Inténtalo de nuevo."
+      }
+    },
+    "create_org": {
+      "first_title": "Crea tu primera organización",
+      "first_subtitle": "Tu inventario vivirá aquí. Podrás invitar a tu equipo y crear más organizaciones cuando quieras.",
+      "title": "Crear nueva organización",
+      "subtitle": "Otro espacio independiente para gestionar inventario. Podrás cambiar entre organizaciones desde el menú lateral.",
+      "name": "Nombre",
+      "name_placeholder": "Atelier Méndez",
+      "slug": "Identificador",
+      "slug_placeholder": "ateliermendez",
+      "slug_available": "Disponible",
+      "slug_hint": "Mínimo 3 caracteres. Solo letras, números y guiones.",
+      "slug_checking": "Comprobando disponibilidad…",
+      "slug_taken": "Ese identificador ya está en uso",
+      "slug_reserved": "Ese identificador está reservado",
+      "slug_invalid": "Solo letras minúsculas, números y guiones (3 a 40 caracteres)",
+      "submit": "Crear organización",
+      "cancel": "Cancelar",
+      "errors": {
+        "conflict": "Ese identificador ya está en uso. Prueba con otro.",
+        "generic": "No se ha podido crear la organización. Inténtalo de nuevo."
+      }
+    }
+  }
+}
