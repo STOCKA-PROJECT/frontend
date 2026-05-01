@@ -31,7 +31,12 @@
     "comingSoon": "Coming soon",
     "comingSoonShort": "Soon",
     "language": "Language",
-    "change_language": "Change language"
+    "change_language": "Change language",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No"
   },
   "nav": {
     "features": "Features",
@@ -290,7 +295,7 @@
       "col_type": "Type",
       "col_status": "Status",
       "col_updated": "Updated",
-      "status_pending": "Under review",
+      "status_pending": "Pending",
       "status_active": "Active",
       "empty": "You haven't added any items to this organization yet. When you create one, it will appear here.",
       "now": "Now",
@@ -533,6 +538,120 @@
         "leave": "Couldn't leave the organization.",
         "generic": "Something went wrong. Please try again."
       }
+    },
+    "pagination": {
+      "size": "Size",
+      "total": "Total: {n}",
+      "prev": "Previous",
+      "next": "Next",
+      "page_of": "Page {current} of {total}"
+    },
+    "pieces": {
+      "page_title": "Items",
+      "page_subtitle": "Manage your organization's inventory: create items, edit their attributes, and review their history.",
+      "back_to_list": "Back to items",
+      "tabs_aria": "Item tabs",
+      "unassigned_location": "No location",
+      "no_owner": "No owner",
+      "total_count": "{n} items total | {n} item | {n} items",
+      "actions": {
+        "new": "New item",
+        "edit": "Edit",
+        "delete": "Delete",
+        "download": "Download",
+        "row_menu": "Actions"
+      },
+      "filters": {
+        "search": "Search",
+        "search_placeholder": "Search by name or description…",
+        "type": "Type",
+        "location": "Location",
+        "owner": "Owner",
+        "status": "Status",
+        "all": "All",
+        "clear": "Clear filters"
+      },
+      "form": {
+        "title_create": "New item",
+        "subtitle": "Choose a type and fill in the attributes. You can leave fields empty; required ones will mark the item as pending.",
+        "field_type": "Item type",
+        "type_placeholder": "Choose a type…",
+        "field_name": "Name",
+        "field_description": "Description",
+        "field_location": "Location",
+        "field_owner": "Owner",
+        "field_status": "Status",
+        "unassigned": "No location",
+        "no_owner": "No owner",
+        "attributes_section": "Type attributes",
+        "submit_create": "Create item",
+        "field_types": "Item types",
+        "types_help": "Pick one or more types. Their attributes are combined in the form. | {n} type selected | {n} types selected",
+        "no_types_yet": "You haven’t created any item types yet. Add one from “Item types” before creating items."
+      },
+      "info": {
+        "section_basic": "Information",
+        "section_attributes": "Attributes"
+      },
+      "attribute": {
+        "select_placeholder": "Choose…"
+      },
+      "tabs": {
+        "info": "Information",
+        "attachments": "Attachments",
+        "history": "History"
+      },
+      "attachments": {
+        "images_title": "Images",
+        "images_empty": "No images yet. Upload one to see it here.",
+        "documents_title": "Documents",
+        "documents_empty": "No documents yet.",
+        "upload_image": "Upload image",
+        "upload_document": "Upload document",
+        "uploading": "Uploading…",
+        "confirm_delete_title": "Delete attachment",
+        "confirm_delete_body": "Delete the attachment \"{name}\"? This action cannot be undone.",
+        "errors": {
+          "too_large_local": "The file \"{file}\" exceeds the {max} limit.",
+          "upload": "The file could not be uploaded.",
+          "download": "The file could not be downloaded.",
+          "delete": "The attachment could not be deleted."
+        }
+      },
+      "history": {
+        "empty": "No activity for this item yet.",
+        "by_actor": "by {actor}",
+        "before": "Before",
+        "after": "After",
+        "unknown_actor": "Unknown",
+        "removed_actor": "Deleted user",
+        "action": {
+          "PIECE_CREATED": "Item created",
+          "PIECE_UPDATED": "Item updated",
+          "PIECE_DELETED": "Item deleted",
+          "OWNER_CHANGED": "Owner changed",
+          "LOCATION_CHANGED": "Location changed",
+          "STATUS_CHANGED": "Status changed",
+          "ATTRIBUTE_VALUE_CHANGED": "Attribute changed",
+          "ATTACHMENT_ADDED": "Attachment added",
+          "ATTACHMENT_REMOVED": "Attachment removed"
+        }
+      },
+      "confirm": {
+        "delete_title": "Delete item",
+        "delete_body": "Are you sure you want to delete \"{name}\"? This action cannot be undone."
+      },
+      "errors": {
+        "load_list": "Items could not be loaded.",
+        "load_detail": "The item could not be loaded.",
+        "load_history": "History could not be loaded.",
+        "save": "The item could not be saved.",
+        "delete": "The item could not be deleted.",
+        "name_required": "Name is required.",
+        "type_required": "You must choose an item type.",
+        "not_found": "Item not found."
+      },
+      "new_breadcrumb": "New"
     }
   },
   "invitations": {

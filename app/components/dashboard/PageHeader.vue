@@ -2,10 +2,16 @@
 const { t } = useI18n()
 const auth = useAuthStore()
 const orgs = useOrganizationsStore()
+const localePath = useLocalePath()
 
 const greeting = computed(() => {
   const name = auth.user?.name?.trim()
   return name ? t('dashboard.header.greeting_named', { name }) : t('dashboard.header.greeting_anonymous')
+})
+
+const canCreatePieces = computed(() => {
+  const role = orgs.current?.currentUserRole
+  return role === 'OWNER' || role === 'MANAGER' || role === 'USER'
 })
 </script>
 
@@ -33,7 +39,20 @@ const greeting = computed(() => {
         <DashboardIcon name="upload" :size="14" />
         {{ t('dashboard.header.import_csv') }}
       </button>
-      <button class="header-btn header-btn-primary" disabled :title="t('common.comingSoon')">
+      <NuxtLink
+        v-if="canCreatePieces"
+        :to="localePath('/dashboard/articulos/nuevo')"
+        class="header-btn header-btn-primary"
+      >
+        <DashboardIcon name="plus" :size="14" />
+        {{ t('dashboard.header.new_item') }}
+      </NuxtLink>
+      <button
+        v-else
+        class="header-btn header-btn-primary"
+        disabled
+        :title="t('errors.auth.forbidden')"
+      >
         <DashboardIcon name="plus" :size="14" />
         {{ t('dashboard.header.new_item') }}
       </button>
@@ -55,18 +74,27 @@ const greeting = computed(() => {
   letter-spacing: -0.005em;
   white-space: nowrap;
   border: 0;
+  cursor: pointer;
+  transition: background .15s, box-shadow .15s, border-color .15s, opacity .15s;
+}
+.header-btn[disabled] {
   cursor: not-allowed;
   opacity: .65;
-  transition: background .15s, box-shadow .15s, border-color .15s;
 }
 .header-btn-primary {
   background: var(--c-ink);
   color: var(--c-bg-card);
   box-shadow: var(--shadow-sm);
 }
+.header-btn-primary:hover:not([disabled]) {
+  background: color-mix(in oklab, var(--c-ink) 88%, transparent);
+}
 .header-btn-outline {
   background: transparent;
   color: var(--c-ink);
   border: 1px solid var(--c-line-strong);
+}
+.header-btn-outline:hover:not([disabled]) {
+  background: var(--c-bg-soft);
 }
 </style>

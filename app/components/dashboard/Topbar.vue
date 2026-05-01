@@ -3,16 +3,40 @@ const { t } = useI18n()
 const orgs = useOrganizationsStore()
 const route = useRoute()
 
-const lastSegment = computed(() => route.path.split('/').filter(Boolean).pop())
+const segments = computed(() => route.path.split('/').filter(Boolean))
+const lastSegment = computed(() => segments.value[segments.value.length - 1])
 
-const here = computed(() => {
-  const last = lastSegment.value
-  if (last === 'dashboard') return t('dashboard.summary')
-  if (last === 'crear-organizacion') return t('dashboard.create_organization')
-  if (last === 'ajustes-organizacion') return t('dashboard.org_settings.breadcrumb')
-  if (last === 'ubicaciones') return t('dashboard.nav.locations')
-  if (last === 'equipo') return t('dashboard.nav.team')
+function labelFor(segment: string): string {
+  if (segment === 'dashboard') return t('dashboard.summary')
+  if (segment === 'crear-organizacion') return t('dashboard.create_organization')
+  if (segment === 'ajustes-organizacion') return t('dashboard.org_settings.breadcrumb')
+  if (segment === 'ubicaciones') return t('dashboard.nav.locations')
+  if (segment === 'equipo') return t('dashboard.nav.team')
+  if (segment === 'tipos-articulos') return t('dashboard.nav.types')
+  if (segment === 'articulos') return t('dashboard.nav.items')
+  if (segment === 'nuevo') return t('dashboard.pieces.new_breadcrumb')
   return ''
+}
+
+const here = computed<string[]>(() => {
+  const segs = segments.value
+  // Filtra prefijos de locale (en, ca) y la raíz "dashboard"
+  const startIdx = segs[0] === 'en' || segs[0] === 'ca' ? 1 : 0
+  if (segs[startIdx] !== 'dashboard') return []
+  const rest = segs.slice(startIdx + 1)
+  if (rest.length === 0) return [t('dashboard.summary')]
+
+  const parts: string[] = []
+  for (let i = 0; i < rest.length; i++) {
+    const seg = rest[i]!
+    const lbl = labelFor(seg)
+    if (lbl) {
+      parts.push(lbl)
+      continue
+    }
+    // Segmento dinámico (id numérico): no aporta label
+  }
+  return parts
 })
 
 const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
@@ -22,9 +46,9 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
   <header class="sticky top-0 z-20 flex h-topbar items-center gap-4 border-b border-line bg-bg/85 px-6 backdrop-blur-md max-md:px-4">
     <nav :aria-label="t('dashboard.main_label')" class="flex min-w-0 items-center gap-1.5 text-[13.5px] text-ink-soft">
       <span v-if="showOrg && orgs.current" class="hover:text-ink truncate">{{ orgs.current.name }}</span>
-      <template v-if="here">
+      <template v-for="(part, idx) in here" :key="`${idx}-${part}`">
         <span aria-hidden="true" class="text-ink-muted">/</span>
-        <span class="font-medium text-ink truncate">{{ here }}</span>
+        <span :class="idx === here.length - 1 ? 'font-medium text-ink truncate' : 'truncate'">{{ part }}</span>
       </template>
     </nav>
 

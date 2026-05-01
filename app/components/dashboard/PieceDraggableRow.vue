@@ -13,7 +13,17 @@ const { onDragStart, onDragEnd, dragging } = useDragSource(
   { disabled: () => !props.draggable }
 )
 
-const thumbVariant = computed(() => `t-${(props.piece.pieceTypeId % 5) + 1}`)
+const thumbVariant = computed(() => {
+  const seed = props.piece.pieceTypes[0]?.id ?? props.piece.id
+  return `t-${(seed % 5) + 1}`
+})
+
+const typeLabel = computed(() => {
+  const types = props.piece.pieceTypes
+  if (types.length === 0) return ''
+  if (types.length === 1) return types[0]!.name
+  return `${types[0]!.name} +${types.length - 1}`
+})
 
 const dateLocale = computed(() => {
   const l = locale.value as string
@@ -67,7 +77,7 @@ const updatedAtLabel = computed(() => {
 
     <div class="min-w-0 flex-1">
       <div class="truncate text-[13.5px] font-medium text-ink">{{ piece.name }}</div>
-      <div class="truncate text-[11.5px] text-ink-muted">{{ piece.pieceTypeName }}</div>
+      <div class="truncate text-[11.5px] text-ink-muted">{{ typeLabel }}</div>
     </div>
 
     <span :class="['tag flex-shrink-0', statusClass]">

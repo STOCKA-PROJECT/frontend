@@ -1,14 +1,34 @@
 <script setup lang="ts">
 import type { PieceListItemDto } from '~/types/api'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   pieces: PieceListItemDto[]
   loading?: boolean
+  showLocation?: boolean
+  showOwner?: boolean
+  canWrite?: boolean
+  linkTo?: (piece: PieceListItemDto) => string
+  locationName?: (id?: number) => string | undefined
+  ownerName?: (id?: number) => string | undefined
+}>(), {
+  loading: false,
+  showLocation: false,
+  showOwner: false,
+  canWrite: false
+})
+
+const emit = defineEmits<{
+  delete: [piece: PieceListItemDto]
+  open: [piece: PieceListItemDto]
 }>()
 
 const { t, locale } = useI18n()
+const router = useRouter()
 
-const thumbVariant = (id: number) => `t-${(id % 5) + 1}` as const
+const thumbVariant = (piece: PieceListItemDto) => {
+  const seed = piece.pieceTypes[0]?.id ?? piece.id
+  return `t-${(seed % 5) + 1}` as const
+}
 
 const dateLocale = computed(() => {
   const l = locale.value as string
@@ -35,6 +55,35 @@ function relativeDate(iso: string): string {
 }
 
 const isEmpty = computed(() => !props.loading && props.pieces.length === 0)
+const isInteractive = computed(() => Boolean(props.linkTo))
+
+function locationLabel(id?: number): string {
+  if (id == null) return t('dashboard.pieces.unassigned_location')
+  return props.locationName?.(id) ?? `#${id}`
+}
+function ownerLabel(id?: number): string {
+  if (id == null) return t('dashboard.pieces.no_owner')
+  return props.ownerName?.(id) ?? `#${id}`
+}
+
+function onRowClick(piece: PieceListItemDto) {
+  if (!props.linkTo) return
+  emit('open', piece)
+  void router.push(props.linkTo(piece))
+}
+
+function onRowKey(e: KeyboardEvent, piece: PieceListItemDto) {
+  if (!props.linkTo) return
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    onRowClick(piece)
+  }
+}
+
+function onDelete(e: MouseEvent, piece: PieceListItemDto) {
+  e.stopPropagation()
+  emit('delete', piece)
+}
 </script>
 
 <template>
@@ -44,8 +93,11 @@ const isEmpty = computed(() => !props.loading && props.pieces.length === 0)
         <tr>
           <th class="th">{{ t('dashboard.pieces_table.col_item') }}</th>
           <th class="th">{{ t('dashboard.pieces_table.col_type') }}</th>
+          <th v-if="showLocation" class="th">{{ t('dashboard.pieces.filters.location') }}</th>
+          <th v-if="showOwner" class="th">{{ t('dashboard.pieces.filters.owner') }}</th>
           <th class="th">{{ t('dashboard.pieces_table.col_status') }}</th>
           <th class="th">{{ t('dashboard.pieces_table.col_updated') }}</th>
+          <th v-if="canWrite" class="th th-actions"><span class="sr-only">{{ t('dashboard.pieces.actions.delete') }}</span></th>
         </tr>
       </thead>
       <tbody>
@@ -53,15 +105,26 @@ const isEmpty = computed(() => !props.loading && props.pieces.length === 0)
           <tr v-for="i in 4" :key="`s-${i}`">
             <td class="td"><span class="block h-5 w-48 animate-pulse rounded bg-bg-soft" /></td>
             <td class="td"><span class="block h-4 w-24 animate-pulse rounded bg-bg-soft" /></td>
+            <td v-if="showLocation" class="td"><span class="block h-4 w-24 animate-pulse rounded bg-bg-soft" /></td>
+            <td v-if="showOwner" class="td"><span class="block h-4 w-24 animate-pulse rounded bg-bg-soft" /></td>
             <td class="td"><span class="block h-5 w-20 animate-pulse rounded bg-bg-soft" /></td>
             <td class="td"><span class="block h-4 w-16 animate-pulse rounded bg-bg-soft" /></td>
+            <td v-if="canWrite" class="td" />
           </tr>
         </template>
         <template v-else>
-          <tr v-for="p in pieces" :key="p.id" class="row">
+          <tr
+            v-for="p in pieces"
+            :key="p.id"
+            class="row"
+            :class="{ 'row-interactive': isInteractive }"
+            :tabindex="isInteractive ? 0 : -1"
+            @click="onRowClick(p)"
+            @keydown="(e) => onRowKey(e, p)"
+          >
             <td class="td">
               <div class="flex min-w-0 items-center gap-3">
-                <div :class="['piece-thumb flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-lg text-bg-card', thumbVariant(p.pieceTypeId)]">
+                <div :class="['piece-thumb flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-lg text-bg-card', thumbVariant(p)]">
                   <DashboardIcon name="box" :size="16" />
                 </div>
                 <div class="min-w-0">
@@ -71,7 +134,16 @@ const isEmpty = computed(() => !props.loading && props.pieces.length === 0)
               </div>
             </td>
             <td class="td">
-              <span class="text-ink-soft">{{ p.pieceTypeName }}</span>
+              <div v-if="p.pieceTypes.length > 0" class="flex flex-wrap gap-1">
+                <span v-for="t in p.pieceTypes" :key="t.id" class="type-chip">{{ t.name }}</span>
+              </div>
+              <span v-else class="text-ink-muted">—</span>
+            </td>
+            <td v-if="showLocation" class="td">
+              <span class="text-ink-soft">{{ locationLabel(p.locationId) }}</span>
+            </td>
+            <td v-if="showOwner" class="td">
+              <span class="text-ink-soft">{{ ownerLabel(p.ownerUserId) }}</span>
             </td>
             <td class="td">
               <span :class="['tag', statusClass(p.status)]">
@@ -80,6 +152,17 @@ const isEmpty = computed(() => !props.loading && props.pieces.length === 0)
             </td>
             <td class="td">
               <span class="text-[12.5px] text-ink-muted">{{ relativeDate(p.updatedAt) }}</span>
+            </td>
+            <td v-if="canWrite" class="td td-actions">
+              <button
+                type="button"
+                class="trash-btn"
+                :aria-label="t('dashboard.pieces.actions.delete')"
+                :title="t('dashboard.pieces.actions.delete')"
+                @click="(e) => onDelete(e, p)"
+              >
+                <DashboardIcon name="trash" :size="15" />
+              </button>
             </td>
           </tr>
         </template>
@@ -109,14 +192,18 @@ const isEmpty = computed(() => !props.loading && props.pieces.length === 0)
   background: var(--c-bg-soft);
   border-bottom: 1px solid var(--c-line);
 }
+.th-actions { width: 48px; }
 .td {
   padding: 14px 20px;
   border-bottom: 1px solid var(--c-line);
   vertical-align: middle;
 }
+.td-actions { padding: 14px 12px; width: 48px; }
 .row:last-child .td { border-bottom: 0; }
 .row { transition: background .12s; }
 .row:hover { background: var(--c-bg-soft); }
+.row-interactive { cursor: pointer; }
+.row-interactive:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -2px; background: var(--c-bg-soft); }
 
 .piece-thumb.t-1 { background: linear-gradient(135deg, #dccfb8, #c8b89c); }
 .piece-thumb.t-2 { background: linear-gradient(135deg, #cdd9c8, #a8baa3); }
@@ -142,4 +229,47 @@ const isEmpty = computed(() => !props.loading && props.pieces.length === 0)
 }
 .tag-ok { background: var(--c-accent-soft); color: var(--c-accent-ink); }
 .tag-warn { background: var(--c-warn-soft); color: #8a6324; }
+
+.type-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-bg-soft);
+  border: 1px solid var(--c-line);
+  font-size: 11.5px;
+  color: var(--c-ink-soft);
+  white-space: nowrap;
+}
+
+.trash-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--c-ink-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .12s, border-color .12s, color .12s;
+}
+.trash-btn:hover {
+  background: color-mix(in oklab, var(--c-danger) 8%, transparent);
+  border-color: color-mix(in oklab, var(--c-danger) 30%, transparent);
+  color: var(--c-danger);
+}
+.trash-btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 1px; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 </style>

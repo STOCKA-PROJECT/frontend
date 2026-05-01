@@ -31,7 +31,12 @@
     "comingSoon": "Próximamente",
     "comingSoonShort": "Próx.",
     "language": "Idioma",
-    "change_language": "Cambiar idioma"
+    "change_language": "Cambiar idioma",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "cancel": "Cancelar",
+    "yes": "Sí",
+    "no": "No"
   },
   "nav": {
     "features": "Funcionalidades",
@@ -290,7 +295,7 @@
       "col_type": "Tipo",
       "col_status": "Estado",
       "col_updated": "Actualizado",
-      "status_pending": "En revisión",
+      "status_pending": "Pendiente",
       "status_active": "Activo",
       "empty": "Aún no has añadido artículos a esta organización. Cuando crees alguno, aparecerá aquí.",
       "now": "Ahora",
@@ -533,6 +538,120 @@
         "leave": "No se ha podido abandonar la organización.",
         "generic": "Algo ha fallado. Inténtalo de nuevo."
       }
+    },
+    "pagination": {
+      "size": "Tamaño",
+      "total": "Total: {n}",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "page_of": "Página {current} de {total}"
+    },
+    "pieces": {
+      "page_title": "Artículos",
+      "page_subtitle": "Gestiona el inventario de tu organización: crea artículos, edita sus atributos y consulta su historial.",
+      "back_to_list": "Volver a artículos",
+      "tabs_aria": "Pestañas del artículo",
+      "unassigned_location": "Sin ubicación",
+      "no_owner": "Sin propietario",
+      "total_count": "{n} artículos en total | {n} artículo | {n} artículos",
+      "actions": {
+        "new": "Nuevo artículo",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "download": "Descargar",
+        "row_menu": "Acciones"
+      },
+      "filters": {
+        "search": "Buscar",
+        "search_placeholder": "Buscar por nombre o descripción…",
+        "type": "Tipo",
+        "location": "Ubicación",
+        "owner": "Propietario",
+        "status": "Estado",
+        "all": "Todos",
+        "clear": "Limpiar filtros"
+      },
+      "form": {
+        "title_create": "Nuevo artículo",
+        "subtitle": "Selecciona el tipo y completa los atributos. Puedes dejar campos en blanco; los obligatorios marcarán el artículo como pendiente.",
+        "field_type": "Tipo de artículo",
+        "type_placeholder": "Selecciona un tipo…",
+        "field_name": "Nombre",
+        "field_description": "Descripción",
+        "field_location": "Ubicación",
+        "field_owner": "Propietario",
+        "field_status": "Estado",
+        "unassigned": "Sin ubicación",
+        "no_owner": "Sin propietario",
+        "attributes_section": "Atributos del tipo",
+        "submit_create": "Crear artículo",
+        "field_types": "Tipos de artículo",
+        "types_help": "Selecciona uno o más tipos. Sus atributos se combinan en el formulario. | {n} tipo seleccionado | {n} tipos seleccionados",
+        "no_types_yet": "Aún no has creado ningún tipo de artículo. Crea uno desde “Tipos de artículo” antes de añadir artículos."
+      },
+      "info": {
+        "section_basic": "Información",
+        "section_attributes": "Atributos"
+      },
+      "attribute": {
+        "select_placeholder": "Selecciona…"
+      },
+      "tabs": {
+        "info": "Información",
+        "attachments": "Adjuntos",
+        "history": "Historial"
+      },
+      "attachments": {
+        "images_title": "Imágenes",
+        "images_empty": "Aún no hay imágenes. Sube la primera para verla aquí.",
+        "documents_title": "Documentos",
+        "documents_empty": "Aún no hay documentos.",
+        "upload_image": "Subir imagen",
+        "upload_document": "Subir documento",
+        "uploading": "Subiendo…",
+        "confirm_delete_title": "Eliminar adjunto",
+        "confirm_delete_body": "¿Eliminar el adjunto \"{name}\"? Esta acción no se puede deshacer.",
+        "errors": {
+          "too_large_local": "El archivo \"{file}\" supera el máximo de {max}.",
+          "upload": "No se ha podido subir el archivo.",
+          "download": "No se ha podido descargar el archivo.",
+          "delete": "No se ha podido eliminar el adjunto."
+        }
+      },
+      "history": {
+        "empty": "Aún no hay actividad para este artículo.",
+        "by_actor": "por {actor}",
+        "before": "Antes",
+        "after": "Ahora",
+        "unknown_actor": "Desconocido",
+        "removed_actor": "Usuario eliminado",
+        "action": {
+          "PIECE_CREATED": "Artículo creado",
+          "PIECE_UPDATED": "Artículo actualizado",
+          "PIECE_DELETED": "Artículo eliminado",
+          "OWNER_CHANGED": "Cambio de propietario",
+          "LOCATION_CHANGED": "Cambio de ubicación",
+          "STATUS_CHANGED": "Cambio de estado",
+          "ATTRIBUTE_VALUE_CHANGED": "Atributo modificado",
+          "ATTACHMENT_ADDED": "Adjunto añadido",
+          "ATTACHMENT_REMOVED": "Adjunto eliminado"
+        }
+      },
+      "confirm": {
+        "delete_title": "Eliminar artículo",
+        "delete_body": "¿Seguro que quieres eliminar \"{name}\"? Esta acción no se puede deshacer."
+      },
+      "errors": {
+        "load_list": "No se han podido cargar los artículos.",
+        "load_detail": "No se ha podido cargar el artículo.",
+        "load_history": "No se ha podido cargar el historial.",
+        "save": "No se ha podido guardar el artículo.",
+        "delete": "No se ha podido eliminar el artículo.",
+        "name_required": "El nombre es obligatorio.",
+        "type_required": "Debes seleccionar un tipo de artículo.",
+        "not_found": "Artículo no encontrado."
+      },
+      "new_breadcrumb": "Nuevo"
     }
   },
   "invitations": {

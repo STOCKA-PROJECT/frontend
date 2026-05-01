@@ -82,11 +82,15 @@ export interface UpdateOrganizationDto {
   slug?: string
 }
 
+export interface PieceTypeRefDto {
+  id: number
+  name: string
+}
+
 export interface PieceListItemDto {
   id: number
   name: string
-  pieceTypeId: number
-  pieceTypeName: string
+  pieceTypes: PieceTypeRefDto[]
   ownerUserId?: number
   locationId?: number
   status: PieceStatus
@@ -164,6 +168,98 @@ export interface UpdateLocationDto {
 export interface UpdatePieceLocationDto {
   locationId?: number
   clearLocation?: boolean
+}
+
+export type PieceAttachmentKind = 'IMAGE' | 'DOCUMENT'
+
+export type PieceHistoryAction =
+  | 'PIECE_CREATED'
+  | 'PIECE_UPDATED'
+  | 'PIECE_DELETED'
+  | 'OWNER_CHANGED'
+  | 'LOCATION_CHANGED'
+  | 'STATUS_CHANGED'
+  | 'ATTRIBUTE_VALUE_CHANGED'
+  | 'ATTACHMENT_ADDED'
+  | 'ATTACHMENT_REMOVED'
+
+export interface AttributeValueInputDto {
+  attributeId: number
+  value: string | null
+}
+
+export interface PieceAttributeValueResponseDto {
+  attributeId: number
+  attributeName: string
+  displayName: string
+  type: AttributeType
+  value: string | null
+}
+
+export interface PieceAttachmentResponseDto {
+  id: number
+  kind: PieceAttachmentKind
+  originalFilename: string
+  mimeType: string
+  sizeBytes: number
+  uploadedByUserId?: number
+  createdAt: string
+}
+
+export interface PieceResponseDto {
+  id: number
+  organizationId: number
+  name: string
+  description?: string
+  pieceTypes: PieceTypeRefDto[]
+  ownerUserId?: number
+  locationId?: number
+  status: PieceStatus
+  createdAt: string
+  updatedAt: string
+  attributeValues: PieceAttributeValueResponseDto[]
+  attachments: PieceAttachmentResponseDto[]
+}
+
+export interface CreatePieceDto {
+  name: string
+  description?: string
+  pieceTypeIds: number[]
+  ownerUserId?: number
+  locationId?: number
+  attributeValues?: AttributeValueInputDto[]
+}
+
+export interface UpdatePieceDto {
+  name?: string
+  description?: string
+  pieceTypeIds?: number[]
+  ownerUserId?: number
+  clearOwner?: boolean
+  locationId?: number
+  clearLocation?: boolean
+  attributeValues?: AttributeValueInputDto[]
+}
+
+export interface PieceHistoryItemDto {
+  id: number
+  actorUserId?: number
+  action: PieceHistoryAction
+  fieldName?: string
+  oldValue?: string
+  newValue?: string
+  createdAt: string
+}
+
+export interface PieceListFilters {
+  typeId?: number
+  locationId?: number
+  ownerUserId?: number
+  status?: PieceStatus
+  q?: string
+  page?: number
+  size?: number
+  sort?: string
 }
 
 export type AttributeType =

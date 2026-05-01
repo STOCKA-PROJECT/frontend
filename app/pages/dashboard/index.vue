@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { LocationTreeNodeDto, PagePieceListItemDto } from '~/types/api'
+import type { LocationTreeNodeDto, PagePieceListItemDto, PieceListItemDto } from '~/types/api'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -90,6 +90,10 @@ const totalPending = computed(() => pendingPage.value?.totalElements ?? 0)
 const totalLocations = computed(() => countNodes(locationsTree.value ?? []))
 const rootLocations = computed(() => (locationsTree.value ?? []).length)
 const depth = computed(() => maxDepth(locationsTree.value ?? []))
+
+function pieceLink(piece: PieceListItemDto): string {
+  return localePath(`/dashboard/articulos/${piece.id}`)
+}
 </script>
 
 <template>
@@ -146,6 +150,7 @@ const depth = computed(() => maxDepth(locationsTree.value ?? []))
         <DashboardPiecesTable
           :pieces="pieces?.content ?? []"
           :loading="piecesPending"
+          :link-to="pieceLink"
         />
       </DashboardCard>
 

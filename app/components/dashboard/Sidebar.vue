@@ -18,9 +18,7 @@ const userFullName = computed(() => {
 const menuOpen = shallowRef(false)
 const userMenuRef = ref<HTMLElement | null>(null)
 
-const inactiveItems = computed(() => [
-  { label: t('dashboard.nav.items'), icon: 'box' }
-])
+const inactiveItems = computed(() => [] as Array<{ label: string; icon: string }>)
 
 function onDocClick(e: MouseEvent) {
   if (!userMenuRef.value) return
@@ -75,6 +73,12 @@ async function handleLogout() {
           <rect x="3" y="14" width="7" height="7" rx="1" />
         </svg>
         <span>{{ t('dashboard.summary') }}</span>
+      </NuxtLink>
+
+      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/articulos')" active-class="is-active"
+        class="nav-item">
+        <DashboardIcon name="box" />
+        <span>{{ t('dashboard.nav.items') }}</span>
       </NuxtLink>
 
       <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/ubicaciones')" exact-active-class="is-active"

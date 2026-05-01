@@ -31,7 +31,12 @@
     "comingSoon": "Properament",
     "comingSoonShort": "Aviat",
     "language": "Idioma",
-    "change_language": "Canviar idioma"
+    "change_language": "Canviar idioma",
+    "save": "Desa",
+    "saving": "Desant…",
+    "cancel": "Cancel·la",
+    "yes": "Sí",
+    "no": "No"
   },
   "nav": {
     "features": "Funcionalitats",
@@ -290,7 +295,7 @@
       "col_type": "Tipus",
       "col_status": "Estat",
       "col_updated": "Actualitzat",
-      "status_pending": "En revisió",
+      "status_pending": "Pendent",
       "status_active": "Actiu",
       "empty": "Encara no has afegit articles a aquesta organització. Quan en creïs algun, apareixerà aquí.",
       "now": "Ara",
@@ -533,6 +538,120 @@
         "leave": "No s'ha pogut abandonar l'organització.",
         "generic": "Alguna cosa ha fallat. Torna-ho a provar."
       }
+    },
+    "pagination": {
+      "size": "Mida",
+      "total": "Total: {n}",
+      "prev": "Anterior",
+      "next": "Següent",
+      "page_of": "Pàgina {current} de {total}"
+    },
+    "pieces": {
+      "page_title": "Articles",
+      "page_subtitle": "Gestiona l'inventari de la teva organització: crea articles, edita els seus atributs i consulta l'historial.",
+      "back_to_list": "Torna a articles",
+      "tabs_aria": "Pestanyes de l'article",
+      "unassigned_location": "Sense ubicació",
+      "no_owner": "Sense propietari",
+      "total_count": "{n} articles en total | {n} article | {n} articles",
+      "actions": {
+        "new": "Nou article",
+        "edit": "Edita",
+        "delete": "Elimina",
+        "download": "Descarrega",
+        "row_menu": "Accions"
+      },
+      "filters": {
+        "search": "Cerca",
+        "search_placeholder": "Cerca per nom o descripció…",
+        "type": "Tipus",
+        "location": "Ubicació",
+        "owner": "Propietari",
+        "status": "Estat",
+        "all": "Tots",
+        "clear": "Neteja filtres"
+      },
+      "form": {
+        "title_create": "Nou article",
+        "subtitle": "Selecciona el tipus i omple els atributs. Pots deixar camps en blanc; els obligatoris marcaran l'article com a pendent.",
+        "field_type": "Tipus d'article",
+        "type_placeholder": "Selecciona un tipus…",
+        "field_name": "Nom",
+        "field_description": "Descripció",
+        "field_location": "Ubicació",
+        "field_owner": "Propietari",
+        "field_status": "Estat",
+        "unassigned": "Sense ubicació",
+        "no_owner": "Sense propietari",
+        "attributes_section": "Atributs del tipus",
+        "submit_create": "Crea article",
+        "field_types": "Tipus d’article",
+        "types_help": "Selecciona un o més tipus. Els seus atributs es combinen al formulari. | {n} tipus seleccionat | {n} tipus seleccionats",
+        "no_types_yet": "Encara no has creat cap tipus d’article. Crea’n un des de “Tipus d’article” abans d’afegir articles."
+      },
+      "info": {
+        "section_basic": "Informació",
+        "section_attributes": "Atributs"
+      },
+      "attribute": {
+        "select_placeholder": "Selecciona…"
+      },
+      "tabs": {
+        "info": "Informació",
+        "attachments": "Adjunts",
+        "history": "Historial"
+      },
+      "attachments": {
+        "images_title": "Imatges",
+        "images_empty": "Encara no hi ha imatges. Puja la primera per veure-la aquí.",
+        "documents_title": "Documents",
+        "documents_empty": "Encara no hi ha documents.",
+        "upload_image": "Puja imatge",
+        "upload_document": "Puja document",
+        "uploading": "Pujant…",
+        "confirm_delete_title": "Elimina adjunt",
+        "confirm_delete_body": "Vols eliminar l'adjunt \"{name}\"? Aquesta acció no es pot desfer.",
+        "errors": {
+          "too_large_local": "El fitxer \"{file}\" supera el màxim de {max}.",
+          "upload": "No s'ha pogut pujar el fitxer.",
+          "download": "No s'ha pogut descarregar el fitxer.",
+          "delete": "No s'ha pogut eliminar l'adjunt."
+        }
+      },
+      "history": {
+        "empty": "Encara no hi ha activitat per a aquest article.",
+        "by_actor": "per {actor}",
+        "before": "Abans",
+        "after": "Ara",
+        "unknown_actor": "Desconegut",
+        "removed_actor": "Usuari eliminat",
+        "action": {
+          "PIECE_CREATED": "Article creat",
+          "PIECE_UPDATED": "Article actualitzat",
+          "PIECE_DELETED": "Article eliminat",
+          "OWNER_CHANGED": "Canvi de propietari",
+          "LOCATION_CHANGED": "Canvi d'ubicació",
+          "STATUS_CHANGED": "Canvi d'estat",
+          "ATTRIBUTE_VALUE_CHANGED": "Atribut modificat",
+          "ATTACHMENT_ADDED": "Adjunt afegit",
+          "ATTACHMENT_REMOVED": "Adjunt eliminat"
+        }
+      },
+      "confirm": {
+        "delete_title": "Elimina article",
+        "delete_body": "Segur que vols eliminar \"{name}\"? Aquesta acció no es pot desfer."
+      },
+      "errors": {
+        "load_list": "No s'han pogut carregar els articles.",
+        "load_detail": "No s'ha pogut carregar l'article.",
+        "load_history": "No s'ha pogut carregar l'historial.",
+        "save": "No s'ha pogut desar l'article.",
+        "delete": "No s'ha pogut eliminar l'article.",
+        "name_required": "El nom és obligatori.",
+        "type_required": "Has de seleccionar un tipus d'article.",
+        "not_found": "Article no trobat."
+      },
+      "new_breadcrumb": "Nou"
     }
   },
   "invitations": {
