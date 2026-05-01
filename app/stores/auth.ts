@@ -47,6 +47,17 @@ export const useAuthStore = defineStore('auth', () => {
     await routeAfterAuth()
   }
 
+  async function loginNoRedirect(payload: LoginUserDto) {
+    const api = useApi()
+    const data = await api<LoginResponseDto>('/auth/login', {
+      method: 'POST',
+      body: payload
+    })
+    setSession(data)
+    const orgs = useOrganizationsStore()
+    await orgs.fetchList()
+  }
+
   async function signup(payload: RegisterUserDto) {
     const api = useApi()
     await api<User>('/auth/signup', {
@@ -94,6 +105,7 @@ export const useAuthStore = defineStore('auth', () => {
     useOrganizationsStore().reset()
     useLocationsStore().reset()
     usePiecesStore().reset()
+    useTeamStore().reset()
   }
 
   async function logout() {
@@ -120,6 +132,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     setSession,
     login,
+    loginNoRedirect,
     signup,
     logout,
     forgotPassword,

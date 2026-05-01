@@ -1,0 +1,129 @@
+<script setup lang="ts">
+const props = withDefaults(defineProps<{
+  open: boolean
+  mode: 'create' | 'rename'
+  initialName?: string
+  loading?: boolean
+  errorMsg?: string | null
+}>(), {
+  loading: false,
+  errorMsg: null,
+  initialName: ''
+})
+
+const emit = defineEmits<{
+  submit: [payload: { name: string }]
+  close: []
+}>()
+
+const { t } = useI18n()
+
+const name = ref(props.initialName)
+const nameInput = ref<HTMLInputElement | null>(null)
+
+watch(() => props.open, (open) => {
+  if (open) {
+    name.value = props.initialName
+    nextTick(() => nameInput.value?.focus())
+  }
+})
+
+onMounted(() => {
+  if (props.open) nextTick(() => nameInput.value?.focus())
+})
+
+const title = computed(() => props.mode === 'rename'
+  ? t('dashboard.pieceTypes.form.rename_title')
+  : t('dashboard.pieceTypes.form.new_title'))
+
+const submitLabel = computed(() => props.mode === 'rename'
+  ? t('dashboard.pieceTypes.form.save')
+  : t('dashboard.pieceTypes.form.create'))
+
+function onBackdropClick(e: MouseEvent) {
+  if (e.target === e.currentTarget) emit('close')
+}
+
+function onKey(e: KeyboardEvent) {
+  if (e.key === 'Escape') emit('close')
+}
+
+function submit() {
+  const trimmed = name.value.trim()
+  if (!trimmed || props.loading) return
+  emit('submit', { name: trimmed })
+}
+</script>
+
+<template>
+  <Teleport to="body">
+    <div v-if="open" class="dialog-backdrop" role="presentation"
+      @click="onBackdropClick" @keydown="onKey">
+      <div role="dialog" aria-modal="true" :aria-label="title"
+        class="w-[440px] max-w-[calc(100vw-32px)] rounded-[14px] border border-line bg-bg-card p-6 shadow-card">
+        <h2 class="text-[17px] font-semibold tracking-[-0.015em] text-ink">{{ title }}</h2>
+
+        <form class="mt-4 flex flex-col gap-3.5" novalidate @submit.prevent="submit">
+          <div v-if="errorMsg" role="alert"
+            class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger">
+            {{ errorMsg }}
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label for="pt-name" class="text-[12.5px] font-medium tracking-[-0.005em] text-ink-soft">
+              {{ t('dashboard.pieceTypes.form.field_name') }}
+            </label>
+            <input id="pt-name" ref="nameInput" v-model="name" type="text" required maxlength="120"
+              :placeholder="t('dashboard.pieceTypes.form.field_name_placeholder')"
+              class="h-11 w-full rounded-[10px] border border-line bg-field px-3.5 text-[14.5px] text-ink outline-none transition-[border-color,background,box-shadow] duration-150 placeholder:text-ink-muted hover:border-line-strong focus:border-accent focus:bg-field-focus">
+          </div>
+
+          <div class="mt-2 flex items-center justify-end gap-2">
+            <button type="button" class="dialog-btn" :disabled="loading" @click="emit('close')">
+              {{ t('common.close') }}
+            </button>
+            <button type="submit" class="dialog-btn dialog-btn-primary"
+              :disabled="!name.trim() || loading" :aria-busy="loading">
+              {{ submitLabel }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </Teleport>
+</template>
+
+<style scoped>
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in oklab, var(--c-ink) 30%, transparent);
+  backdrop-filter: blur(2px);
+  padding: 16px;
+}
+.dialog-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 500;
+  border: 1px solid var(--c-line);
+  background: var(--c-bg-card);
+  color: var(--c-ink);
+  transition: background .15s, border-color .15s;
+}
+.dialog-btn:hover:not(:disabled) { background: var(--c-bg-soft); }
+.dialog-btn:disabled { opacity: .5; cursor: not-allowed; }
+.dialog-btn-primary {
+  background: var(--c-ink);
+  color: var(--c-bg-card);
+  border-color: var(--c-ink);
+}
+.dialog-btn-primary:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--c-ink) 90%, transparent);
+}
+</style>

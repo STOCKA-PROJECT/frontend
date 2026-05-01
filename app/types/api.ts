@@ -166,11 +166,113 @@ export interface UpdatePieceLocationDto {
   clearLocation?: boolean
 }
 
+export type AttributeType =
+  | 'TEXT'
+  | 'LONGTEXT'
+  | 'INTEGER'
+  | 'DECIMAL'
+  | 'PRICE'
+  | 'DATE'
+  | 'DATETIME'
+  | 'BOOLEAN'
+  | 'SELECT'
+  | 'MULTI_SELECT'
+  | 'URL'
+  | 'EMAIL'
+
+export interface AttributeValidatorsDto {
+  minLength?: number
+  maxLength?: number
+  regex?: string
+  min?: number
+  max?: number
+  decimals?: number
+  currency?: string
+  minDate?: string
+  maxDate?: string
+  allowFuture?: boolean
+  allowPast?: boolean
+  options?: string[]
+  minItems?: number
+  maxItems?: number
+}
+
+export interface PieceTypeAttributeResponseDto {
+  id: number
+  name: string
+  displayName: string
+  type: AttributeType
+  required: boolean
+  position: number
+  validators: AttributeValidatorsDto
+}
+
+export interface PieceTypeResponseDto {
+  id: number
+  organizationId: number
+  name: string
+  createdAt: string
+  updatedAt: string
+  attributes: PieceTypeAttributeResponseDto[]
+}
+
+export interface CreatePieceTypeAttributeDto {
+  name: string
+  displayName: string
+  type: AttributeType
+  required?: boolean
+  position?: number
+  validators?: AttributeValidatorsDto
+}
+
+export interface CreatePieceTypeDto {
+  name: string
+  attributes?: CreatePieceTypeAttributeDto[]
+}
+
+export interface UpdatePieceTypeDto {
+  name?: string
+}
+
+export interface UpdatePieceTypeAttributeDto {
+  displayName?: string
+  required?: boolean
+  position?: number
+  validators?: AttributeValidatorsDto
+}
+
 export interface MemberResponseDto {
   id: number
   userId: number
   name: string
   lastName: string
+  email: string
+  role: OrganizationRole
+}
+
+export interface UpdateMemberRoleDto {
+  role: OrganizationRole
+}
+
+export type InvitationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED' | 'EXPIRED'
+
+export interface OrganizationSummaryDto {
+  id: number
+  name: string
+  slug: string
+}
+
+export interface InvitationResponseDto {
+  id: number
+  email: string
+  role: OrganizationRole
+  status: InvitationStatus
+  expiresAt: string
+  token: string | null
+  organization: OrganizationSummaryDto
+}
+
+export interface CreateInvitationDto {
   email: string
   role: OrganizationRole
 }

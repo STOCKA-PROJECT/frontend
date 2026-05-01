@@ -358,6 +358,102 @@
         "delete": "Couldn't delete the location."
       }
     },
+    "pieceTypes": {
+      "page_title": "Item types",
+      "page_subtitle": "Define the item types in your inventory and the custom attributes each one will have.",
+      "list": {
+        "header": "Types",
+        "empty": "You haven't created any item types yet.",
+        "new": "New type",
+        "attribute_count": "{n} attributes | {n} attribute | {n} attributes",
+        "option_count": "{n} options | {n} option | {n} options"
+      },
+      "detail": {
+        "empty": "Pick a type from the list to view and manage its attributes, or create a new one.",
+        "attributes_title": "Attributes ({n})",
+        "add_attribute": "Add attribute",
+        "empty_attributes": "This type has no attributes yet. Add the first one to start describing your items.",
+        "created_at": "Created on {date}",
+        "updated_at": "Updated on {date}"
+      },
+      "form": {
+        "new_title": "New type",
+        "rename_title": "Rename type",
+        "field_name": "Name",
+        "field_name_placeholder": "Tool, Computer equipment…",
+        "create": "Create",
+        "save": "Save"
+      },
+      "attribute_form": {
+        "new_title": "New attribute on \"{type}\"",
+        "edit_title": "Edit attribute \"{name}\"",
+        "field_name": "Technical name",
+        "field_name_help": "Lowercase letters, numbers, and underscore only. Must start with a letter.",
+        "field_name_placeholder": "color, weight, purchase_date…",
+        "field_display_name": "Display label",
+        "field_display_name_placeholder": "Color, Weight (kg), Purchase date…",
+        "field_type": "Data type",
+        "field_type_locked_help": "The technical name and the data type cannot be changed after the attribute is created.",
+        "field_required": "Required",
+        "validators_title": "Validation rules",
+        "validators": {
+          "minLength": "Minimum length",
+          "maxLength": "Maximum length",
+          "regex": "Regular expression",
+          "min": "Minimum value",
+          "max": "Maximum value",
+          "decimals": "Decimal places",
+          "currency": "Currency (ISO 4217)",
+          "minDate": "Minimum date",
+          "maxDate": "Maximum date",
+          "allowFuture": "Allow future dates",
+          "allowPast": "Allow past dates",
+          "options": "Options",
+          "options_placeholder": "Add an option and press Enter",
+          "options_add": "Add",
+          "options_duplicate": "That option already exists.",
+          "options_empty": "The option cannot be empty.",
+          "minItems": "Minimum selections",
+          "maxItems": "Maximum selections"
+        },
+        "create": "Create attribute",
+        "save": "Save changes"
+      },
+      "types": {
+        "TEXT": "Short text",
+        "LONGTEXT": "Long text",
+        "INTEGER": "Integer",
+        "DECIMAL": "Decimal",
+        "PRICE": "Price",
+        "DATE": "Date",
+        "DATETIME": "Date and time",
+        "BOOLEAN": "Yes/No",
+        "SELECT": "Select",
+        "MULTI_SELECT": "Multi-select",
+        "URL": "URL",
+        "EMAIL": "Email"
+      },
+      "delete": {
+        "confirm_title": "Delete type",
+        "confirm_message": "Are you sure you want to delete the type \"{name}\"? This action cannot be undone.",
+        "attribute_confirm_title": "Delete attribute",
+        "attribute_confirm_message": "Deleting attribute \"{name}\" will erase its values across all existing items. This action cannot be undone.",
+        "confirm_label": "Delete"
+      },
+      "errors": {
+        "load_list": "Couldn't load the item types.",
+        "load_detail": "Couldn't load the item type.",
+        "save_type": "Couldn't save the type.",
+        "save_attribute": "Couldn't save the attribute.",
+        "delete_type": "Couldn't delete the type.",
+        "delete_attribute": "Couldn't delete the attribute.",
+        "name_pattern": "Use lowercase letters, numbers, and underscore only. Must start with a letter.",
+        "name_required": "Name is required.",
+        "display_name_required": "Display label is required.",
+        "options_required": "Add at least one option.",
+        "type_required": "Pick a data type."
+      }
+    },
     "org_settings": {
       "breadcrumb": "Settings",
       "title": "Organization settings",
@@ -392,6 +488,129 @@
         "conflict": "That identifier is already in use. Try another.",
         "generic": "Could not create the organization. Please try again."
       }
+    },
+    "team": {
+      "page_title": "Team",
+      "page_subtitle": "Manage the members of your organization, invite people with their role and control their permissions.",
+      "members_title": "Members",
+      "members_count": "{n} members | {n} member | {n} members",
+      "you": "You",
+      "invitations_title": "Pending invitations",
+      "invitations_count": "{n} pending | {n} pending | {n} pending",
+      "empty_invitations": "No pending invitations.",
+      "empty_members": "No members yet. Invite someone to get started.",
+      "invite_btn": "Invite member",
+      "invite_dialog_title": "Invite member",
+      "invite_dialog_subtitle": "We'll email them a link to join your organization.",
+      "email_label": "Email",
+      "email_placeholder": "person\\@company.com",
+      "role_label": "Role",
+      "send_invite": "Send invitation",
+      "cancel": "Cancel",
+      "expires_in_days": "Expires in {n} days | Expires tomorrow | Expires in {n} days",
+      "expires_today": "Expires today",
+      "expires_past": "Expired",
+      "change_role": "Change role",
+      "confirm_change_role_title": "Change role",
+      "confirm_change_role_message": "Change {name}'s role to {newRole}?",
+      "remove_member": "Remove member",
+      "confirm_remove_title": "Remove member",
+      "confirm_remove_message": "Are you sure you want to remove {name}? They will lose access to this organization.",
+      "cancel_invitation": "Cancel invitation",
+      "confirm_cancel_invitation_title": "Cancel invitation",
+      "confirm_cancel_invitation_message": "Cancel the invitation sent to {email}?",
+      "leave_org": "Leave this organization",
+      "leave_org_disabled_last_owner": "You are the only owner; you can't leave without first promoting another member.",
+      "confirm_leave_title": "Leave organization",
+      "confirm_leave_message": "If you leave \"{name}\", you'll lose access to its data. Continue?",
+      "errors": {
+        "load_members": "Couldn't load the members.",
+        "load_invitations": "Couldn't load the invitations.",
+        "invite": "Couldn't send the invitation.",
+        "update_role": "Couldn't change the role.",
+        "remove": "Couldn't remove the member.",
+        "cancel_invitation": "Couldn't cancel the invitation.",
+        "leave": "Couldn't leave the organization.",
+        "generic": "Something went wrong. Please try again."
+      }
+    }
+  },
+  "invitations": {
+    "page_title": "Stocka invitation",
+    "title": "You've been invited to Stocka",
+    "subtitle": "You've received an invitation to join an organization on Stocka. Accept it to join the team.",
+    "accept": "Accept invitation",
+    "reject": "Reject",
+    "accepting": "Accepting…",
+    "rejecting": "Rejecting…",
+    "accepted_title": "Invitation accepted!",
+    "accepted_subtitle": "Taking you to your new organization.",
+    "rejected_title": "Invitation rejected",
+    "rejected_subtitle": "You've rejected this invitation.",
+    "back_to_dashboard": "Go to dashboard",
+    "not_authenticated_title": "Sign in to continue",
+    "not_authenticated_subtitle": "To accept or reject the invitation, sign in first with the invited email's account.",
+    "go_to_login": "Sign in",
+    "no_account": "Don't have an account yet?",
+    "create_account": "Create one",
+    "errors": {
+      "not_found": "This invitation doesn't exist or has already been processed.",
+      "email_mismatch": "This invitation is for a different email. Sign in with the correct account.",
+      "expired": "The invitation has expired. Ask the person who invited you to send a new one.",
+      "already_used": "This invitation is no longer pending.",
+      "generic": "Couldn't process the invitation. Please try again."
+    }
+  },
+  "errors": {
+    "title": "Error",
+    "generic": "An unexpected error occurred.",
+    "network": "Could not reach the server.",
+    "auth": {
+      "invalid_credentials": "Invalid email or password.",
+      "email_not_verified": "Email is not verified.",
+      "passwords_mismatch": "Passwords do not match.",
+      "unauthenticated": "Session invalid or expired.",
+      "forbidden": "You don't have permission to perform this action."
+    },
+    "users": {
+      "email_taken": "A user with that email already exists.",
+      "username_taken": "A user with that username already exists.",
+      "username_invalid": "The username is not valid.",
+      "username_reserved": "That username is reserved."
+    },
+    "pieces": {
+      "not_found": "Piece not found."
+    },
+    "piece_types": {
+      "not_found": "Piece type not found.",
+      "attribute_invalid": "The attribute is not valid."
+    },
+    "locations": {
+      "not_found": "Location not found."
+    },
+    "organizations": {
+      "not_found": "Organization not found.",
+      "invitation_limit_reached": "You have reached the limit of {max} pending invitations.",
+      "invitation_expired": "The invitation has expired."
+    },
+    "storage": {
+      "r2_unavailable": "Storage is unavailable."
+    },
+    "upload": {
+      "too_large": "The file is too large.",
+      "invalid_kind": "File type not allowed."
+    },
+    "validation": {
+      "required": "This field is required.",
+      "failed": "The request is not valid."
+    },
+    "request": {
+      "malformed_body": "The request body is malformed.",
+      "not_found": "Resource not found.",
+      "method_not_allowed": "Method not allowed."
+    },
+    "server": {
+      "internal_error": "Internal server error."
     }
   }
 }

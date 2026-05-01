@@ -358,6 +358,102 @@
         "delete": "No se ha podido eliminar la ubicación."
       }
     },
+    "pieceTypes": {
+      "page_title": "Tipos de artículo",
+      "page_subtitle": "Define los tipos de artículo de tu inventario y los atributos personalizados que tendrá cada uno.",
+      "list": {
+        "header": "Tipos",
+        "empty": "Aún no has creado ningún tipo de artículo.",
+        "new": "Nuevo tipo",
+        "attribute_count": "{n} atributos | {n} atributo | {n} atributos",
+        "option_count": "{n} opciones | {n} opción | {n} opciones"
+      },
+      "detail": {
+        "empty": "Selecciona un tipo de la lista para ver y gestionar sus atributos, o crea uno nuevo.",
+        "attributes_title": "Atributos ({n})",
+        "add_attribute": "Añadir atributo",
+        "empty_attributes": "Este tipo aún no tiene atributos. Añade el primero para empezar a describir tus artículos.",
+        "created_at": "Creado el {date}",
+        "updated_at": "Actualizado el {date}"
+      },
+      "form": {
+        "new_title": "Nuevo tipo",
+        "rename_title": "Renombrar tipo",
+        "field_name": "Nombre",
+        "field_name_placeholder": "Herramienta, Equipo informático…",
+        "create": "Crear",
+        "save": "Guardar"
+      },
+      "attribute_form": {
+        "new_title": "Nuevo atributo en \"{type}\"",
+        "edit_title": "Editar atributo \"{name}\"",
+        "field_name": "Nombre técnico",
+        "field_name_help": "Solo minúsculas, números y guion bajo. Empieza por una letra.",
+        "field_name_placeholder": "color, peso, fecha_compra…",
+        "field_display_name": "Etiqueta visible",
+        "field_display_name_placeholder": "Color, Peso (kg), Fecha de compra…",
+        "field_type": "Tipo de dato",
+        "field_type_locked_help": "El nombre técnico y el tipo no se pueden modificar después de crear el atributo.",
+        "field_required": "Obligatorio",
+        "validators_title": "Reglas de validación",
+        "validators": {
+          "minLength": "Longitud mínima",
+          "maxLength": "Longitud máxima",
+          "regex": "Expresión regular",
+          "min": "Valor mínimo",
+          "max": "Valor máximo",
+          "decimals": "Decimales",
+          "currency": "Moneda (ISO 4217)",
+          "minDate": "Fecha mínima",
+          "maxDate": "Fecha máxima",
+          "allowFuture": "Permitir fechas futuras",
+          "allowPast": "Permitir fechas pasadas",
+          "options": "Opciones",
+          "options_placeholder": "Añade una opción y pulsa Intro",
+          "options_add": "Añadir",
+          "options_duplicate": "Esa opción ya existe.",
+          "options_empty": "La opción no puede estar vacía.",
+          "minItems": "Selecciones mínimas",
+          "maxItems": "Selecciones máximas"
+        },
+        "create": "Crear atributo",
+        "save": "Guardar cambios"
+      },
+      "types": {
+        "TEXT": "Texto corto",
+        "LONGTEXT": "Texto largo",
+        "INTEGER": "Número entero",
+        "DECIMAL": "Decimal",
+        "PRICE": "Precio",
+        "DATE": "Fecha",
+        "DATETIME": "Fecha y hora",
+        "BOOLEAN": "Sí/No",
+        "SELECT": "Selección",
+        "MULTI_SELECT": "Selección múltiple",
+        "URL": "URL",
+        "EMAIL": "Correo electrónico"
+      },
+      "delete": {
+        "confirm_title": "Eliminar tipo",
+        "confirm_message": "¿Seguro que quieres eliminar el tipo «{name}»? Esta acción no se puede deshacer.",
+        "attribute_confirm_title": "Eliminar atributo",
+        "attribute_confirm_message": "Eliminar el atributo «{name}» borrará sus valores en todos los artículos existentes. Esta acción no se puede deshacer.",
+        "confirm_label": "Eliminar"
+      },
+      "errors": {
+        "load_list": "No se han podido cargar los tipos de artículo.",
+        "load_detail": "No se ha podido cargar el tipo de artículo.",
+        "save_type": "No se ha podido guardar el tipo.",
+        "save_attribute": "No se ha podido guardar el atributo.",
+        "delete_type": "No se ha podido eliminar el tipo.",
+        "delete_attribute": "No se ha podido eliminar el atributo.",
+        "name_pattern": "Usa solo minúsculas, números y guion bajo. Debe empezar por una letra.",
+        "name_required": "El nombre es obligatorio.",
+        "display_name_required": "La etiqueta visible es obligatoria.",
+        "options_required": "Añade al menos una opción.",
+        "type_required": "Selecciona un tipo de dato."
+      }
+    },
     "org_settings": {
       "breadcrumb": "Ajustes",
       "title": "Ajustes de la organización",
@@ -392,6 +488,129 @@
         "conflict": "Ese identificador ya está en uso. Prueba con otro.",
         "generic": "No se ha podido crear la organización. Inténtalo de nuevo."
       }
+    },
+    "team": {
+      "page_title": "Equipo",
+      "page_subtitle": "Gestiona los miembros de tu organización, invítales con su rol y controla sus permisos.",
+      "members_title": "Miembros",
+      "members_count": "{n} miembros | {n} miembro | {n} miembros",
+      "you": "Tú",
+      "invitations_title": "Invitaciones pendientes",
+      "invitations_count": "{n} pendientes | {n} pendiente | {n} pendientes",
+      "empty_invitations": "No hay invitaciones pendientes.",
+      "empty_members": "Aún no hay miembros. Invita a alguien para empezar.",
+      "invite_btn": "Invitar miembro",
+      "invite_dialog_title": "Invitar miembro",
+      "invite_dialog_subtitle": "Le enviaremos un correo con un enlace para unirse a tu organización.",
+      "email_label": "Correo electrónico",
+      "email_placeholder": "persona\\@empresa.com",
+      "role_label": "Rol",
+      "send_invite": "Enviar invitación",
+      "cancel": "Cancelar",
+      "expires_in_days": "Expira en {n} días | Expira mañana | Expira en {n} días",
+      "expires_today": "Expira hoy",
+      "expires_past": "Caducada",
+      "change_role": "Cambiar rol",
+      "confirm_change_role_title": "Cambiar rol",
+      "confirm_change_role_message": "¿Cambiar el rol de {name} a {newRole}?",
+      "remove_member": "Expulsar miembro",
+      "confirm_remove_title": "Expulsar miembro",
+      "confirm_remove_message": "¿Seguro que quieres expulsar a {name}? Perderá el acceso a esta organización.",
+      "cancel_invitation": "Cancelar invitación",
+      "confirm_cancel_invitation_title": "Cancelar invitación",
+      "confirm_cancel_invitation_message": "¿Cancelar la invitación enviada a {email}?",
+      "leave_org": "Abandonar esta organización",
+      "leave_org_disabled_last_owner": "Eres el único propietario; no puedes abandonar la organización sin antes ascender a otro miembro.",
+      "confirm_leave_title": "Abandonar organización",
+      "confirm_leave_message": "Si abandonas \"{name}\", perderás acceso a sus datos. ¿Quieres continuar?",
+      "errors": {
+        "load_members": "No se han podido cargar los miembros.",
+        "load_invitations": "No se han podido cargar las invitaciones.",
+        "invite": "No se ha podido enviar la invitación.",
+        "update_role": "No se ha podido cambiar el rol.",
+        "remove": "No se ha podido expulsar al miembro.",
+        "cancel_invitation": "No se ha podido cancelar la invitación.",
+        "leave": "No se ha podido abandonar la organización.",
+        "generic": "Algo ha fallado. Inténtalo de nuevo."
+      }
+    }
+  },
+  "invitations": {
+    "page_title": "Invitación a Stocka",
+    "title": "Te han invitado a Stocka",
+    "subtitle": "Has recibido una invitación para unirte a una organización en Stocka. Acéptala para entrar al equipo.",
+    "accept": "Aceptar invitación",
+    "reject": "Rechazar",
+    "accepting": "Aceptando…",
+    "rejecting": "Rechazando…",
+    "accepted_title": "¡Invitación aceptada!",
+    "accepted_subtitle": "Te estamos llevando a tu nueva organización.",
+    "rejected_title": "Invitación rechazada",
+    "rejected_subtitle": "Has rechazado esta invitación.",
+    "back_to_dashboard": "Ir al dashboard",
+    "not_authenticated_title": "Inicia sesión para continuar",
+    "not_authenticated_subtitle": "Para aceptar o rechazar la invitación, primero accede con la cuenta del email invitado.",
+    "go_to_login": "Iniciar sesión",
+    "no_account": "¿No tienes cuenta aún?",
+    "create_account": "Crea una cuenta",
+    "errors": {
+      "not_found": "Esta invitación no existe o ya ha sido procesada.",
+      "email_mismatch": "Esta invitación está dirigida a otro email. Inicia sesión con la cuenta correcta.",
+      "expired": "La invitación ha caducado. Pide a quien te invitó que te envíe una nueva.",
+      "already_used": "Esta invitación ya no está pendiente.",
+      "generic": "No se ha podido procesar la invitación. Inténtalo de nuevo."
+    }
+  },
+  "errors": {
+    "title": "Error",
+    "generic": "Ha ocurrido un error inesperado.",
+    "network": "No se ha podido contactar con el servidor.",
+    "auth": {
+      "invalid_credentials": "Email o contraseña incorrectos.",
+      "email_not_verified": "El email no ha sido verificado.",
+      "passwords_mismatch": "Las contraseñas no coinciden.",
+      "unauthenticated": "Sesión no válida o expirada.",
+      "forbidden": "No tienes permiso para realizar esta acción."
+    },
+    "users": {
+      "email_taken": "Ya existe un usuario con ese email.",
+      "username_taken": "Ya existe un usuario con ese nombre de usuario.",
+      "username_invalid": "El nombre de usuario no es válido.",
+      "username_reserved": "Ese nombre de usuario está reservado."
+    },
+    "pieces": {
+      "not_found": "Artículo no encontrado."
+    },
+    "piece_types": {
+      "not_found": "Tipo de artículo no encontrado.",
+      "attribute_invalid": "El atributo no es válido."
+    },
+    "locations": {
+      "not_found": "Ubicación no encontrada."
+    },
+    "organizations": {
+      "not_found": "Organización no encontrada.",
+      "invitation_limit_reached": "Has alcanzado el límite de {max} invitaciones pendientes.",
+      "invitation_expired": "La invitación ha caducado."
+    },
+    "storage": {
+      "r2_unavailable": "Almacenamiento no disponible."
+    },
+    "upload": {
+      "too_large": "El archivo es demasiado grande.",
+      "invalid_kind": "Tipo de archivo no permitido."
+    },
+    "validation": {
+      "required": "Este campo es obligatorio.",
+      "failed": "La solicitud no es válida."
+    },
+    "request": {
+      "malformed_body": "El cuerpo de la solicitud no es válido.",
+      "not_found": "Recurso no encontrado.",
+      "method_not_allowed": "Método no permitido."
+    },
+    "server": {
+      "internal_error": "Error interno del servidor."
     }
   }
 }

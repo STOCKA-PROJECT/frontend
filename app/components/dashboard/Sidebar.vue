@@ -19,11 +19,7 @@ const menuOpen = shallowRef(false)
 const userMenuRef = ref<HTMLElement | null>(null)
 
 const inactiveItems = computed(() => [
-  { label: t('dashboard.nav.items'), icon: 'box' },
-  { label: t('dashboard.nav.types'), icon: 'list' }
-])
-const orgInactive = computed(() => [
-  { label: t('dashboard.nav.team'), icon: 'users' }
+  { label: t('dashboard.nav.items'), icon: 'box' }
 ])
 
 function onDocClick(e: MouseEvent) {
@@ -87,6 +83,12 @@ async function handleLogout() {
         <span>{{ t('dashboard.nav.locations') }}</span>
       </NuxtLink>
 
+      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/tipos-articulos')" exact-active-class="is-active"
+        class="nav-item">
+        <DashboardIcon name="list" />
+        <span>{{ t('dashboard.nav.types') }}</span>
+      </NuxtLink>
+
       <button v-for="item in inactiveItems" :key="item.label" type="button" class="nav-item is-disabled"
         :title="`${item.label} · ${t('common.comingSoon')}`" :aria-disabled="true" disabled>
         <DashboardIcon :name="item.icon" />
@@ -100,11 +102,11 @@ async function handleLogout() {
       <span class="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[.08em] text-ink-muted">
         {{ t('dashboard.organization_label') }}
       </span>
-      <button v-for="item in orgInactive" :key="item.label" type="button" class="nav-item is-disabled"
-        :title="`${item.label} · ${t('common.comingSoon')}`" :aria-disabled="true" disabled>
-        <DashboardIcon :name="item.icon" />
-        <span>{{ item.label }}</span>
-      </button>
+      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/equipo')" exact-active-class="is-active"
+        class="nav-item">
+        <DashboardIcon name="users" />
+        <span>{{ t('dashboard.nav.team') }}</span>
+      </NuxtLink>
       <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/ajustes-organizacion')" exact-active-class="is-active"
         class="nav-item">
         <DashboardIcon name="settings" />

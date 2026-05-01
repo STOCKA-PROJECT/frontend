@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { FetchError } from 'ofetch'
-
 definePageMeta({ layout: 'auth' })
 
 const { t } = useI18n()
@@ -13,6 +11,7 @@ useSeoMeta({
 
 const auth = useAuthStore()
 const route = useRoute()
+const apiError = useApiError()
 
 const email = ref('')
 const password = ref('')
@@ -22,18 +21,34 @@ const successMsg = computed(() => route.query.reset === 'ok' ? t('auth.login.res
 
 const canSubmit = computed(() => email.value.trim() && password.value && !loading.value)
 
+function safeNextPath(): string | null {
+  const raw = route.query.next
+  if (typeof raw !== 'string') return null
+  let decoded: string
+  try {
+    decoded = decodeURIComponent(raw)
+  } catch {
+    return null
+  }
+  if (!decoded.startsWith('/') || decoded.startsWith('//')) return null
+  return decoded
+}
+
 async function submit() {
   if (!canSubmit.value) return
   loading.value = true
   errorMsg.value = null
   try {
-    await auth.login({ email: email.value.trim(), password: password.value })
-  } catch (e) {
-    if (e instanceof FetchError && e.response?.status === 401) {
-      errorMsg.value = t('auth.login.errors.invalid')
+    const next = safeNextPath()
+    if (next) {
+      await auth.loginNoRedirect({ email: email.value.trim(), password: password.value })
+      await navigateTo(next)
     } else {
-      errorMsg.value = t('auth.login.errors.generic')
+      await auth.login({ email: email.value.trim(), password: password.value })
     }
+  } catch (e) {
+    console.error('[login] error:', e)
+    errorMsg.value = apiError(e).description
   } finally {
     loading.value = false
   }
@@ -41,50 +56,25 @@ async function submit() {
 </script>
 
 <template>
-  <AuthFormCard
-    :title="t('auth.login.title')"
-    :subtitle="t('auth.login.subtitle')"
-  >
+  <AuthFormCard :title="t('auth.login.title')" :subtitle="t('auth.login.subtitle')">
     <form class="flex flex-col gap-3.5" novalidate @submit.prevent="submit">
-      <div
-        v-if="successMsg"
-        role="status"
-        class="rounded-lg border border-accent/30 bg-accent-soft px-3 py-2 text-[13px] text-accent-ink"
-      >
+      <div v-if="successMsg" role="status"
+        class="rounded-lg border border-accent/30 bg-accent-soft px-3 py-2 text-[13px] text-accent-ink">
         {{ successMsg }}
       </div>
 
-      <div
-        v-if="errorMsg"
-        role="alert"
-        class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger"
-      >
+      <div v-if="errorMsg" role="alert"
+        class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger">
         {{ errorMsg }}
       </div>
 
-      <AuthTextField
-        id="email"
-        v-model="email"
-        :label="t('auth.login.email')"
-        type="email"
-        :placeholder="t('auth.login.email_placeholder')"
-        autocomplete="email"
-        required
-      />
+      <AuthTextField id="email" v-model="email" :label="t('auth.login.email')" type="email"
+        :placeholder="t('auth.login.email_placeholder')" autocomplete="email" required />
 
-      <AuthPasswordField
-        id="password"
-        v-model="password"
-        :label="t('auth.login.password')"
-        :placeholder="t('auth.login.password_placeholder')"
-        autocomplete="current-password"
-        required
-      >
+      <AuthPasswordField id="password" v-model="password" :label="t('auth.login.password')"
+        :placeholder="t('auth.login.password_placeholder')" autocomplete="current-password" required>
         <template #right-link>
-          <NuxtLink
-            :to="localePath('/recuperar-password')"
-            class="text-[12.5px] font-medium text-ink hover:underline"
-          >
+          <NuxtLink :to="localePath('/recuperar-password')" class="text-[12.5px] font-medium text-ink hover:underline">
             {{ t('auth.login.forgot') }}
           </NuxtLink>
         </template>
@@ -97,10 +87,8 @@ async function submit() {
 
     <template #foot>
       {{ t('auth.login.no_account') }}
-      <NuxtLink
-        :to="localePath('/registro')"
-        class="font-medium text-ink border-b border-line-strong pb-px transition-colors hover:border-ink"
-      >
+      <NuxtLink :to="localePath('/registro')"
+        class="font-medium text-ink border-b border-line-strong pb-px transition-colors hover:border-ink">
         {{ t('auth.login.create_free') }}
       </NuxtLink>
     </template>

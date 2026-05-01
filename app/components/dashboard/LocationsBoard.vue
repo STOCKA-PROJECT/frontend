@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { FetchError } from 'ofetch'
 import type { LocationTreeNodeDto, OrganizationRole } from '~/types/api'
 
 const props = defineProps<{
@@ -10,6 +9,13 @@ const props = defineProps<{
 const { t } = useI18n()
 const locations = useLocationsStore()
 const pieces = usePiecesStore()
+const toast = useToastStore()
+const apiError = useApiError()
+
+function notifyError(e: unknown) {
+  const view = apiError(e)
+  toast.push({ type: 'error', title: view.title, description: view.description })
+}
 
 type Focus =
   | { kind: 'location'; id: number }
@@ -41,18 +47,6 @@ const piecesLoading = computed(() => {
   return false
 })
 
-const errorMsg = ref<string | null>(null)
-let errorTimer: ReturnType<typeof setTimeout> | null = null
-function showError(msg: string) {
-  errorMsg.value = msg
-  if (errorTimer) clearTimeout(errorTimer)
-  errorTimer = setTimeout(() => { errorMsg.value = null }, 6000)
-}
-
-onBeforeUnmount(() => {
-  if (errorTimer) clearTimeout(errorTimer)
-})
-
 function findInTree(nodes: LocationTreeNodeDto[], id: number): LocationTreeNodeDto | null {
   for (const n of nodes) {
     if (n.id === id) return n
@@ -65,8 +59,8 @@ function findInTree(nodes: LocationTreeNodeDto[], id: number): LocationTreeNodeD
 async function loadTree() {
   try {
     await locations.fetchTree(props.orgId)
-  } catch {
-    showError(t('dashboard.locations.errors.load_tree'))
+  } catch (e) {
+    notifyError(e)
   }
 }
 
@@ -77,16 +71,16 @@ async function loadFocusedPieces() {
     } else if (focus.value.kind === 'unassigned') {
       await pieces.fetchByLocation(props.orgId, null)
     }
-  } catch {
-    showError(t('dashboard.locations.errors.load_pieces'))
+  } catch (e) {
+    notifyError(e)
   }
 }
 
 async function loadDetail(id: number) {
   try {
     await locations.fetchOne(props.orgId, id)
-  } catch {
-    showError(t('dashboard.locations.errors.load_detail'))
+  } catch (e) {
+    notifyError(e)
   }
 }
 
@@ -113,14 +107,6 @@ function onSelectUnassigned() {
   focus.value = { kind: 'unassigned' }
 }
 
-function extractErrorMessage(e: unknown, fallback: string): string {
-  if (e instanceof FetchError) {
-    const data = e.response?._data as { message?: string } | undefined
-    return data?.message ?? fallback
-  }
-  return fallback
-}
-
 async function handleDropLocation(payload: { sourceId: number; targetId: number | null }) {
   if (props.role !== 'OWNER' && props.role !== 'MANAGER') return
   if (payload.sourceId === payload.targetId) return
@@ -131,7 +117,7 @@ async function handleDropLocation(payload: { sourceId: number; targetId: number 
       await locations.update(props.orgId, payload.sourceId, { parentId: payload.targetId })
     }
   } catch (e) {
-    showError(extractErrorMessage(e, t('dashboard.locations.errors.move_location')))
+    notifyError(e)
   }
 }
 
@@ -148,7 +134,7 @@ async function handleDropPiece(payload: { pieceId: number; targetLocationId: num
     pieces.invalidate(payload.targetLocationId)
     await loadFocusedPieces()
   } catch (e) {
-    showError(extractErrorMessage(e, t('dashboard.locations.errors.move_piece')))
+    notifyError(e)
   }
 }
 
@@ -238,7 +224,7 @@ async function submitFormDialog(payload: { name: string; description?: string })
     }
     closeFormDialog()
   } catch (e) {
-    formDialog.value.error = extractErrorMessage(e, t('dashboard.locations.errors.save'))
+    formDialog.value.error = apiError(e).description
   } finally {
     formDialog.value.loading = false
   }
@@ -280,7 +266,7 @@ async function confirmDelete() {
     }
     closeConfirm()
   } catch (e) {
-    showError(extractErrorMessage(e, t('dashboard.locations.errors.delete')))
+    notifyError(e)
     confirmDialog.value.loading = false
   }
 }
@@ -300,11 +286,6 @@ function onDetailDelete() {
 
 <template>
   <div class="board flex h-full flex-col gap-3">
-    <div v-if="errorMsg" role="alert"
-      class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger">
-      {{ errorMsg }}
-    </div>
-
     <div class="board-grid flex-1">
       <DashboardLocationsTreeEditable
         :nodes="locations.tree"

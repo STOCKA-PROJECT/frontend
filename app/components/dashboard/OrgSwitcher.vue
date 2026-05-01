@@ -8,6 +8,7 @@ const router = useRouter()
 const orgs = useOrganizationsStore()
 const locations = useLocationsStore()
 const pieces = usePiecesStore()
+const team = useTeamStore()
 
 const open = shallowRef(false)
 const rootRef = ref<HTMLElement | null>(null)
@@ -31,6 +32,7 @@ function pickOrg(id: number) {
   orgs.setCurrent(id)
   locations.reset()
   pieces.reset()
+  team.reset()
   router.push(localePath('/dashboard'))
 }
 

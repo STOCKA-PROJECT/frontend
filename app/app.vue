@@ -34,4 +34,5 @@ function pageKey(route: RouteLocationNormalizedLoaded): string {
     <NuxtRouteAnnouncer />
     <NuxtPage :page-key="pageKey" />
   </NuxtLayout>
+  <Toaster />
 </template>

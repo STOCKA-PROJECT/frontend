@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { FetchError } from 'ofetch'
-
 definePageMeta({ layout: 'auth' })
 
 const { t, locale } = useI18n()
@@ -12,6 +10,7 @@ useSeoMeta({
 })
 
 const auth = useAuthStore()
+const apiError = useApiError()
 
 const firstName = ref('')
 const lastName = ref('')
@@ -93,13 +92,7 @@ async function submit() {
       language: backendLanguage.value
     })
   } catch (e) {
-    if (e instanceof FetchError && e.data?.message) {
-      errorMsg.value = String(e.data.message)
-    } else if (e instanceof FetchError && e.response?.status === 409) {
-      errorMsg.value = t('auth.signup.errors.conflict')
-    } else {
-      errorMsg.value = t('auth.signup.errors.generic')
-    }
+    errorMsg.value = apiError(e).description
   } finally {
     loading.value = false
   }

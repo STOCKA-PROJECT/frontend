@@ -358,6 +358,102 @@
         "delete": "No s'ha pogut eliminar la ubicació."
       }
     },
+    "pieceTypes": {
+      "page_title": "Tipus d'article",
+      "page_subtitle": "Defineix els tipus d'article del teu inventari i els atributs personalitzats que tindrà cadascun.",
+      "list": {
+        "header": "Tipus",
+        "empty": "Encara no has creat cap tipus d'article.",
+        "new": "Nou tipus",
+        "attribute_count": "{n} atributs | {n} atribut | {n} atributs",
+        "option_count": "{n} opcions | {n} opció | {n} opcions"
+      },
+      "detail": {
+        "empty": "Selecciona un tipus de la llista per veure i gestionar els seus atributs, o crea'n un de nou.",
+        "attributes_title": "Atributs ({n})",
+        "add_attribute": "Afegir atribut",
+        "empty_attributes": "Aquest tipus encara no té atributs. Afegeix el primer per començar a descriure els teus articles.",
+        "created_at": "Creat el {date}",
+        "updated_at": "Actualitzat el {date}"
+      },
+      "form": {
+        "new_title": "Nou tipus",
+        "rename_title": "Reanomenar tipus",
+        "field_name": "Nom",
+        "field_name_placeholder": "Eina, Equip informàtic…",
+        "create": "Crear",
+        "save": "Desar"
+      },
+      "attribute_form": {
+        "new_title": "Nou atribut a \"{type}\"",
+        "edit_title": "Editar atribut \"{name}\"",
+        "field_name": "Nom tècnic",
+        "field_name_help": "Només minúscules, números i guió baix. Comença per una lletra.",
+        "field_name_placeholder": "color, pes, data_compra…",
+        "field_display_name": "Etiqueta visible",
+        "field_display_name_placeholder": "Color, Pes (kg), Data de compra…",
+        "field_type": "Tipus de dada",
+        "field_type_locked_help": "El nom tècnic i el tipus no es poden modificar després de crear l'atribut.",
+        "field_required": "Obligatori",
+        "validators_title": "Regles de validació",
+        "validators": {
+          "minLength": "Longitud mínima",
+          "maxLength": "Longitud màxima",
+          "regex": "Expressió regular",
+          "min": "Valor mínim",
+          "max": "Valor màxim",
+          "decimals": "Decimals",
+          "currency": "Moneda (ISO 4217)",
+          "minDate": "Data mínima",
+          "maxDate": "Data màxima",
+          "allowFuture": "Permetre dates futures",
+          "allowPast": "Permetre dates passades",
+          "options": "Opcions",
+          "options_placeholder": "Afegeix una opció i prem Intro",
+          "options_add": "Afegir",
+          "options_duplicate": "Aquesta opció ja existeix.",
+          "options_empty": "L'opció no pot estar buida.",
+          "minItems": "Seleccions mínimes",
+          "maxItems": "Seleccions màximes"
+        },
+        "create": "Crear atribut",
+        "save": "Desar canvis"
+      },
+      "types": {
+        "TEXT": "Text curt",
+        "LONGTEXT": "Text llarg",
+        "INTEGER": "Nombre enter",
+        "DECIMAL": "Decimal",
+        "PRICE": "Preu",
+        "DATE": "Data",
+        "DATETIME": "Data i hora",
+        "BOOLEAN": "Sí/No",
+        "SELECT": "Selecció",
+        "MULTI_SELECT": "Selecció múltiple",
+        "URL": "URL",
+        "EMAIL": "Correu electrònic"
+      },
+      "delete": {
+        "confirm_title": "Eliminar tipus",
+        "confirm_message": "Segur que vols eliminar el tipus «{name}»? Aquesta acció no es pot desfer.",
+        "attribute_confirm_title": "Eliminar atribut",
+        "attribute_confirm_message": "Eliminar l'atribut «{name}» esborrarà els seus valors a tots els articles existents. Aquesta acció no es pot desfer.",
+        "confirm_label": "Eliminar"
+      },
+      "errors": {
+        "load_list": "No s'han pogut carregar els tipus d'article.",
+        "load_detail": "No s'ha pogut carregar el tipus d'article.",
+        "save_type": "No s'ha pogut desar el tipus.",
+        "save_attribute": "No s'ha pogut desar l'atribut.",
+        "delete_type": "No s'ha pogut eliminar el tipus.",
+        "delete_attribute": "No s'ha pogut eliminar l'atribut.",
+        "name_pattern": "Utilitza només minúscules, números i guió baix. Ha de començar per una lletra.",
+        "name_required": "El nom és obligatori.",
+        "display_name_required": "L'etiqueta visible és obligatòria.",
+        "options_required": "Afegeix almenys una opció.",
+        "type_required": "Selecciona un tipus de dada."
+      }
+    },
     "org_settings": {
       "breadcrumb": "Configuració",
       "title": "Configuració de l'organització",
@@ -392,6 +488,129 @@
         "conflict": "Aquest identificador ja està en ús. Prova'n un altre.",
         "generic": "No s'ha pogut crear l'organització. Torna-ho a provar."
       }
+    },
+    "team": {
+      "page_title": "Equip",
+      "page_subtitle": "Gestiona els membres de la teva organització, convida'ls amb el seu rol i controla els seus permisos.",
+      "members_title": "Membres",
+      "members_count": "{n} membres | {n} membre | {n} membres",
+      "you": "Tu",
+      "invitations_title": "Invitacions pendents",
+      "invitations_count": "{n} pendents | {n} pendent | {n} pendents",
+      "empty_invitations": "No hi ha invitacions pendents.",
+      "empty_members": "Encara no hi ha membres. Convida algú per començar.",
+      "invite_btn": "Convidar membre",
+      "invite_dialog_title": "Convidar membre",
+      "invite_dialog_subtitle": "Li enviarem un correu amb un enllaç per unir-se a la teva organització.",
+      "email_label": "Correu electrònic",
+      "email_placeholder": "persona\\@empresa.com",
+      "role_label": "Rol",
+      "send_invite": "Enviar invitació",
+      "cancel": "Cancel·la",
+      "expires_in_days": "Caduca en {n} dies | Caduca demà | Caduca en {n} dies",
+      "expires_today": "Caduca avui",
+      "expires_past": "Caducada",
+      "change_role": "Canviar rol",
+      "confirm_change_role_title": "Canviar rol",
+      "confirm_change_role_message": "Canviar el rol de {name} a {newRole}?",
+      "remove_member": "Expulsar membre",
+      "confirm_remove_title": "Expulsar membre",
+      "confirm_remove_message": "Segur que vols expulsar {name}? Perdrà l'accés a aquesta organització.",
+      "cancel_invitation": "Cancel·lar invitació",
+      "confirm_cancel_invitation_title": "Cancel·lar invitació",
+      "confirm_cancel_invitation_message": "Cancel·lar la invitació enviada a {email}?",
+      "leave_org": "Abandonar aquesta organització",
+      "leave_org_disabled_last_owner": "Ets l'únic propietari; no pots abandonar sense ascendir abans un altre membre.",
+      "confirm_leave_title": "Abandonar organització",
+      "confirm_leave_message": "Si abandones \"{name}\", perdràs l'accés a les seves dades. Vols continuar?",
+      "errors": {
+        "load_members": "No s'han pogut carregar els membres.",
+        "load_invitations": "No s'han pogut carregar les invitacions.",
+        "invite": "No s'ha pogut enviar la invitació.",
+        "update_role": "No s'ha pogut canviar el rol.",
+        "remove": "No s'ha pogut expulsar el membre.",
+        "cancel_invitation": "No s'ha pogut cancel·lar la invitació.",
+        "leave": "No s'ha pogut abandonar l'organització.",
+        "generic": "Alguna cosa ha fallat. Torna-ho a provar."
+      }
+    }
+  },
+  "invitations": {
+    "page_title": "Invitació a Stocka",
+    "title": "T'han convidat a Stocka",
+    "subtitle": "Has rebut una invitació per unir-te a una organització a Stocka. Accepta-la per entrar a l'equip.",
+    "accept": "Acceptar invitació",
+    "reject": "Rebutjar",
+    "accepting": "Acceptant…",
+    "rejecting": "Rebutjant…",
+    "accepted_title": "Invitació acceptada!",
+    "accepted_subtitle": "T'estem portant a la teva nova organització.",
+    "rejected_title": "Invitació rebutjada",
+    "rejected_subtitle": "Has rebutjat aquesta invitació.",
+    "back_to_dashboard": "Anar al dashboard",
+    "not_authenticated_title": "Inicia sessió per continuar",
+    "not_authenticated_subtitle": "Per acceptar o rebutjar la invitació, primer accedeix amb el compte del correu convidat.",
+    "go_to_login": "Iniciar sessió",
+    "no_account": "Encara no tens compte?",
+    "create_account": "Crea'n un",
+    "errors": {
+      "not_found": "Aquesta invitació no existeix o ja s'ha processat.",
+      "email_mismatch": "Aquesta invitació és per a un altre correu. Inicia sessió amb el compte correcte.",
+      "expired": "La invitació ha caducat. Demana a qui et va convidar que te n'enviï una de nova.",
+      "already_used": "Aquesta invitació ja no està pendent.",
+      "generic": "No s'ha pogut processar la invitació. Torna-ho a provar."
+    }
+  },
+  "errors": {
+    "title": "Error",
+    "generic": "S'ha produït un error inesperat.",
+    "network": "No s'ha pogut contactar amb el servidor.",
+    "auth": {
+      "invalid_credentials": "Correu o contrasenya incorrectes.",
+      "email_not_verified": "El correu no s'ha verificat.",
+      "passwords_mismatch": "Les contrasenyes no coincideixen.",
+      "unauthenticated": "Sessió no vàlida o expirada.",
+      "forbidden": "No tens permís per fer aquesta acció."
+    },
+    "users": {
+      "email_taken": "Ja existeix un usuari amb aquest correu.",
+      "username_taken": "Ja existeix un usuari amb aquest nom d'usuari.",
+      "username_invalid": "El nom d'usuari no és vàlid.",
+      "username_reserved": "Aquest nom d'usuari està reservat."
+    },
+    "pieces": {
+      "not_found": "Article no trobat."
+    },
+    "piece_types": {
+      "not_found": "Tipus d'article no trobat.",
+      "attribute_invalid": "L'atribut no és vàlid."
+    },
+    "locations": {
+      "not_found": "Ubicació no trobada."
+    },
+    "organizations": {
+      "not_found": "Organització no trobada.",
+      "invitation_limit_reached": "Has assolit el límit de {max} invitacions pendents.",
+      "invitation_expired": "La invitació ha caducat."
+    },
+    "storage": {
+      "r2_unavailable": "L'emmagatzematge no està disponible."
+    },
+    "upload": {
+      "too_large": "El fitxer és massa gran.",
+      "invalid_kind": "Tipus de fitxer no permès."
+    },
+    "validation": {
+      "required": "Aquest camp és obligatori.",
+      "failed": "La sol·licitud no és vàlida."
+    },
+    "request": {
+      "malformed_body": "El cos de la sol·licitud no és vàlid.",
+      "not_found": "Recurs no trobat.",
+      "method_not_allowed": "Mètode no permès."
+    },
+    "server": {
+      "internal_error": "Error intern del servidor."
     }
   }
 }
