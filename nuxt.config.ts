@@ -7,14 +7,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   future: { compatibilityVersion: 4 },
-
-  modules: [
-    "@nuxtjs/i18n",
-    "@nuxtjs/tailwindcss",
-    "@pinia/nuxt",
-    "@nuxt/eslint",
-  ],
-
+  modules: ["@nuxtjs/i18n", "@nuxtjs/tailwindcss", "@pinia/nuxt", "@nuxt/eslint", "@sentry/nuxt/module"],
   css: ["~/assets/css/main.css"],
 
   runtimeConfig: {
@@ -103,5 +96,14 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
     typeCheck: false,
+  },
+
+  sentry: {
+    org: "stocka",
+    project: "stocka-frontend",
+  },
+
+  sourcemap: {
+    client: "hidden",
   },
 });
