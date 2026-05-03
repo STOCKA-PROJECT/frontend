@@ -17,7 +17,23 @@ const email = ref('')
 const password = ref('')
 const loading = ref(false)
 const errorMsg = ref<string | null>(null)
-const successMsg = computed(() => route.query.reset === 'ok' ? t('auth.login.reset_ok') : null)
+const errorCode = ref<string | null>(null)
+const resendingVerification = ref(false)
+const verificationResent = ref(false)
+
+const successMsg = computed(() => {
+  if (route.query.verified === 'ok') return t('auth.login.verified_ok')
+  if (route.query.registered === 'ok') {
+    const e = typeof route.query.email === 'string' ? route.query.email : ''
+    return t('auth.login.registered_ok', { email: e })
+  }
+  if (route.query.reset === 'ok') return t('auth.login.reset_ok')
+  return null
+})
+
+const showResendVerification = computed(() =>
+  errorCode.value === 'auth.email_not_verified' && !!email.value.trim()
+)
 
 const canSubmit = computed(() => email.value.trim() && password.value && !loading.value)
 
@@ -38,6 +54,8 @@ async function submit() {
   if (!canSubmit.value) return
   loading.value = true
   errorMsg.value = null
+  errorCode.value = null
+  verificationResent.value = false
   try {
     const next = safeNextPath()
     if (next) {
@@ -48,9 +66,24 @@ async function submit() {
     }
   } catch (e) {
     console.error('[login] error:', e)
-    errorMsg.value = apiError(e).description
+    const view = apiError(e)
+    errorMsg.value = view.description
+    errorCode.value = view.code
   } finally {
     loading.value = false
+  }
+}
+
+async function resendVerification() {
+  if (!email.value.trim() || resendingVerification.value) return
+  resendingVerification.value = true
+  try {
+    await auth.resendVerification({ email: email.value.trim() })
+    verificationResent.value = true
+  } catch {
+    // silent — anti-enumeration: backend always returns 204 anyway
+  } finally {
+    resendingVerification.value = false
   }
 }
 </script>
@@ -65,7 +98,19 @@ async function submit() {
 
       <div v-if="errorMsg" role="alert"
         class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger">
-        {{ errorMsg }}
+        <p>{{ errorMsg }}</p>
+        <button
+          v-if="showResendVerification && !verificationResent"
+          type="button"
+          class="mt-1 inline-flex font-medium underline underline-offset-2 hover:opacity-80 disabled:opacity-60"
+          :disabled="resendingVerification"
+          @click="resendVerification"
+        >
+          {{ t('auth.login.resend_verification') }}
+        </button>
+        <p v-if="verificationResent" class="mt-1 text-accent-ink">
+          {{ t('auth.login.resend_verification_sent') }}
+        </p>
       </div>
 
       <AuthTextField id="email" v-model="email" :label="t('auth.login.email')" type="email"

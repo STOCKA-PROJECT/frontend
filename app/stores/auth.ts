@@ -5,8 +5,10 @@ import type {
   LoginResponseDto,
   LoginUserDto,
   RegisterUserDto,
+  ResendVerificationRequestDto,
   ResetPasswordRequestDto,
-  User
+  User,
+  VerifyEmailRequestDto
 } from '~/types/api'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -60,11 +62,31 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function signup(payload: RegisterUserDto) {
     const api = useApi()
+    const localePath = useLocalePath()
     await api<User>('/auth/signup', {
       method: 'POST',
       body: payload
     })
-    await login({ email: payload.email, password: payload.password })
+    await navigateTo({
+      path: localePath('/login'),
+      query: { registered: 'ok', email: payload.email }
+    })
+  }
+
+  async function verifyEmail(payload: VerifyEmailRequestDto) {
+    const api = useApi()
+    await api('/auth/verify-email', {
+      method: 'POST',
+      body: payload
+    })
+  }
+
+  async function resendVerification(payload: ResendVerificationRequestDto) {
+    const api = useApi()
+    await api('/auth/resend-verification', {
+      method: 'POST',
+      body: payload
+    })
   }
 
   async function forgotPassword(payload: ForgotPasswordRequestDto) {
@@ -137,6 +159,8 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     forgotPassword,
     resetPassword,
+    verifyEmail,
+    resendVerification,
     fetchMe,
     checkUsername,
     clearLocalSession

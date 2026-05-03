@@ -175,6 +175,10 @@
         "generic": "No s'ha pogut iniciar sessió. Torna-ho a provar."
       },
       "reset_ok": "La teva contrasenya s'ha restablert. Inicia sessió amb la nova contrasenya.",
+      "verified_ok": "El teu correu s'ha verificat. Ja pots iniciar sessió.",
+      "registered_ok": "T'hem enviat un correu de verificació a {email}. Verifica'l per iniciar sessió.",
+      "resend_verification": "Reenviar correu de verificació",
+      "resend_verification_sent": "Correu de verificació enviat. Revisa la safata d'entrada.",
       "page_title": "Inicia sessió"
     },
     "signup": {
@@ -196,6 +200,9 @@
       "email_placeholder": "tu\\@empresa.com",
       "password": "Contrasenya",
       "password_placeholder": "Mínim 8 caràcters",
+      "confirm_password": "Confirma la contrasenya",
+      "confirm_password_placeholder": "Torna-la a escriure",
+      "passwords_mismatch": "Les contrasenyes no coincideixen.",
       "accept_pre": "Accepto els",
       "terms": "Termes",
       "accept_mid": "i la",
@@ -243,6 +250,24 @@
         "generic": "No s'ha pogut restablir la contrasenya. Torna-ho a provar."
       },
       "page_title": "Restablir contrasenya"
+    },
+    "verify": {
+      "page_title": "Verificar correu",
+      "title": "Verificant el teu correu…",
+      "subtitle": "Espera un moment mentre confirmem el teu compte.",
+      "invalid_title": "Enllaç no vàlid",
+      "invalid_subtitle": "Aquest enllaç de verificació no és correcte o ha caducat.",
+      "errors": {
+        "expired": "L'enllaç ha caducat o no és vàlid. Sol·licita'n un de nou aquí sota.",
+        "generic": "No s'ha pogut verificar el correu. Torna-ho a provar."
+      },
+      "resend_title": "Reenviar correu de verificació",
+      "resend_subtitle": "Introdueix el teu correu i t'enviarem un nou enllaç.",
+      "resend_email_label": "Correu electrònic",
+      "resend_email_placeholder": "tu\\@empresa.com",
+      "resend_submit": "Reenviar enllaç",
+      "resend_sent": "Si {email} està registrat, rebràs un nou enllaç en breu.",
+      "back_to_login": "Tornar a l'inici de sessió"
     }
   },
   "dashboard": {
@@ -687,6 +712,7 @@
     "auth": {
       "invalid_credentials": "Correu o contrasenya incorrectes.",
       "email_not_verified": "El correu no s'ha verificat.",
+      "verification_token_invalid": "L'enllaç de verificació no és vàlid o ha caducat.",
       "passwords_mismatch": "Les contrasenyes no coincideixen.",
       "unauthenticated": "Sessió no vàlida o expirada.",
       "forbidden": "No tens permís per fer aquesta acció."

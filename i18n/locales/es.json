@@ -175,6 +175,10 @@
         "generic": "No se ha podido iniciar sesión. Inténtalo de nuevo."
       },
       "reset_ok": "Tu contraseña se ha restablecido. Inicia sesión con tu nueva contraseña.",
+      "verified_ok": "Tu correo ha sido verificado. Ya puedes iniciar sesión.",
+      "registered_ok": "Te hemos enviado un correo de verificación a {email}. Verifícalo para iniciar sesión.",
+      "resend_verification": "Reenviar correo de verificación",
+      "resend_verification_sent": "Correo de verificación enviado. Revisa tu bandeja.",
       "page_title": "Iniciar sesión"
     },
     "signup": {
@@ -196,6 +200,9 @@
       "email_placeholder": "tu\\@empresa.com",
       "password": "Contraseña",
       "password_placeholder": "Mínimo 8 caracteres",
+      "confirm_password": "Confirma la contraseña",
+      "confirm_password_placeholder": "Vuelve a escribirla",
+      "passwords_mismatch": "Las contraseñas no coinciden.",
       "accept_pre": "Acepto los",
       "terms": "Términos",
       "accept_mid": "y la",
@@ -243,6 +250,24 @@
         "generic": "No se ha podido restablecer la contraseña. Inténtalo de nuevo."
       },
       "page_title": "Restablecer contraseña"
+    },
+    "verify": {
+      "page_title": "Verificar correo",
+      "title": "Verificando tu correo…",
+      "subtitle": "Espera un momento mientras confirmamos tu cuenta.",
+      "invalid_title": "Enlace no válido",
+      "invalid_subtitle": "Este enlace de verificación no es correcto o ha caducado.",
+      "errors": {
+        "expired": "El enlace ha caducado o no es válido. Solicita uno nuevo abajo.",
+        "generic": "No se ha podido verificar el correo. Inténtalo de nuevo."
+      },
+      "resend_title": "Reenviar correo de verificación",
+      "resend_subtitle": "Introduce tu correo y te enviaremos un nuevo enlace.",
+      "resend_email_label": "Correo electrónico",
+      "resend_email_placeholder": "tu\\@empresa.com",
+      "resend_submit": "Reenviar enlace",
+      "resend_sent": "Si {email} está registrado, recibirás un nuevo enlace en breve.",
+      "back_to_login": "Volver al inicio de sesión"
     }
   },
   "dashboard": {
@@ -688,6 +713,7 @@
       "invalid_credentials": "Email o contraseña incorrectos.",
       "email_not_verified": "El email no ha sido verificado.",
       "passwords_mismatch": "Las contraseñas no coinciden.",
+      "verification_token_invalid": "El enlace de verificación es inválido o ha caducado.",
       "unauthenticated": "Sesión no válida o expirada.",
       "forbidden": "No tienes permiso para realizar esta acción."
     },

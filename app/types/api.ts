@@ -57,6 +57,14 @@ export interface ResetPasswordRequestDto {
   repeatPassword: string
 }
 
+export interface VerifyEmailRequestDto {
+  token: string
+}
+
+export interface ResendVerificationRequestDto {
+  email: string
+}
+
 export interface UpdateUserProfileDto {
   name?: string
   lastName?: string

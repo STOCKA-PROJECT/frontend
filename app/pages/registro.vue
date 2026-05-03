@@ -18,9 +18,12 @@ const username = ref('')
 const usernameTouched = ref(false)
 const email = ref('')
 const password = ref('')
+const confirmPassword = ref('')
 const acceptTerms = ref(false)
 const loading = ref(false)
 const errorMsg = ref<string | null>(null)
+
+const passwordsMatch = computed(() => !!password.value && password.value === confirmPassword.value)
 
 watch([firstName, lastName], ([fn, ln]) => {
   if (usernameTouched.value) return
@@ -47,6 +50,7 @@ const canSubmit = computed(() =>
   && usernameStatus.value === 'available'
   && emailLooksValid.value
   && passwordStrong.value
+  && passwordsMatch.value
   && acceptTerms.value
   && !loading.value
 )
@@ -88,7 +92,7 @@ async function submit() {
       lastName: lastName.value.trim(),
       email: email.value.trim(),
       password: password.value,
-      repeatPassword: password.value,
+      repeatPassword: confirmPassword.value,
       language: backendLanguage.value
     })
   } catch (e) {
@@ -165,6 +169,22 @@ async function submit() {
         show-strength
         required
       />
+
+      <AuthPasswordField
+        id="confirm-password-signup"
+        v-model="confirmPassword"
+        :label="t('auth.signup.confirm_password')"
+        :placeholder="t('auth.signup.confirm_password_placeholder')"
+        autocomplete="new-password"
+        required
+      />
+
+      <p
+        v-if="confirmPassword && !passwordsMatch"
+        class="text-[12px] text-danger"
+      >
+        {{ t('auth.signup.passwords_mismatch') }}
+      </p>
 
       <AuthCheckbox id="terms" v-model="acceptTerms">
         {{ t('auth.signup.accept_pre') }}

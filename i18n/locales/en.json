@@ -175,6 +175,10 @@
         "generic": "Could not sign you in. Please try again."
       },
       "reset_ok": "Your password has been reset. Sign in with your new password.",
+      "verified_ok": "Your email has been verified. You can sign in now.",
+      "registered_ok": "We've sent a verification email to {email}. Verify it to sign in.",
+      "resend_verification": "Resend verification email",
+      "resend_verification_sent": "Verification email sent. Check your inbox.",
       "page_title": "Sign in"
     },
     "signup": {
@@ -196,6 +200,9 @@
       "email_placeholder": "you\\@company.com",
       "password": "Password",
       "password_placeholder": "At least 8 characters",
+      "confirm_password": "Confirm password",
+      "confirm_password_placeholder": "Type it again",
+      "passwords_mismatch": "Passwords do not match.",
       "accept_pre": "I accept the",
       "terms": "Terms",
       "accept_mid": "and the",
@@ -243,6 +250,24 @@
         "generic": "Could not reset the password. Please try again."
       },
       "page_title": "Reset password"
+    },
+    "verify": {
+      "page_title": "Verify email",
+      "title": "Verifying your email…",
+      "subtitle": "Hold on while we confirm your account.",
+      "invalid_title": "Invalid link",
+      "invalid_subtitle": "This verification link is not correct or has expired.",
+      "errors": {
+        "expired": "The link has expired or is not valid. Request a new one below.",
+        "generic": "Could not verify your email. Please try again."
+      },
+      "resend_title": "Resend verification email",
+      "resend_subtitle": "Enter your email and we'll send you a new link.",
+      "resend_email_label": "Email",
+      "resend_email_placeholder": "you\\@company.com",
+      "resend_submit": "Resend link",
+      "resend_sent": "If {email} is registered, you'll receive a new link shortly.",
+      "back_to_login": "Back to sign in"
     }
   },
   "dashboard": {
@@ -687,6 +712,7 @@
     "auth": {
       "invalid_credentials": "Invalid email or password.",
       "email_not_verified": "Email is not verified.",
+      "verification_token_invalid": "The verification link is invalid or has expired.",
       "passwords_mismatch": "Passwords do not match.",
       "unauthenticated": "Session invalid or expired.",
       "forbidden": "You don't have permission to perform this action."
