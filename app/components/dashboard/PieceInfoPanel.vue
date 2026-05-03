@@ -380,11 +380,11 @@ function renderValue(attrId: number, type: PieceTypeAttributeResponseDto['type']
 <style scoped>
 .info-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 12px 24px;
 }
-@media (max-width: 720px) {
-  .info-grid { grid-template-columns: 1fr; }
+@media (min-width: 768px) {
+  .info-grid { grid-template-columns: 1fr 1fr; }
 }
 .info-row { display: flex; flex-direction: column; gap: 3px; }
 .info-row-full { grid-column: 1 / -1; }

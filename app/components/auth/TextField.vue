@@ -50,7 +50,7 @@ defineEmits<{
         :disabled="disabled"
         :maxlength="maxlength"
         :spellcheck="spellcheck"
-        class="h-11 flex-1 bg-transparent pr-3.5 text-[14.5px] text-ink outline-none placeholder:text-ink-muted disabled:opacity-50"
+        class="h-11 flex-1 bg-transparent pr-3.5 text-[16px] text-ink outline-none placeholder:text-ink-muted disabled:opacity-50 sm:text-[14.5px]"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       >
     </div>
@@ -66,7 +66,7 @@ defineEmits<{
       :disabled="disabled"
       :maxlength="maxlength"
       :spellcheck="spellcheck"
-      class="h-11 w-full rounded-[10px] border border-line bg-field px-3.5 text-[14.5px] text-ink outline-none transition-[border-color,background,box-shadow] duration-150 placeholder:text-ink-muted hover:border-line-strong focus:border-accent focus:bg-field-focus disabled:opacity-50"
+      class="h-11 w-full rounded-[10px] border border-line bg-field px-3.5 text-[16px] text-ink outline-none transition-[border-color,background,box-shadow] duration-150 placeholder:text-ink-muted hover:border-line-strong focus:border-accent focus:bg-field-focus disabled:opacity-50 sm:text-[14.5px]"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     >
 

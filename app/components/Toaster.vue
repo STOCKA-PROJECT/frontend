@@ -41,13 +41,19 @@ function iconFor(type: 'error' | 'success' | 'info'): string {
 <style scoped>
 .toaster {
   position: fixed;
-  inset: auto 1rem 1rem auto;
+  inset: auto 0.75rem max(0.75rem, env(safe-area-inset-bottom)) 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   z-index: 9999;
   pointer-events: none;
-  max-width: min(420px, calc(100vw - 2rem));
+  max-width: calc(100vw - 1.5rem);
+}
+@media (min-width: 640px) {
+  .toaster {
+    inset: auto 1rem max(1rem, env(safe-area-inset-bottom)) auto;
+    max-width: min(380px, calc(100vw - 2rem));
+  }
 }
 
 .toast {

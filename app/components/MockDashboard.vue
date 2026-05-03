@@ -69,17 +69,16 @@ const stats = computed(() => [
         </span>
       </div>
 
-      <div class="mb-2 grid grid-cols-3 gap-2.5 max-[520px]:grid-cols-2">
+      <div class="mb-2 grid grid-cols-3 gap-2.5">
         <div
-          v-for="(stat, i) in stats"
+          v-for="stat in stats"
           :key="stat.label"
-          class="mock-stat relative overflow-hidden rounded-[10px] border border-line bg-bg px-3.5 py-3"
-          :class="{ 'max-[520px]:hidden': i === 2 }"
+          class="mock-stat relative overflow-hidden rounded-[10px] border border-line bg-bg px-3 py-3 sm:px-3.5"
         >
-          <div class="mb-1 text-[11px] text-ink-muted">
+          <div class="mb-1 truncate text-[11px] text-ink-muted">
             {{ stat.label }}
           </div>
-          <div class="text-xl font-semibold tracking-tighter">
+          <div class="truncate text-xl font-semibold tracking-tighter">
             {{ stat.value }}
           </div>
         </div>
@@ -88,21 +87,21 @@ const stats = computed(() => [
       <div
         v-for="item in items"
         :key="item.title"
-        class="mock-row flex items-center gap-3 rounded-lg border border-line bg-bg p-2.5"
+        class="mock-row flex items-center gap-2.5 rounded-lg border border-line bg-bg p-2.5 sm:gap-3"
       >
         <div
           class="h-8 w-8 shrink-0 rounded-md"
           :style="item.thumbStyle ?? 'background:linear-gradient(135deg,var(--c-accent-soft),var(--c-line-strong))'"
         />
         <div class="min-w-0 flex-1">
-          <strong class="block text-[13px] font-medium text-ink">{{ item.title }}</strong>
-          <span class="font-mono text-[11.5px] text-ink-muted">{{ item.meta }}</span>
+          <strong class="block truncate text-[13px] font-medium text-ink">{{ item.title }}</strong>
+          <span class="block truncate font-mono text-[11.5px] text-ink-muted">{{ item.meta }}</span>
         </div>
-        <div class="text-[13px] tabular-nums text-ink-soft">
+        <div class="hidden truncate text-[13px] tabular-nums text-ink-soft sm:block">
           {{ item.owner }}
         </div>
         <span
-          class="rounded px-2 py-0.5 text-[11px]"
+          class="flex-shrink-0 rounded px-2 py-0.5 text-[11px]"
           :class="item.status === 'review' ? 'bg-warn-bg text-warn-ink' : 'bg-bg-alt text-ink-soft'"
         >
           {{ t(`mock.status.${item.status}`) }}

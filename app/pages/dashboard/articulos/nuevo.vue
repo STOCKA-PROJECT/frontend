@@ -104,13 +104,13 @@ function onCancel() {
 </script>
 
 <template>
-  <div class="page flex flex-col gap-5 px-8 pb-10 pt-7 max-md:px-4">
+  <div class="page flex flex-col gap-5 px-4 pb-10 pt-5 sm:px-5 sm:pt-7 lg:px-8">
     <NuxtLink :to="localePath('/dashboard/articulos')" class="back-link">
       ← {{ t('dashboard.pieces.back_to_list') }}
     </NuxtLink>
 
     <div>
-      <h1 class="text-[26px] font-semibold leading-[1.15] tracking-[-0.025em] text-ink">
+      <h1 class="text-[22px] font-semibold leading-[1.15] tracking-[-0.025em] text-ink sm:text-[26px]">
         {{ t('dashboard.pieces.form.title_create') }}
       </h1>
       <p class="mt-1 max-w-[680px] text-[14px] leading-relaxed text-ink-soft">

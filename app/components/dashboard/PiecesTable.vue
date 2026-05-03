@@ -88,7 +88,7 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
 
 <template>
   <div class="overflow-x-auto">
-    <table v-if="!isEmpty" class="w-full border-collapse text-[13.5px]">
+    <table v-if="!isEmpty" class="w-full min-w-[680px] border-collapse text-[13.5px]">
       <thead>
         <tr>
           <th class="th">{{ t('dashboard.pieces_table.col_item') }}</th>
@@ -188,17 +188,26 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
   font-size: 12px;
   letter-spacing: .04em;
   text-transform: uppercase;
-  padding: 10px 20px;
+  padding: 10px 16px;
   background: var(--c-bg-soft);
   border-bottom: 1px solid var(--c-line);
 }
+@media (min-width: 640px) {
+  .th { padding: 10px 20px; }
+}
 .th-actions { width: 48px; }
 .td {
-  padding: 14px 20px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--c-line);
   vertical-align: middle;
 }
-.td-actions { padding: 14px 12px; width: 48px; }
+@media (min-width: 640px) {
+  .td { padding: 14px 20px; }
+}
+.td-actions { padding: 12px 10px; width: 48px; }
+@media (min-width: 640px) {
+  .td-actions { padding: 14px 12px; }
+}
 .row:last-child .td { border-bottom: 0; }
 .row { transition: background .12s; }
 .row:hover { background: var(--c-bg-soft); }
@@ -243,8 +252,8 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
 }
 
 .trash-btn {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
@@ -253,6 +262,12 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
   align-items: center;
   justify-content: center;
   transition: background .12s, border-color .12s, color .12s;
+}
+@media (min-width: 640px) {
+  .trash-btn {
+    width: 30px;
+    height: 30px;
+  }
 }
 .trash-btn:hover {
   background: color-mix(in oklab, var(--c-danger) 8%, transparent);

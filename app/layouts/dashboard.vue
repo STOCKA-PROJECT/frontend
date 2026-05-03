@@ -9,7 +9,7 @@ if (auth.isAuthenticated && orgs.list.length === 0) {
 </script>
 
 <template>
-  <div class="grid min-h-screen grid-cols-[var(--sidebar-w)_1fr] max-[820px]:grid-cols-1">
+  <div class="grid min-h-screen grid-cols-1 lg:grid-cols-[var(--sidebar-w)_1fr]">
     <a href="#dashboard-content" class="skip-link">{{ t('dashboard.skip') }}</a>
     <DashboardSidebar />
     <div class="flex min-w-0 flex-col">

@@ -11,7 +11,7 @@ defineEmits<{
 </script>
 
 <template>
-  <label :for="id" class="check relative flex cursor-pointer select-none items-start gap-2.5">
+  <label :for="id" class="check relative flex min-h-[44px] cursor-pointer select-none items-center gap-2.5 sm:min-h-0 sm:items-start">
     <input
       :id="id"
       type="checkbox"
@@ -21,7 +21,7 @@ defineEmits<{
       @change="$emit('update:modelValue', ($event.target as HTMLInputElement).checked)"
     >
     <span
-      class="check-box mt-px flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded-[5px] border border-line-strong bg-field transition-all duration-150"
+      class="check-box flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[5px] border border-line-strong bg-field transition-all duration-150 sm:mt-px sm:h-[18px] sm:w-[18px]"
       aria-hidden="true"
     >
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" class="check-mark text-white">

@@ -37,7 +37,7 @@ const features: Feature[] = [
         <li
           v-for="(feat, i) in features"
           :key="feat.key"
-          class="feat reveal flex flex-col gap-3.5 rounded-[14px] border border-line bg-bg-card p-7
+          class="feat reveal flex flex-col gap-3.5 rounded-[14px] border border-line bg-bg-card p-5 sm:p-7
                  transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-line-strong"
           :class="`d${i + 1}`"
         >

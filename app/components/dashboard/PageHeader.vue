@@ -16,9 +16,9 @@ const canCreatePieces = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-wrap items-end justify-between gap-6">
-    <div>
-      <h1 class="text-[26px] font-semibold leading-[1.15] tracking-[-0.025em] text-ink">
+  <div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-6">
+    <div class="min-w-0">
+      <h1 class="text-[22px] font-semibold leading-[1.15] tracking-[-0.025em] text-ink sm:text-[26px]">
         {{ greeting }}
       </h1>
       <p class="mt-1 text-[14px] leading-relaxed text-ink-soft">
@@ -34,22 +34,22 @@ const canCreatePieces = computed(() => {
         </template>
       </p>
     </div>
-    <div class="flex items-center gap-2">
-      <button class="header-btn header-btn-outline" disabled :title="t('common.comingSoon')">
+    <div class="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+      <button class="header-btn header-btn-outline flex-1 sm:flex-none" disabled :title="t('common.comingSoon')">
         <DashboardIcon name="upload" :size="14" />
         {{ t('dashboard.header.import_csv') }}
       </button>
       <NuxtLink
         v-if="canCreatePieces"
         :to="localePath('/dashboard/articulos/nuevo')"
-        class="header-btn header-btn-primary"
+        class="header-btn header-btn-primary flex-1 sm:flex-none"
       >
         <DashboardIcon name="plus" :size="14" />
         {{ t('dashboard.header.new_item') }}
       </NuxtLink>
       <button
         v-else
-        class="header-btn header-btn-primary"
+        class="header-btn header-btn-primary flex-1 sm:flex-none"
         disabled
         :title="t('errors.auth.forbidden')"
       >
@@ -66,8 +66,8 @@ const canCreatePieces = computed(() => {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  height: 36px;
-  padding: 0 14px;
+  height: 40px;
+  padding: 0 16px;
   border-radius: 9px;
   font-size: 13.5px;
   font-weight: 500;
@@ -75,6 +75,7 @@ const canCreatePieces = computed(() => {
   white-space: nowrap;
   border: 0;
   cursor: pointer;
+  min-width: 0;
   transition: background .15s, box-shadow .15s, border-color .15s, opacity .15s;
 }
 .header-btn[disabled] {

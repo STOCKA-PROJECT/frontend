@@ -40,12 +40,12 @@ const show = shallowRef(false)
         :autocomplete="autocomplete"
         :required="required"
         :disabled="disabled"
-        class="h-11 w-full rounded-[10px] border border-line bg-field pl-3.5 pr-11 text-[14.5px] text-ink outline-none transition-[border-color,background,box-shadow] duration-150 placeholder:text-ink-muted hover:border-line-strong focus:border-accent focus:bg-field-focus disabled:opacity-50"
+        class="h-11 w-full rounded-[10px] border border-line bg-field pl-3.5 pr-12 text-[16px] text-ink outline-none transition-[border-color,background,box-shadow] duration-150 placeholder:text-ink-muted hover:border-line-strong focus:border-accent focus:bg-field-focus disabled:opacity-50 sm:text-[14.5px]"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       >
       <button
         type="button"
-        class="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center justify-center rounded-md border-0 bg-transparent p-1.5 text-ink-muted transition-colors hover:bg-ink/5 hover:text-ink-soft"
+        class="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md border-0 bg-transparent text-ink-muted transition-colors hover:bg-ink/5 hover:text-ink-soft"
         :aria-label="show ? t('auth.hide_password') : t('auth.show_password')"
         @click="show = !show"
       >

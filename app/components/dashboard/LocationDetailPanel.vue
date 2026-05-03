@@ -105,7 +105,7 @@ const showEmptyState = computed(() =>
           <h3 class="mb-2 text-[11.5px] font-semibold uppercase tracking-[.06em] text-ink-muted">
             {{ t('dashboard.locations.children_title') }}
           </h3>
-          <ul class="grid grid-cols-2 gap-2 max-[640px]:grid-cols-1">
+          <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <li v-for="child in childLocations" :key="child.id">
               <button type="button" class="child-card"
                 @click="emit('select-child', child.id)">

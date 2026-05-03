@@ -62,8 +62,8 @@ const hasAnyFilter = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-wrap items-end gap-3 border-b border-line bg-bg-soft/40 px-5 py-3.5">
-    <div class="flex min-w-[220px] flex-1 flex-col gap-1">
+  <div class="grid grid-cols-1 items-end gap-2.5 border-b border-line bg-bg-soft/40 px-4 py-3.5 sm:grid-cols-2 sm:px-5 lg:grid-cols-[1.5fr_1fr_1fr_1fr_auto] lg:gap-3">
+    <div class="flex flex-col gap-1">
       <label for="filter-q" class="filter-label">
         {{ t('dashboard.pieces.filters.search') }}
       </label>
@@ -77,33 +77,33 @@ const hasAnyFilter = computed(() =>
           :value="qLocal"
           :placeholder="t('dashboard.pieces.filters.search_placeholder')"
           :disabled="loading"
-          class="filter-input pl-8"
+          class="filter-input w-full pl-8"
           @input="onQInput"
         >
       </div>
     </div>
 
-    <div class="flex min-w-[150px] flex-col gap-1">
+    <div class="flex flex-col gap-1">
       <label for="filter-type" class="filter-label">{{ t('dashboard.pieces.filters.type') }}</label>
-      <select id="filter-type" class="filter-select" :value="filters.typeId ?? ''" :disabled="loading"
+      <select id="filter-type" class="filter-select w-full" :value="filters.typeId ?? ''" :disabled="loading"
         @change="onTypeChange">
         <option value="">{{ t('dashboard.pieces.filters.all') }}</option>
         <option v-for="pt in pieceTypes" :key="pt.id" :value="pt.id">{{ pt.name }}</option>
       </select>
     </div>
 
-    <div class="flex min-w-[160px] flex-col gap-1">
+    <div class="flex flex-col gap-1">
       <label for="filter-location" class="filter-label">{{ t('dashboard.pieces.filters.location') }}</label>
-      <select id="filter-location" class="filter-select" :value="filters.locationId ?? ''" :disabled="loading"
+      <select id="filter-location" class="filter-select w-full" :value="filters.locationId ?? ''" :disabled="loading"
         @change="onLocationChange">
         <option value="">{{ t('dashboard.pieces.filters.all') }}</option>
         <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
       </select>
     </div>
 
-    <div class="flex min-w-[160px] flex-col gap-1">
+    <div class="flex flex-col gap-1">
       <label for="filter-owner" class="filter-label">{{ t('dashboard.pieces.filters.owner') }}</label>
-      <select id="filter-owner" class="filter-select" :value="filters.ownerUserId ?? ''" :disabled="loading"
+      <select id="filter-owner" class="filter-select w-full" :value="filters.ownerUserId ?? ''" :disabled="loading"
         @change="onOwnerChange">
         <option value="">{{ t('dashboard.pieces.filters.all') }}</option>
         <option v-for="m in members" :key="m.userId" :value="m.userId">
@@ -112,9 +112,9 @@ const hasAnyFilter = computed(() =>
       </select>
     </div>
 
-    <div class="flex min-w-[130px] flex-col gap-1">
+    <div class="flex flex-col gap-1 sm:col-span-2 lg:col-span-1">
       <label for="filter-status" class="filter-label">{{ t('dashboard.pieces.filters.status') }}</label>
-      <select id="filter-status" class="filter-select" :value="filters.status ?? ''" :disabled="loading"
+      <select id="filter-status" class="filter-select w-full" :value="filters.status ?? ''" :disabled="loading"
         @change="onStatusChange">
         <option value="">{{ t('dashboard.pieces.filters.all') }}</option>
         <option value="ACTIVE">{{ t('dashboard.pieces_table.status_active') }}</option>
@@ -125,7 +125,7 @@ const hasAnyFilter = computed(() =>
     <button
       v-if="hasAnyFilter"
       type="button"
-      class="clear-btn"
+      class="clear-btn sm:col-span-2 lg:col-span-1"
       :disabled="loading"
       @click="emit('clear')"
     >
@@ -144,14 +144,21 @@ const hasAnyFilter = computed(() =>
 }
 .filter-input,
 .filter-select {
-  height: 34px;
+  height: 40px;
   padding: 0 10px;
   border: 1px solid var(--c-line);
   border-radius: 8px;
   background: var(--c-field);
   color: var(--c-ink);
-  font-size: 13.5px;
+  font-size: 14px;
   transition: border-color .12s, background .12s;
+}
+@media (min-width: 1024px) {
+  .filter-input,
+  .filter-select {
+    height: 36px;
+    font-size: 13.5px;
+  }
 }
 .filter-input:focus,
 .filter-select:focus {
@@ -165,15 +172,21 @@ const hasAnyFilter = computed(() =>
   cursor: not-allowed;
 }
 .clear-btn {
-  height: 34px;
+  height: 40px;
   padding: 0 12px;
   align-self: end;
   border: 1px solid var(--c-line);
   border-radius: 8px;
   background: var(--c-bg-card);
   color: var(--c-ink-soft);
-  font-size: 12.5px;
+  font-size: 13px;
   transition: background .12s;
+}
+@media (min-width: 1024px) {
+  .clear-btn {
+    height: 36px;
+    font-size: 12.5px;
+  }
 }
 .clear-btn:hover:not(:disabled) { background: var(--c-bg-soft); color: var(--c-ink); }
 .clear-btn:disabled { opacity: .45; cursor: not-allowed; }

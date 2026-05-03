@@ -5,6 +5,7 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const auth = useAuthStore()
 const orgs = useOrganizationsStore()
+const { isOpen, close } = useMobileNav()
 
 const hasOrgs = computed(() => orgs.list.length >= 1)
 
@@ -32,13 +33,15 @@ onMounted(() => {
 
 async function handleLogout() {
   menuOpen.value = false
+  close()
   await auth.logout()
 }
 </script>
 
 <template>
+  <!-- Desktop sidebar (lg+): fixed, always visible -->
   <aside
-    class="dashboard-side sticky top-0 flex h-screen flex-col gap-[18px] border-r border-line bg-bg-card px-3.5 py-4.5 max-[820px]:hidden">
+    class="dashboard-side sticky top-0 hidden h-screen flex-col gap-[18px] border-r border-line bg-bg-card px-3.5 py-4.5 lg:flex">
     <NuxtLink :to="localePath('/')"
       class="flex items-center gap-2.5 px-2 py-1.5 text-[15px] font-semibold tracking-[-0.015em] text-ink">
       <svg width="22" height="22" viewBox="0 0 40 40" fill="none" aria-hidden="true">
@@ -75,8 +78,7 @@ async function handleLogout() {
         <span>{{ t('dashboard.summary') }}</span>
       </NuxtLink>
 
-      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/articulos')" active-class="is-active"
-        class="nav-item">
+      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/articulos')" active-class="is-active" class="nav-item">
         <DashboardIcon name="box" />
         <span>{{ t('dashboard.nav.items') }}</span>
       </NuxtLink>
@@ -106,8 +108,7 @@ async function handleLogout() {
       <span class="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[.08em] text-ink-muted">
         {{ t('dashboard.organization_label') }}
       </span>
-      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/equipo')" exact-active-class="is-active"
-        class="nav-item">
+      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/equipo')" exact-active-class="is-active" class="nav-item">
         <DashboardIcon name="users" />
         <span>{{ t('dashboard.nav.team') }}</span>
       </NuxtLink>
@@ -143,17 +144,138 @@ async function handleLogout() {
         <button type="button" role="menuitem"
           class="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-[13.5px] text-ink transition-colors hover:bg-bg-soft"
           @click="handleLogout">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
+          <DashboardIcon name="log-out" :size="14" />
           {{ t('dashboard.logout') }}
         </button>
       </div>
     </div>
   </aside>
+
+  <!-- Mobile drawer (<lg): teleported to body, slides in from left -->
+  <Teleport to="body">
+    <Transition name="backdrop">
+      <div
+        v-if="isOpen"
+        class="mobile-nav-backdrop fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+        aria-hidden="true"
+        @click="close"
+      />
+    </Transition>
+    <Transition name="drawer">
+      <aside
+        v-if="isOpen"
+        class="mobile-nav-drawer fixed inset-y-0 left-0 z-50 flex w-[min(320px,85vw)] flex-col gap-[18px] overflow-y-auto border-r border-line bg-bg-card px-3.5 py-4.5 shadow-elevated lg:hidden"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="t('common.main_nav')"
+      >
+        <div class="flex items-center justify-between">
+          <NuxtLink
+            :to="localePath('/')"
+            class="flex items-center gap-2.5 px-2 py-1.5 text-[15px] font-semibold tracking-[-0.015em] text-ink"
+            @click="close"
+          >
+            <svg width="22" height="22" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+              <rect x="2" y="2" width="36" height="36" rx="6" stroke="currentColor" stroke-width="1.5" opacity="0.25" />
+              <rect x="8" y="8" width="24" height="24" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.55" />
+              <rect x="14" y="14" width="12" height="12" rx="2.5" fill="currentColor" />
+            </svg>
+            <span>Stocka</span>
+          </NuxtLink>
+          <button
+            type="button"
+            class="flex h-10 w-10 items-center justify-center rounded-[10px] border border-line bg-bg-card text-ink-soft transition-colors hover:bg-bg-soft"
+            :aria-label="t('common.close_menu')"
+            @click="close"
+          >
+            <DashboardIcon name="x" :size="18" />
+          </button>
+        </div>
+
+        <DashboardOrgSwitcher v-if="hasOrgs" />
+        <NuxtLink
+          v-else
+          :to="localePath('/dashboard/crear-organizacion')"
+          class="flex items-center gap-2.5 rounded-[10px] border border-dashed border-line-strong bg-bg-soft px-3 py-2.5 text-left text-[13px] font-medium text-ink-soft transition-[border-color,color,background] duration-150 hover:border-accent hover:bg-accent-soft hover:text-accent-ink"
+          @click="close"
+        >
+          <div class="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-lg border border-dashed border-line-strong text-ink-muted">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </div>
+          <span class="flex-1 leading-snug">{{ t('dashboard.org.start_first_cta') }}</span>
+        </NuxtLink>
+
+        <nav class="flex flex-col gap-px" :aria-label="t('common.main_nav')">
+          <NuxtLink :to="localePath('/dashboard')" exact-active-class="is-active" class="nav-item" @click="close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span>{{ t('dashboard.summary') }}</span>
+          </NuxtLink>
+
+          <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/articulos')" active-class="is-active" class="nav-item" @click="close">
+            <DashboardIcon name="box" />
+            <span>{{ t('dashboard.nav.items') }}</span>
+          </NuxtLink>
+
+          <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/ubicaciones')" exact-active-class="is-active" class="nav-item" @click="close">
+            <DashboardIcon name="building" />
+            <span>{{ t('dashboard.nav.locations') }}</span>
+          </NuxtLink>
+
+          <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/tipos-articulos')" exact-active-class="is-active" class="nav-item" @click="close">
+            <DashboardIcon name="list" />
+            <span>{{ t('dashboard.nav.types') }}</span>
+          </NuxtLink>
+        </nav>
+
+        <div class="flex flex-col gap-px">
+          <span class="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[.08em] text-ink-muted">
+            {{ t('dashboard.organization_label') }}
+          </span>
+          <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/equipo')" exact-active-class="is-active" class="nav-item" @click="close">
+            <DashboardIcon name="users" />
+            <span>{{ t('dashboard.nav.team') }}</span>
+          </NuxtLink>
+          <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/ajustes-organizacion')" exact-active-class="is-active" class="nav-item" @click="close">
+            <DashboardIcon name="settings" />
+            <span>{{ t('dashboard.nav.settings') }}</span>
+          </NuxtLink>
+        </div>
+
+        <div class="mt-auto">
+          <button
+            type="button"
+            class="flex w-full items-center gap-2.5 rounded-[10px] px-2.5 py-2.5 text-left transition-colors hover:bg-bg-soft"
+          >
+            <div class="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#c4b5a3] to-[#a89786] text-[12px] font-semibold text-white">
+              {{ userInitials }}
+            </div>
+            <div class="flex min-w-0 flex-1 flex-col">
+              <span class="truncate text-[13px] font-medium text-ink">{{ userFullName || t('common.user_fallback') }}</span>
+              <span class="truncate text-[11.5px] text-ink-muted">{{ auth.user?.email }}</span>
+            </div>
+          </button>
+          <button
+            type="button"
+            class="mt-1 flex w-full items-center gap-2 rounded-[10px] px-2.5 py-2.5 text-left text-[13.5px] text-ink transition-colors hover:bg-bg-soft"
+            @click="handleLogout"
+          >
+            <DashboardIcon name="log-out" :size="14" />
+            {{ t('dashboard.logout') }}
+          </button>
+        </div>
+      </aside>
+    </Transition>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -161,7 +283,7 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   border-radius: 8px;
   font-size: 13.5px;
   color: var(--c-ink-soft);
@@ -198,5 +320,32 @@ async function handleLogout() {
 .nav-item.is-disabled {
   cursor: not-allowed;
   opacity: .55;
+}
+
+.backdrop-enter-active,
+.backdrop-leave-active {
+  transition: opacity .2s ease;
+}
+.backdrop-enter-from,
+.backdrop-leave-to {
+  opacity: 0;
+}
+
+.drawer-enter-active,
+.drawer-leave-active {
+  transition: transform .25s cubic-bezier(.2, .7, .2, 1);
+}
+.drawer-enter-from,
+.drawer-leave-to {
+  transform: translateX(-100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop-enter-active,
+  .backdrop-leave-active,
+  .drawer-enter-active,
+  .drawer-leave-active {
+    transition: none;
+  }
 }
 </style>

@@ -30,7 +30,7 @@ function expiresLabel(expiresAt: string): string {
 
 <template>
   <section class="rounded-[14px] border border-line bg-bg-card shadow-card">
-    <header class="flex items-center justify-between px-6 pt-5 pb-3">
+    <header class="flex flex-wrap items-center justify-between gap-3 px-5 pb-3 pt-5 sm:px-6">
       <div>
         <h2 class="text-[15px] font-semibold tracking-[-0.01em] text-ink">
           {{ t('dashboard.team.invitations_title') }}
@@ -50,34 +50,38 @@ function expiresLabel(expiresAt: string): string {
       </button>
     </header>
 
-    <div v-if="loading && invitations.length === 0" class="px-6 pb-6 pt-2 text-[13px] text-ink-muted">
+    <div v-if="loading && invitations.length === 0" class="px-5 pb-6 pt-2 text-[13px] text-ink-muted sm:px-6">
       {{ t('common.loading') }}
     </div>
-    <div v-else-if="invitations.length === 0" class="px-6 pb-6 pt-2 text-[13px] text-ink-muted">
+    <div v-else-if="invitations.length === 0" class="px-5 pb-6 pt-2 text-[13px] text-ink-muted sm:px-6">
       {{ t('dashboard.team.empty_invitations') }}
     </div>
 
     <ul v-else class="divide-y divide-line border-t border-line">
       <li v-for="inv in invitations" :key="inv.id"
-        class="flex items-center gap-3.5 px-6 py-3.5">
-        <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-bg-soft text-ink-soft">
-          <DashboardIcon name="mail" :size="16" />
+        class="flex flex-col gap-2.5 px-5 py-3.5 sm:flex-row sm:items-center sm:gap-3.5 sm:px-6">
+        <div class="flex min-w-0 flex-1 items-center gap-3">
+          <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-bg-soft text-ink-soft">
+            <DashboardIcon name="mail" :size="16" />
+          </div>
+          <div class="flex min-w-0 flex-1 flex-col">
+            <span class="truncate text-[13.5px] font-medium tracking-[-0.005em] text-ink">{{ inv.email }}</span>
+            <span class="truncate text-[12px] text-ink-muted">{{ expiresLabel(inv.expiresAt) }}</span>
+          </div>
         </div>
-        <div class="flex min-w-0 flex-1 flex-col">
-          <span class="truncate text-[13.5px] font-medium tracking-[-0.005em] text-ink">{{ inv.email }}</span>
-          <span class="truncate text-[12px] text-ink-muted">{{ expiresLabel(inv.expiresAt) }}</span>
+        <div class="flex items-center justify-end gap-2 sm:gap-3">
+          <DashboardRoleChip :role="inv.role" />
+          <button
+            v-if="canInvite"
+            type="button"
+            class="action-btn action-btn-danger"
+            :title="t('dashboard.team.cancel_invitation')"
+            :aria-label="t('dashboard.team.cancel_invitation')"
+            @click="emit('cancel', inv)"
+          >
+            <DashboardIcon name="x" :size="14" />
+          </button>
         </div>
-        <DashboardRoleChip :role="inv.role" />
-        <button
-          v-if="canInvite"
-          type="button"
-          class="action-btn action-btn-danger"
-          :title="t('dashboard.team.cancel_invitation')"
-          :aria-label="t('dashboard.team.cancel_invitation')"
-          @click="emit('cancel', inv)"
-        >
-          <DashboardIcon name="x" :size="14" />
-        </button>
       </li>
     </ul>
   </section>
@@ -88,7 +92,7 @@ function expiresLabel(expiresAt: string): string {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 36px;
+  height: 40px;
   padding: 0 14px;
   border-radius: 9px;
   font-size: 13px;
@@ -103,13 +107,19 @@ function expiresLabel(expiresAt: string): string {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   border: 1px solid var(--c-line);
   background: var(--c-bg-card);
   color: var(--c-ink-soft);
   transition: background .15s, border-color .15s, color .15s;
+}
+@media (min-width: 640px) {
+  .action-btn {
+    width: 30px;
+    height: 30px;
+  }
 }
 .action-btn:hover {
   background: var(--c-bg-soft);

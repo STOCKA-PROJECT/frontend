@@ -88,9 +88,9 @@ async function submit() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-7 px-8 pb-16 pt-7 max-md:px-4">
+  <div class="flex flex-col gap-7 px-4 pb-10 pt-5 sm:px-5 sm:pb-16 sm:pt-7 lg:px-8">
     <div>
-      <h1 class="text-[26px] font-semibold leading-[1.15] tracking-[-0.025em] text-ink">
+      <h1 class="text-[22px] font-semibold leading-[1.15] tracking-[-0.025em] text-ink sm:text-[26px]">
         {{ title }}
       </h1>
       <p class="mt-1 max-w-[640px] text-[14px] leading-relaxed text-ink-soft">

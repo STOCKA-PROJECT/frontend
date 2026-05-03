@@ -2,6 +2,7 @@
 const { t } = useI18n()
 const orgs = useOrganizationsStore()
 const route = useRoute()
+const { isOpen: mobileNavOpen, toggle: toggleMobileNav } = useMobileNav({ observeSideEffects: false })
 
 const segments = computed(() => route.path.split('/').filter(Boolean))
 const lastSegment = computed(() => segments.value[segments.value.length - 1])
@@ -43,16 +44,26 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
 </script>
 
 <template>
-  <header class="sticky top-0 z-20 flex h-topbar items-center gap-4 border-b border-line bg-bg/85 px-6 backdrop-blur-md max-md:px-4">
-    <nav :aria-label="t('dashboard.main_label')" class="flex min-w-0 items-center gap-1.5 text-[13.5px] text-ink-soft">
+  <header class="sticky top-0 z-20 flex h-topbar items-center gap-3 border-b border-line bg-bg/85 px-4 backdrop-blur-md sm:gap-4 sm:px-6">
+    <button
+      type="button"
+      class="hamburger-btn lg:hidden"
+      :aria-label="mobileNavOpen ? t('common.close_menu') : t('common.open_menu')"
+      :aria-expanded="mobileNavOpen"
+      @click="toggleMobileNav"
+    >
+      <DashboardIcon :name="mobileNavOpen ? 'x' : 'menu'" :size="18" />
+    </button>
+
+    <nav :aria-label="t('dashboard.main_label')" class="flex min-w-0 flex-1 items-center gap-1.5 text-[13.5px] text-ink-soft">
       <span v-if="showOrg && orgs.current" class="hover:text-ink truncate">{{ orgs.current.name }}</span>
       <template v-for="(part, idx) in here" :key="`${idx}-${part}`">
         <span aria-hidden="true" class="text-ink-muted">/</span>
-        <span :class="idx === here.length - 1 ? 'font-medium text-ink truncate' : 'truncate'">{{ part }}</span>
+        <span :class="idx === here.length - 1 ? 'truncate font-medium text-ink' : 'truncate'">{{ part }}</span>
       </template>
     </nav>
 
-    <div class="ml-auto flex h-9 w-[280px] items-center gap-2 rounded-[9px] border border-line bg-field px-3 text-[13.5px] transition-[border-color,box-shadow] duration-150 focus-within:border-accent focus-within:shadow-[0_0_0_3px_color-mix(in_oklab,var(--c-accent)_16%,transparent)] max-lg:w-[200px] max-md:hidden">
+    <div class="ml-auto hidden h-9 w-[280px] items-center gap-2 rounded-[9px] border border-line bg-field px-3 text-[13.5px] transition-[border-color,box-shadow] duration-150 focus-within:border-accent focus-within:shadow-[0_0_0_3px_color-mix(in_oklab,var(--c-accent)_16%,transparent)] lg:flex xl:w-[280px]">
       <DashboardIcon name="search" :size="14" />
       <input
         type="search"
@@ -67,7 +78,7 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
 
     <button
       type="button"
-      class="icon-btn relative"
+      class="icon-btn relative max-sm:hidden"
       :aria-label="t('dashboard.notifications')"
       :title="t('common.comingSoon')"
       disabled
@@ -76,7 +87,7 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
     </button>
     <button
       type="button"
-      class="icon-btn"
+      class="icon-btn max-sm:hidden"
       :aria-label="t('dashboard.help')"
       disabled
     >
@@ -87,8 +98,8 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
 
 <style scoped>
 .icon-btn {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -99,5 +110,30 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
   transition: border-color .15s, color .15s, background .15s;
   cursor: not-allowed;
   opacity: .65;
+}
+
+.hamburger-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--c-line);
+  border-radius: 9px;
+  color: var(--c-ink);
+  transition: border-color .15s, color .15s, background .15s;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hamburger-btn:hover {
+  background: var(--c-bg-soft);
+  border-color: var(--c-line-strong);
+}
+
+.hamburger-btn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
 }
 </style>

@@ -57,7 +57,7 @@ onBeforeUnmount(() => { cleanup?.() })
 <template>
   <section ref="heroRef" class="relative overflow-hidden pt-20 pb-16 max-md:pt-14 max-md:pb-10">
     <div class="wrap">
-      <div class="grid items-center gap-[72px] lg:grid-cols-[1.05fr_1fr] max-lg:gap-12">
+      <div class="grid items-center gap-8 sm:gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-[72px]">
         <div>
           <EyebrowBadge class="reveal mb-5">
             {{ t('hero.eyebrow') }}
@@ -70,7 +70,7 @@ onBeforeUnmount(() => { cleanup?.() })
             <em class="not-italic font-semibold text-accent-ink">{{ t('hero.title_b') }}</em>
             {{ t('hero.title_c') }}
           </h1>
-          <p class="reveal d2 mb-8 max-w-[520px] text-[17px] leading-relaxed text-ink-soft max-md:text-base">
+          <p class="reveal d2 mb-8 max-w-[520px] text-[15px] leading-relaxed text-ink-soft sm:text-base md:text-[17px]">
             {{ t('hero.sub') }}
           </p>
           <div class="reveal d3 mb-6 flex flex-wrap items-center gap-2.5">

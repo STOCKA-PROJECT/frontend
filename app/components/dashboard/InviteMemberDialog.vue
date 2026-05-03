@@ -64,46 +64,54 @@ function submit() {
     <div v-if="open" class="dialog-backdrop" role="presentation"
       @click="onBackdropClick" @keydown="onKey">
       <div role="dialog" aria-modal="true" :aria-label="t('dashboard.team.invite_dialog_title')"
-        class="w-[460px] max-w-[calc(100vw-32px)] rounded-[14px] border border-line bg-bg-card p-6 shadow-card">
-        <h2 class="text-[17px] font-semibold tracking-[-0.015em] text-ink">
-          {{ t('dashboard.team.invite_dialog_title') }}
-        </h2>
-        <p class="mt-1 text-[12.5px] text-ink-muted">
-          {{ t('dashboard.team.invite_dialog_subtitle') }}
-        </p>
+        class="flex w-[460px] max-h-[calc(100vh-24px)] max-w-[calc(100vw-24px)] flex-col rounded-[14px] border border-line bg-bg-card shadow-card">
+        <header class="flex-shrink-0 border-b border-line px-5 py-4 sm:px-6">
+          <h2 class="text-[17px] font-semibold tracking-[-0.015em] text-ink">
+            {{ t('dashboard.team.invite_dialog_title') }}
+          </h2>
+          <p class="mt-1 text-[12.5px] text-ink-muted">
+            {{ t('dashboard.team.invite_dialog_subtitle') }}
+          </p>
+        </header>
 
-        <form class="mt-4 flex flex-col gap-3.5" novalidate @submit.prevent="submit">
-          <div v-if="errorMsg" role="alert"
-            class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger">
-            {{ errorMsg }}
+        <form class="flex min-h-0 flex-1 flex-col" novalidate @submit.prevent="submit">
+          <div class="flex-1 overflow-y-auto px-5 py-4 sm:px-6">
+            <div v-if="errorMsg" role="alert"
+              class="mb-3 rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger">
+              {{ errorMsg }}
+            </div>
+
+            <div class="flex flex-col gap-3.5">
+              <div class="flex flex-col gap-1.5">
+                <label for="invite-email" class="text-[12.5px] font-medium tracking-[-0.005em] text-ink-soft">
+                  {{ t('dashboard.team.email_label') }}
+                </label>
+                <input id="invite-email" ref="emailInput" v-model="email" type="email" autocomplete="email"
+                  required maxlength="255"
+                  :placeholder="t('dashboard.team.email_placeholder')"
+                  class="h-11 w-full rounded-[10px] border border-line bg-field px-3.5 text-[14.5px] text-ink outline-none transition-[border-color,background,box-shadow] duration-150 placeholder:text-ink-muted hover:border-line-strong focus:border-accent focus:bg-field-focus">
+              </div>
+
+              <div class="flex flex-col gap-1.5">
+                <label for="invite-role" class="text-[12.5px] font-medium tracking-[-0.005em] text-ink-soft">
+                  {{ t('dashboard.team.role_label') }}
+                </label>
+                <DashboardRoleSelect id="invite-role" v-model="role" :available-roles="availableRoles" />
+              </div>
+            </div>
           </div>
 
-          <div class="flex flex-col gap-1.5">
-            <label for="invite-email" class="text-[12.5px] font-medium tracking-[-0.005em] text-ink-soft">
-              {{ t('dashboard.team.email_label') }}
-            </label>
-            <input id="invite-email" ref="emailInput" v-model="email" type="email" autocomplete="email"
-              required maxlength="255"
-              :placeholder="t('dashboard.team.email_placeholder')"
-              class="h-11 w-full rounded-[10px] border border-line bg-field px-3.5 text-[14.5px] text-ink outline-none transition-[border-color,background,box-shadow] duration-150 placeholder:text-ink-muted hover:border-line-strong focus:border-accent focus:bg-field-focus">
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label for="invite-role" class="text-[12.5px] font-medium tracking-[-0.005em] text-ink-soft">
-              {{ t('dashboard.team.role_label') }}
-            </label>
-            <DashboardRoleSelect id="invite-role" v-model="role" :available-roles="availableRoles" />
-          </div>
-
-          <div class="mt-2 flex items-center justify-end gap-2">
-            <button type="button" class="dialog-btn" :disabled="loading" @click="emit('close')">
-              {{ t('dashboard.team.cancel') }}
-            </button>
-            <button type="submit" class="dialog-btn dialog-btn-primary"
-              :disabled="!emailLooksValid || loading" :aria-busy="loading">
-              {{ t('dashboard.team.send_invite') }}
-            </button>
-          </div>
+          <footer class="flex-shrink-0 border-t border-line px-5 py-4 sm:px-6">
+            <div class="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+              <button type="button" class="dialog-btn" :disabled="loading" @click="emit('close')">
+                {{ t('dashboard.team.cancel') }}
+              </button>
+              <button type="submit" class="dialog-btn dialog-btn-primary"
+                :disabled="!emailLooksValid || loading" :aria-busy="loading">
+                {{ t('dashboard.team.send_invite') }}
+              </button>
+            </div>
+          </footer>
         </form>
       </div>
     </div>
@@ -120,11 +128,11 @@ function submit() {
   justify-content: center;
   background: color-mix(in oklab, var(--c-ink) 30%, transparent);
   backdrop-filter: blur(2px);
-  padding: 16px;
+  padding: 12px;
 }
 .dialog-btn {
-  height: 36px;
-  padding: 0 14px;
+  height: 40px;
+  padding: 0 16px;
   border-radius: 9px;
   font-size: 13.5px;
   font-weight: 500;

@@ -116,7 +116,7 @@ const showingDiff = (item: PieceHistoryItemDto) =>
           <div v-if="item.fieldName" class="mt-1 text-[12px] text-ink-soft">
             <span class="rounded bg-bg-soft px-1.5 py-0.5 font-mono text-[11px] text-ink">{{ item.fieldName }}</span>
           </div>
-          <div v-if="showingDiff(item)" class="mt-2 grid grid-cols-2 gap-2 text-[12.5px] max-[600px]:grid-cols-1">
+          <div v-if="showingDiff(item)" class="mt-2 grid grid-cols-1 gap-2 text-[12.5px] sm:grid-cols-2">
             <div class="diff-block diff-old">
               <span class="diff-label">{{ t('dashboard.pieces.history.before') }}</span>
               <span class="diff-value">{{ shortValue(item.oldValue) }}</span>

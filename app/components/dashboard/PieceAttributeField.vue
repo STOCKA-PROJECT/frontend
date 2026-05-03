@@ -212,16 +212,16 @@ const labelSuffix = computed(() => {
       <label
         v-for="opt in (attribute.validators?.options ?? [])"
         :key="opt"
-        class="inline-flex items-center gap-1.5 rounded-md border border-line bg-bg-card px-2 py-1 text-[12.5px] text-ink-soft"
+        class="inline-flex max-w-full items-center gap-1.5 rounded-md border border-line bg-bg-card px-2 py-1 text-[12.5px] text-ink-soft"
       >
         <input
           type="checkbox"
           :checked="multiSelected.has(opt)"
           :disabled="disabled"
-          class="h-3.5 w-3.5 accent-accent"
+          class="h-3.5 w-3.5 flex-shrink-0 accent-accent"
           @change="toggleMulti(opt)"
         >
-        {{ opt }}
+        <span class="truncate">{{ opt }}</span>
       </label>
     </div>
 

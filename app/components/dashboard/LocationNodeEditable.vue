@@ -250,6 +250,7 @@ function openMenu(e: Event) {
   top: 100%;
   margin-top: 4px;
   min-width: 180px;
+  max-width: calc(100vw - 24px);
   z-index: 30;
   border: 1px solid var(--c-line);
   background: var(--c-bg-card);

@@ -347,15 +347,17 @@ function onDetailDelete() {
 .board { min-height: 0; }
 .board-grid {
   display: grid;
-  grid-template-columns: minmax(280px, 360px) 1fr;
-  gap: 14px;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(280px, 40vh) 1fr;
+  gap: 12px;
   min-height: 0;
   height: 100%;
 }
-@media (max-width: 980px) {
+@media (min-width: 1024px) {
   .board-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(280px, 40vh) 1fr;
+    grid-template-columns: minmax(280px, 360px) 1fr;
+    grid-template-rows: 1fr;
+    gap: 14px;
   }
 }
 </style>

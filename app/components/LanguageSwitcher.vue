@@ -182,6 +182,7 @@ onBeforeUnmount(() => {
   top: calc(100% + 6px);
   z-index: 80;
   min-width: 180px;
+  max-width: calc(100vw - 1.5rem);
   padding: 4px;
   background: var(--c-bg-card);
   border: 1px solid var(--c-line);

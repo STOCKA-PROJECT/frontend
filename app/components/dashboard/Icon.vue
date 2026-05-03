@@ -100,5 +100,10 @@ withDefaults(defineProps<{ name: string; size?: number }>(), { size: 16 })
     <template v-else-if="name === 'check'">
       <polyline points="20 6 9 17 4 12" />
     </template>
+    <template v-else-if="name === 'menu'">
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </template>
   </svg>
 </template>

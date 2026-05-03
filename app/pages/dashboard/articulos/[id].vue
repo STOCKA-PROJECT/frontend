@@ -163,7 +163,7 @@ const members = computed(() => (orgId.value != null && team.getMembers(orgId.val
 </script>
 
 <template>
-  <div class="page flex flex-col gap-5 px-8 pb-10 pt-6 max-md:px-4">
+  <div class="page flex flex-col gap-5 px-4 pb-10 pt-5 sm:px-5 sm:pt-6 lg:px-8">
     <NuxtLink :to="localePath('/dashboard/articulos')" class="back-link">
       ← {{ t('dashboard.pieces.back_to_list') }}
     </NuxtLink>
@@ -178,10 +178,10 @@ const members = computed(() => (orgId.value != null && team.getMembers(orgId.val
     </div>
 
     <template v-else-if="piece && orgId != null">
-      <header class="flex flex-wrap items-start justify-between gap-3">
+      <header class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <div class="min-w-0">
-          <div class="flex items-center gap-3">
-            <h1 class="truncate text-[24px] font-semibold tracking-[-0.02em] text-ink">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h1 class="truncate text-[20px] font-semibold tracking-[-0.02em] text-ink sm:text-[24px]">
               {{ piece.name }}
             </h1>
             <span :class="['tag', piece.status === 'PENDING' ? 'tag-warn' : 'tag-ok']">
@@ -194,7 +194,7 @@ const members = computed(() => (orgId.value != null && team.getMembers(orgId.val
             {{ pieceTypesLabel || '—' }} · #{{ piece.id }}
           </p>
         </div>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
           <button
             v-if="canWrite"
             type="button"
@@ -299,7 +299,7 @@ const members = computed(() => (orgId.value != null && team.getMembers(orgId.val
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 34px;
+  height: 40px;
   padding: 0 14px;
   border-radius: 9px;
   border: 1px solid var(--c-line);
@@ -316,20 +316,28 @@ const members = computed(() => (orgId.value != null && team.getMembers(orgId.val
 
 .tab-bar {
   display: flex;
+  flex-wrap: nowrap;
   gap: 4px;
   border-bottom: 1px solid var(--c-line);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
 }
+.tab-bar::-webkit-scrollbar { height: 4px; }
+.tab-bar::-webkit-scrollbar-thumb { background: var(--c-line); border-radius: 4px; }
 .tab {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 14px;
+  padding: 12px 14px;
   font-size: 13.5px;
   color: var(--c-ink-soft);
   background: transparent;
   border: 0;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: color .12s, border-color .12s;
 }
 .tab:hover { color: var(--c-ink); }
@@ -350,7 +358,10 @@ const members = computed(() => (orgId.value != null && team.getMembers(orgId.val
   background: var(--c-bg-card);
   border: 1px solid var(--c-line);
   border-radius: 14px;
-  padding: 20px 22px;
+  padding: 16px;
+}
+@media (min-width: 640px) {
+  .panel { padding: 20px 22px; }
 }
 
 .tag {

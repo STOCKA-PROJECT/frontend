@@ -256,7 +256,7 @@ async function confirmDelete() {
       <div v-if="images.length === 0" class="empty-state">
         {{ t('dashboard.pieces.attachments.images_empty') }}
       </div>
-      <div v-else class="grid grid-cols-4 gap-3 max-[860px]:grid-cols-3 max-[600px]:grid-cols-2">
+      <div v-else class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
         <div v-for="att in images" :key="att.id" class="image-card">
           <button
             type="button"
@@ -305,21 +305,23 @@ async function confirmDelete() {
         {{ t('dashboard.pieces.attachments.documents_empty') }}
       </div>
       <ul v-else class="flex flex-col divide-y divide-line rounded-lg border border-line bg-bg-card">
-        <li v-for="att in documents" :key="att.id" class="flex items-center gap-3 px-4 py-3">
-          <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-bg-soft text-ink-soft">
-            <DashboardIcon name="folder" :size="16" />
-          </div>
-          <div class="min-w-0 flex-1">
-            <div class="truncate text-[13.5px] font-medium text-ink" :title="att.originalFilename">
-              {{ att.originalFilename }}
+        <li v-for="att in documents" :key="att.id" class="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-3">
+          <div class="flex min-w-0 flex-1 items-center gap-3">
+            <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-bg-soft text-ink-soft">
+              <DashboardIcon name="folder" :size="16" />
             </div>
-            <div class="flex items-center gap-3 text-[11.5px] text-ink-muted">
-              <span>{{ humanSize(att.sizeBytes) }}</span>
-              <span>·</span>
-              <span>{{ formatDate(att.createdAt) }}</span>
+            <div class="min-w-0 flex-1">
+              <div class="truncate text-[13.5px] font-medium text-ink" :title="att.originalFilename">
+                {{ att.originalFilename }}
+              </div>
+              <div class="flex items-center gap-2 text-[11.5px] text-ink-muted">
+                <span>{{ humanSize(att.sizeBytes) }}</span>
+                <span>·</span>
+                <span class="truncate">{{ formatDate(att.createdAt) }}</span>
+              </div>
             </div>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
             <button type="button" class="ghost-btn" @click="downloadDocument(att)">
               {{ t('dashboard.pieces.actions.download') }}
             </button>
@@ -456,14 +458,21 @@ async function confirmDelete() {
 .image-delete:disabled { opacity: .4; cursor: not-allowed; }
 
 .ghost-btn {
-  height: 30px;
-  padding: 0 10px;
+  height: 36px;
+  padding: 0 12px;
   border: 1px solid var(--c-line);
   border-radius: 8px;
   background: var(--c-bg-card);
   color: var(--c-ink);
-  font-size: 12.5px;
+  font-size: 13px;
   transition: background .12s;
+}
+@media (min-width: 640px) {
+  .ghost-btn {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 12.5px;
+  }
 }
 .ghost-btn:hover:not(:disabled) { background: var(--c-bg-soft); }
 .ghost-btn:disabled { opacity: .5; cursor: not-allowed; }

@@ -33,22 +33,26 @@ function onKey(e: KeyboardEvent) {
     <div v-if="open" class="dialog-backdrop" role="presentation"
       @click="onBackdropClick" @keydown="onKey">
       <div role="alertdialog" aria-modal="true" :aria-label="title"
-        class="w-[420px] max-w-[calc(100vw-32px)] rounded-[14px] border border-line bg-bg-card p-6 shadow-card">
-        <h2 class="text-[17px] font-semibold tracking-[-0.015em] text-ink">{{ title }}</h2>
-        <p class="mt-2 whitespace-pre-line text-[13.5px] leading-relaxed text-ink-soft">
-          {{ message }}
-        </p>
-        <div class="mt-5 flex items-center justify-end gap-2">
-          <button type="button" class="dialog-btn" :disabled="loading" @click="emit('close')">
-            {{ cancelLabel ?? t('common.close') }}
-          </button>
-          <button type="button" class="dialog-btn"
-            :class="tone === 'danger' ? 'dialog-btn-danger' : 'dialog-btn-primary'"
-            :disabled="loading" :aria-busy="loading"
-            @click="emit('confirm')">
-            {{ confirmLabel ?? t('common.confirm') }}
-          </button>
+        class="flex w-[420px] max-h-[calc(100vh-24px)] max-w-[calc(100vw-24px)] flex-col rounded-[14px] border border-line bg-bg-card shadow-card">
+        <div class="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+          <h2 class="text-[17px] font-semibold tracking-[-0.015em] text-ink">{{ title }}</h2>
+          <p class="mt-2 whitespace-pre-line text-[13.5px] leading-relaxed text-ink-soft">
+            {{ message }}
+          </p>
         </div>
+        <footer class="flex-shrink-0 border-t border-line px-5 py-4 sm:px-6">
+          <div class="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+            <button type="button" class="dialog-btn" :disabled="loading" @click="emit('close')">
+              {{ cancelLabel ?? t('common.close') }}
+            </button>
+            <button type="button" class="dialog-btn"
+              :class="tone === 'danger' ? 'dialog-btn-danger' : 'dialog-btn-primary'"
+              :disabled="loading" :aria-busy="loading"
+              @click="emit('confirm')">
+              {{ confirmLabel ?? t('common.confirm') }}
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
   </Teleport>
@@ -64,11 +68,11 @@ function onKey(e: KeyboardEvent) {
   justify-content: center;
   background: color-mix(in oklab, var(--c-ink) 30%, transparent);
   backdrop-filter: blur(2px);
-  padding: 16px;
+  padding: 12px;
 }
 .dialog-btn {
-  height: 36px;
-  padding: 0 14px;
+  height: 40px;
+  padding: 0 16px;
   border-radius: 9px;
   font-size: 13.5px;
   font-weight: 500;

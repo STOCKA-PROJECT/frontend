@@ -97,10 +97,10 @@ function pieceLink(piece: PieceListItemDto): string {
 </script>
 
 <template>
-  <div class="flex flex-col gap-7 px-8 pb-16 pt-7 max-md:px-4">
+  <div class="flex flex-col gap-7 px-4 pb-10 pt-5 sm:px-5 sm:pb-16 sm:pt-7 lg:px-8">
     <DashboardPageHeader />
 
-    <div class="grid grid-cols-3 gap-3.5 max-[1100px]:grid-cols-2 max-[640px]:grid-cols-1">
+    <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
       <DashboardStatCard
         :label="t('dashboard.stats.items')"
         :value="formatNumber(totalPieces)"
@@ -142,7 +142,7 @@ function pieceLink(piece: PieceListItemDto): string {
       </DashboardStatCard>
     </div>
 
-    <div class="grid grid-cols-[1.6fr_1fr] items-start gap-5 max-[1100px]:grid-cols-1">
+    <div class="grid grid-cols-1 items-start gap-4 sm:gap-5 xl:grid-cols-[1.6fr_1fr]">
       <DashboardCard
         :title="t('dashboard.cards.recent_items')"
         :pill="t('dashboard.cards.last_changes')"

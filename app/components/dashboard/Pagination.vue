@@ -81,7 +81,7 @@ function changeSize(e: Event) {
 
 <style scoped>
 .page-size {
-  height: 30px;
+  height: 36px;
   padding: 0 28px 0 10px;
   border: 1px solid var(--c-line);
   border-radius: 8px;
@@ -97,7 +97,7 @@ function changeSize(e: Event) {
 }
 .page-size:focus { outline: 2px solid var(--c-accent); outline-offset: 1px; }
 .page-btn {
-  height: 30px;
+  height: 36px;
   padding: 0 12px;
   border: 1px solid var(--c-line);
   border-radius: 8px;

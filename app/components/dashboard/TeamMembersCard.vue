@@ -75,7 +75,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 
 <template>
   <section ref="rootRef" class="rounded-[14px] border border-line bg-bg-card shadow-card">
-    <header class="flex items-center justify-between px-6 pt-5 pb-3">
+    <header class="flex items-center justify-between px-5 pb-3 pt-5 sm:px-6">
       <div>
         <h2 class="text-[15px] font-semibold tracking-[-0.01em] text-ink">
           {{ t('dashboard.team.members_title') }}
@@ -86,33 +86,36 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
       </div>
     </header>
 
-    <div v-if="loading && members.length === 0" class="px-6 pb-6 pt-2 text-[13px] text-ink-muted">
+    <div v-if="loading && members.length === 0" class="px-5 pb-6 pt-2 text-[13px] text-ink-muted sm:px-6">
       {{ t('common.loading') }}
     </div>
-    <div v-else-if="members.length === 0" class="px-6 pb-6 pt-2 text-[13px] text-ink-muted">
+    <div v-else-if="members.length === 0" class="px-5 pb-6 pt-2 text-[13px] text-ink-muted sm:px-6">
       {{ t('dashboard.team.empty_members') }}
     </div>
 
     <ul v-else class="divide-y divide-line border-t border-line">
       <li v-for="m in members" :key="m.id"
-        class="flex items-center gap-3.5 px-6 py-3.5">
-        <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-accent text-[12.5px] font-semibold text-white">
-          {{ initials(m) }}
-        </div>
-        <div class="flex min-w-0 flex-1 flex-col">
-          <div class="flex items-center gap-2 text-[13.5px] font-medium tracking-[-0.005em] text-ink">
-            <span class="truncate">{{ m.name }} {{ m.lastName }}</span>
-            <span v-if="m.userId === currentUserId"
-              class="rounded-md border border-line px-1.5 py-px text-[10.5px] font-semibold uppercase tracking-wider text-ink-muted">
-              {{ t('dashboard.team.you') }}
-            </span>
+        class="flex flex-col gap-2.5 px-5 py-3.5 sm:flex-row sm:items-center sm:gap-3.5 sm:px-6">
+        <div class="flex min-w-0 flex-1 items-center gap-3">
+          <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-accent text-[12.5px] font-semibold text-white">
+            {{ initials(m) }}
           </div>
-          <span class="truncate text-[12px] text-ink-muted">{{ m.email }}</span>
+          <div class="flex min-w-0 flex-1 flex-col">
+            <div class="flex items-center gap-2 text-[13.5px] font-medium tracking-[-0.005em] text-ink">
+              <span class="truncate">{{ m.name }} {{ m.lastName }}</span>
+              <span v-if="m.userId === currentUserId"
+                class="rounded-md border border-line px-1.5 py-px text-[10.5px] font-semibold uppercase tracking-wider text-ink-muted">
+                {{ t('dashboard.team.you') }}
+              </span>
+            </div>
+            <span class="truncate text-[12px] text-ink-muted">{{ m.email }}</span>
+          </div>
         </div>
 
-        <DashboardRoleChip :role="m.role" />
+        <div class="flex items-center justify-end gap-2 sm:gap-3">
+          <DashboardRoleChip :role="m.role" />
 
-        <div class="relative flex items-center gap-1">
+          <div class="relative flex items-center gap-1">
           <button
             v-if="canChangeRole(m)"
             type="button"
@@ -135,24 +138,25 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
             <DashboardIcon name="trash" :size="14" />
           </button>
 
-          <div
-            v-if="openMenuId === m.id && canChangeRole(m)"
-            role="menu"
-            class="role-menu"
-          >
-            <button
-              v-for="r in ALL_ROLES"
-              :key="r"
-              type="button"
-              role="menuitemradio"
-              :aria-checked="m.role === r"
-              class="role-menu-item"
-              :class="{ 'is-active': m.role === r }"
-              @click.stop="pickRole(m, r)"
+            <div
+              v-if="openMenuId === m.id && canChangeRole(m)"
+              role="menu"
+              class="role-menu"
             >
-              <span class="flex-1 text-left">{{ t(`dashboard.org.roles.${r}`) }}</span>
-              <DashboardIcon v-if="m.role === r" name="check" :size="13" />
-            </button>
+              <button
+                v-for="r in ALL_ROLES"
+                :key="r"
+                type="button"
+                role="menuitemradio"
+                :aria-checked="m.role === r"
+                class="role-menu-item"
+                :class="{ 'is-active': m.role === r }"
+                @click.stop="pickRole(m, r)"
+              >
+                <span class="flex-1 text-left">{{ t(`dashboard.org.roles.${r}`) }}</span>
+                <DashboardIcon v-if="m.role === r" name="check" :size="13" />
+              </button>
+            </div>
           </div>
         </div>
       </li>
@@ -165,13 +169,19 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   border: 1px solid var(--c-line);
   background: var(--c-bg-card);
   color: var(--c-ink-soft);
   transition: background .15s, border-color .15s, color .15s;
+}
+@media (min-width: 640px) {
+  .action-btn {
+    width: 30px;
+    height: 30px;
+  }
 }
 .action-btn:hover {
   background: var(--c-bg-soft);
@@ -189,6 +199,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
   right: 0;
   z-index: 20;
   min-width: 180px;
+  max-width: calc(100vw - 24px);
   padding: 4px;
   border-radius: 10px;
   border: 1px solid var(--c-line);

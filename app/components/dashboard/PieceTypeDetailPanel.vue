@@ -50,10 +50,10 @@ const attributesCount = computed(() => props.detail?.attributes.length ?? 0)
     </div>
 
     <template v-else>
-      <header class="flex flex-col gap-2 border-b border-line px-6 py-4 max-md:px-4">
-        <div class="flex items-start justify-between gap-3">
+      <header class="flex flex-col gap-2 border-b border-line px-4 py-4 sm:px-6">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
           <div class="min-w-0">
-            <h2 class="truncate text-[20px] font-semibold tracking-[-0.015em] text-ink">
+            <h2 class="truncate text-[18px] font-semibold tracking-[-0.015em] text-ink sm:text-[20px]">
               {{ detail.name }}
             </h2>
             <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[12px] text-ink-muted">
@@ -63,7 +63,7 @@ const attributesCount = computed(() => props.detail?.attributes.length ?? 0)
             </div>
           </div>
 
-          <div v-if="canWrite" class="flex items-center gap-2">
+          <div v-if="canWrite" class="flex flex-wrap items-center gap-2">
             <button type="button" class="action-btn" @click="emit('rename')">
               {{ t('dashboard.pieceTypes.form.rename_title') }}
             </button>
