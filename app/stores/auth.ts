@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia'
 import type {
   AvailabilityResponse,
+  ChangePasswordDto,
   ForgotPasswordRequestDto,
   LoginResponseDto,
   LoginUserDto,
   RegisterUserDto,
   ResendVerificationRequestDto,
   ResetPasswordRequestDto,
+  UpdateUserProfileDto,
   User,
   VerifyEmailRequestDto
 } from '~/types/api'
@@ -121,6 +123,31 @@ export const useAuthStore = defineStore('auth', () => {
     return me
   }
 
+  async function updateProfile(payload: UpdateUserProfileDto) {
+    const api = useApi()
+    const updated = await api<User>('/users/me', {
+      method: 'PATCH',
+      body: payload
+    })
+    userCookie.value = updated
+    return updated
+  }
+
+  /**
+   * Changes the current user's password and re-authenticates with the new
+   * credentials. Re-auth is necessary because `JwtAuthenticationFilter`
+   * rejects tokens issued before `passwordChangedAt`, so the cookie's token
+   * is invalid as soon as the PATCH succeeds.
+   */
+  async function changePassword(payload: ChangePasswordDto) {
+    const api = useApi()
+    const email = userCookie.value?.email
+    await api('/users/me/password', { method: 'PATCH', body: payload })
+    if (email) {
+      await loginNoRedirect({ email, password: payload.newPassword })
+    }
+  }
+
   function clearLocalSession() {
     tokenCookie.value = null
     userCookie.value = null
@@ -162,6 +189,8 @@ export const useAuthStore = defineStore('auth', () => {
     verifyEmail,
     resendVerification,
     fetchMe,
+    updateProfile,
+    changePassword,
     checkUsername,
     clearLocalSession
   }

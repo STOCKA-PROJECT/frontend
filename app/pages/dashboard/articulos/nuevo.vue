@@ -10,6 +10,7 @@ const localePath = useLocalePath()
 const orgs = useOrganizationsStore()
 const pieces = usePiecesStore()
 const pieceTypes = usePieceTypesStore()
+const orgAttributes = useOrganizationPieceAttributesStore()
 const locations = useLocationsStore()
 const team = useTeamStore()
 
@@ -76,7 +77,10 @@ async function loadDeps() {
         : locations.fetchTree(orgId.value).catch(() => undefined),
       team.getMembers(orgId.value)
         ? Promise.resolve()
-        : team.fetchMembers(orgId.value).catch(() => undefined)
+        : team.fetchMembers(orgId.value).catch(() => undefined),
+      orgAttributes.loadedOrgIds.has(orgId.value)
+        ? Promise.resolve()
+        : orgAttributes.fetchAll(orgId.value).catch(() => undefined)
     ])
   } finally {
     loading.value = false
@@ -85,12 +89,21 @@ async function loadDeps() {
 
 await loadDeps()
 
-async function onSubmit(payload: CreatePieceDto) {
+async function onSubmit(payload: CreatePieceDto, coverFile: File | null) {
   if (orgId.value == null) return
   saving.value = true
   errorMsg.value = null
   try {
     const created = await pieces.create(orgId.value, payload)
+    if (coverFile) {
+      try {
+        await pieces.uploadAttachment(orgId.value, created.id, coverFile, 'IMAGE')
+      } catch {
+        // Non-fatal: the piece is created. Surface a softer warning and let the user retry from
+        // the detail page. We still navigate so they can manage attachments there.
+        errorMsg.value = t('dashboard.pieces.errors.cover_upload')
+      }
+    }
     void navigateTo(localePath(`/dashboard/articulos/${created.id}`))
   } catch (e) {
     errorMsg.value = extractErrorMessage(e, t('dashboard.pieces.errors.save'))
@@ -124,6 +137,7 @@ function onCancel() {
         :piece-types="pieceTypes.list"
         :locations="flatLocations"
         :members="members"
+        :org-attributes="orgId !== null ? orgAttributes.listFor(orgId) : []"
         :loading="saving"
         :error-msg="errorMsg"
         @submit="onSubmit"

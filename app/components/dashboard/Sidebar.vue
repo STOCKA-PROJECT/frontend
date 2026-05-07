@@ -141,6 +141,12 @@ async function handleLogout() {
 
       <div v-if="menuOpen" role="menu"
         class="absolute bottom-full left-0 right-0 z-30 mb-2 rounded-[10px] border border-line bg-bg-card p-1 shadow-card">
+        <NuxtLink :to="localePath('/dashboard/mi-cuenta')" role="menuitem"
+          class="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-[13.5px] text-ink transition-colors hover:bg-bg-soft"
+          @click="menuOpen = false">
+          <DashboardIcon name="user" :size="14" />
+          {{ t('dashboard.account.menu_entry') }}
+        </NuxtLink>
         <button type="button" role="menuitem"
           class="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-[13.5px] text-ink transition-colors hover:bg-bg-soft"
           @click="handleLogout">
@@ -264,6 +270,14 @@ async function handleLogout() {
               <span class="truncate text-[11.5px] text-ink-muted">{{ auth.user?.email }}</span>
             </div>
           </button>
+          <NuxtLink
+            :to="localePath('/dashboard/mi-cuenta')"
+            class="mt-1 flex w-full items-center gap-2 rounded-[10px] px-2.5 py-2.5 text-left text-[13.5px] text-ink transition-colors hover:bg-bg-soft"
+            @click="close"
+          >
+            <DashboardIcon name="user" :size="14" />
+            {{ t('dashboard.account.menu_entry') }}
+          </NuxtLink>
           <button
             type="button"
             class="mt-1 flex w-full items-center gap-2 rounded-[10px] px-2.5 py-2.5 text-left text-[13.5px] text-ink transition-colors hover:bg-bg-soft"

@@ -73,6 +73,12 @@ export interface UpdateUserProfileDto {
   language?: Language
 }
 
+export interface ChangePasswordDto {
+  currentPassword: string
+  newPassword: string
+  repeatPassword: string
+}
+
 export interface OrganizationResponseDto {
   id: number
   name: string
@@ -98,9 +104,11 @@ export interface PieceTypeRefDto {
 export interface PieceListItemDto {
   id: number
   name: string
+  serialNumber?: string | null
   pieceTypes: PieceTypeRefDto[]
   ownerUserId?: number
   locationId?: number
+  coverAttachmentId?: number | null
   status: PieceStatus
   createdAt: string
   updatedAt: string
@@ -191,13 +199,17 @@ export type PieceHistoryAction =
   | 'ATTACHMENT_ADDED'
   | 'ATTACHMENT_REMOVED'
 
+export type AttributeScope = 'TYPE' | 'ORG'
+
 export interface AttributeValueInputDto {
   attributeId: number
+  scope?: AttributeScope
   value: string | null
 }
 
 export interface PieceAttributeValueResponseDto {
   attributeId: number
+  scope: AttributeScope
   attributeName: string
   displayName: string
   type: AttributeType
@@ -218,10 +230,12 @@ export interface PieceResponseDto {
   id: number
   organizationId: number
   name: string
+  serialNumber?: string | null
   description?: string
   pieceTypes: PieceTypeRefDto[]
   ownerUserId?: number
   locationId?: number
+  coverAttachmentId?: number | null
   status: PieceStatus
   createdAt: string
   updatedAt: string
@@ -231,6 +245,7 @@ export interface PieceResponseDto {
 
 export interface CreatePieceDto {
   name: string
+  serialNumber?: string | null
   description?: string
   pieceTypeIds: number[]
   ownerUserId?: number
@@ -240,12 +255,15 @@ export interface CreatePieceDto {
 
 export interface UpdatePieceDto {
   name?: string
+  serialNumber?: string | null
   description?: string
   pieceTypeIds?: number[]
   ownerUserId?: number
   clearOwner?: boolean
   locationId?: number
   clearLocation?: boolean
+  coverAttachmentId?: number | null
+  clearCover?: boolean
   attributeValues?: AttributeValueInputDto[]
 }
 
@@ -339,7 +357,37 @@ export interface UpdatePieceTypeDto {
 }
 
 export interface UpdatePieceTypeAttributeDto {
+  name?: string
   displayName?: string
+  type?: AttributeType
+  required?: boolean
+  position?: number
+  validators?: AttributeValidatorsDto
+}
+
+export interface OrganizationPieceAttributeResponseDto {
+  id: number
+  name: string
+  displayName: string
+  type: AttributeType
+  required: boolean
+  position: number
+  validators: AttributeValidatorsDto
+}
+
+export interface CreateOrganizationPieceAttributeDto {
+  name: string
+  displayName: string
+  type: AttributeType
+  required?: boolean
+  position?: number
+  validators?: AttributeValidatorsDto
+}
+
+export interface UpdateOrganizationPieceAttributeDto {
+  name?: string
+  displayName?: string
+  type?: AttributeType
   required?: boolean
   position?: number
   validators?: AttributeValidatorsDto

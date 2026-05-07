@@ -423,7 +423,8 @@
         "field_display_name": "Etiqueta visible",
         "field_display_name_placeholder": "Color, Peso (kg), Fecha de compra…",
         "field_type": "Tipo de dato",
-        "field_type_locked_help": "El nombre técnico y el tipo no se pueden modificar después de crear el atributo.",
+        "field_name_edit_help": "Cambiar el nombre técnico no afecta a los valores existentes.",
+        "field_type_edit_help": "Solo puedes cambiar el tipo si ninguna pieza tiene valor guardado para este atributo.",
         "field_required": "Obligatorio",
         "validators_title": "Reglas de validación",
         "validators": {
@@ -484,6 +485,49 @@
         "type_required": "Selecciona un tipo de dato."
       }
     },
+    "account": {
+      "menu_entry": "Mi cuenta",
+      "title": "Mi cuenta",
+      "subtitle": "Gestiona los ajustes de tu cuenta personal.",
+      "profile": {
+        "section_title": "Perfil",
+        "name": "Nombre",
+        "name_placeholder": "Tu nombre",
+        "last_name": "Apellido",
+        "last_name_placeholder": "Tu apellido",
+        "email": "Email",
+        "email_placeholder": "tu\\@email.com",
+        "email_change_warning": "Tendrás que volver a verificar el nuevo email.",
+        "language": "Idioma",
+        "language_options": {
+          "ES": "Español",
+          "CA": "Català",
+          "EN": "English"
+        },
+        "submit": "Guardar cambios",
+        "saved": "Perfil actualizado correctamente.",
+        "errors": {
+          "generic": "No se han podido guardar los cambios. Inténtalo de nuevo."
+        }
+      },
+      "change_password": {
+        "section_title": "Cambiar contraseña",
+        "subtitle": "Tras guardar, mantendremos tu sesión activa con la nueva contraseña.",
+        "current_password": "Contraseña actual",
+        "current_password_placeholder": "Tu contraseña actual",
+        "new_password": "Nueva contraseña",
+        "new_password_placeholder": "Mínimo 8 caracteres",
+        "repeat_password": "Repite la nueva contraseña",
+        "repeat_password_placeholder": "Vuelve a escribirla",
+        "submit": "Actualizar contraseña",
+        "success": "Tu contraseña se ha actualizado correctamente.",
+        "errors": {
+          "generic": "No se ha podido cambiar la contraseña. Inténtalo de nuevo.",
+          "passwords_mismatch": "Las contraseñas no coinciden.",
+          "too_short": "Mínimo 8 caracteres."
+        }
+      }
+    },
     "org_settings": {
       "breadcrumb": "Ajustes",
       "title": "Ajustes de la organización",
@@ -495,6 +539,22 @@
       "errors": {
         "forbidden": "No tienes permisos para editar esta organización.",
         "generic": "No se han podido guardar los cambios. Inténtalo de nuevo."
+      },
+      "attributes": {
+        "title": "Atributos básicos del artículo",
+        "subtitle": "Campos extra que se aplicarán a todos los artículos de la organización, además del nombre, descripción, ubicación y propietario.",
+        "scope_label": "Organización",
+        "add": "Añadir atributo",
+        "empty": "Aún no has añadido ningún atributo a nivel de organización.",
+        "delete_title": "Eliminar atributo",
+        "delete_message": "¿Seguro que quieres eliminar el atributo «{name}»? Los valores guardados se conservarán por si lo restauras más adelante.",
+        "delete_confirm": "Eliminar",
+        "errors": {
+          "load": "No se han podido cargar los atributos.",
+          "duplicate": "Ya existe un atributo con ese nombre.",
+          "generic": "No se ha podido guardar el atributo.",
+          "delete": "No se ha podido eliminar el atributo."
+        }
       }
     },
     "create_org": {
@@ -602,6 +662,9 @@
         "field_type": "Tipo de artículo",
         "type_placeholder": "Selecciona un tipo…",
         "field_name": "Nombre",
+        "field_serial_number": "Nº de serie",
+        "serial_placeholder": "p. ej. SN-000123",
+        "optional": "opcional",
         "field_description": "Descripción",
         "field_location": "Ubicación",
         "field_owner": "Propietario",
@@ -609,9 +672,17 @@
         "unassigned": "Sin ubicación",
         "no_owner": "Sin propietario",
         "attributes_section": "Atributos del tipo",
+        "org_attributes_section": "Atributos básicos",
+        "field_cover_image": "Imagen de portada",
+        "cover_help": "Se mostrará como imagen principal del artículo. Puedes cambiarla más adelante desde la pestaña de adjuntos.",
+        "cover_choose": "Seleccionar imagen",
+        "cover_replace": "Cambiar imagen",
+        "cover_invalid_type": "Formato no soportado. Usa JPG, PNG, WEBP o GIF.",
+        "cover_too_large": "La imagen supera el límite de 25 MB.",
         "submit_create": "Crear artículo",
         "field_types": "Tipos de artículo",
         "types_help": "Selecciona uno o más tipos. Sus atributos se combinan en el formulario. | {n} tipo seleccionado | {n} tipos seleccionados",
+        "types_help_optional": "Sin tipos asignados | {n} tipo seleccionado | {n} tipos seleccionados",
         "no_types_yet": "Aún no has creado ningún tipo de artículo. Crea uno desde “Tipos de artículo” antes de añadir artículos."
       },
       "info": {
@@ -634,6 +705,8 @@
         "upload_image": "Subir imagen",
         "upload_document": "Subir documento",
         "uploading": "Subiendo…",
+        "cover_badge": "Portada",
+        "set_cover": "Hacer portada",
         "confirm_delete_title": "Eliminar adjunto",
         "confirm_delete_body": "¿Eliminar el adjunto \"{name}\"? Esta acción no se puede deshacer.",
         "errors": {
@@ -674,6 +747,7 @@
         "delete": "No se ha podido eliminar el artículo.",
         "name_required": "El nombre es obligatorio.",
         "type_required": "Debes seleccionar un tipo de artículo.",
+        "cover_upload": "Se ha creado el artículo, pero no se pudo subir la imagen. Inténtalo de nuevo desde la pestaña de adjuntos.",
         "not_found": "Artículo no encontrado."
       },
       "new_breadcrumb": "Nuevo"
@@ -715,7 +789,10 @@
       "passwords_mismatch": "Las contraseñas no coinciden.",
       "verification_token_invalid": "El enlace de verificación es inválido o ha caducado.",
       "unauthenticated": "Sesión no válida o expirada.",
-      "forbidden": "No tienes permiso para realizar esta acción."
+      "forbidden": "No tienes permiso para realizar esta acción.",
+      "current_password_invalid": "La contraseña actual es incorrecta.",
+      "password_too_short": "La contraseña debe tener al menos 8 caracteres.",
+      "new_password_same_as_current": "La nueva contraseña debe ser distinta de la actual."
     },
     "users": {
       "email_taken": "Ya existe un usuario con ese email.",

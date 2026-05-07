@@ -4,6 +4,7 @@ import type {
   CreatePieceDto,
   LocationResponseDto,
   MemberResponseDto,
+  OrganizationPieceAttributeResponseDto,
   PieceTypeAttributeResponseDto,
   PieceTypeResponseDto
 } from '~/types/api'
@@ -12,29 +13,40 @@ const props = withDefaults(defineProps<{
   pieceTypes: PieceTypeResponseDto[]
   locations: LocationResponseDto[]
   members: MemberResponseDto[]
+  orgAttributes?: OrganizationPieceAttributeResponseDto[]
   loading?: boolean
   errorMsg?: string | null
   submitLabel?: string
 }>(), {
   loading: false,
-  errorMsg: null
+  errorMsg: null,
+  orgAttributes: () => []
 })
 
 const emit = defineEmits<{
-  submit: [payload: CreatePieceDto]
+  submit: [payload: CreatePieceDto, coverFile: File | null]
   cancel: []
 }>()
 
 const { t } = useI18n()
 
 const name = ref('')
+const serialNumber = ref('')
 const description = ref('')
 const selectedTypeIds = ref<Set<number>>(new Set())
 const ownerUserId = ref<number | null>(null)
 const locationId = ref<number | null>(null)
 const attributeValues = ref<Record<number, string | null>>({})
+const orgAttributeValues = ref<Record<number, string | null>>({})
+const coverFile = ref<File | null>(null)
+const coverPreview = ref<string | null>(null)
+const coverError = ref<string | null>(null)
 const localError = ref<string | null>(null)
 const nameInput = ref<HTMLInputElement | null>(null)
+const coverInput = ref<HTMLInputElement | null>(null)
+
+const COVER_MAX_BYTES = 25 * 1024 * 1024
+const COVER_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 
 const sortedPieceTypes = computed(() =>
   [...props.pieceTypes].sort((a, b) => a.name.localeCompare(b.name))
@@ -89,23 +101,68 @@ function setAttrValue(attrId: number, value: string | null) {
   attributeValues.value = { ...attributeValues.value, [attrId]: value }
 }
 
+const sortedOrgAttributes = computed(() =>
+  [...props.orgAttributes].sort((a, b) => a.position - b.position || a.id - b.id)
+)
+
+function setOrgAttrValue(attrId: number, value: string | null) {
+  orgAttributeValues.value = { ...orgAttributeValues.value, [attrId]: value }
+}
+
+function clearCover() {
+  coverFile.value = null
+  if (coverPreview.value) URL.revokeObjectURL(coverPreview.value)
+  coverPreview.value = null
+  coverError.value = null
+  if (coverInput.value) coverInput.value.value = ''
+}
+
+function onCoverInput(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0] ?? null
+  coverError.value = null
+  if (!file) {
+    clearCover()
+    return
+  }
+  if (!COVER_MIMES.includes(file.type)) {
+    coverError.value = t('dashboard.pieces.form.cover_invalid_type')
+    target.value = ''
+    return
+  }
+  if (file.size > COVER_MAX_BYTES) {
+    coverError.value = t('dashboard.pieces.form.cover_too_large')
+    target.value = ''
+    return
+  }
+  if (coverPreview.value) URL.revokeObjectURL(coverPreview.value)
+  coverFile.value = file
+  coverPreview.value = URL.createObjectURL(file)
+}
+
+onBeforeUnmount(() => {
+  if (coverPreview.value) URL.revokeObjectURL(coverPreview.value)
+})
+
 function submit() {
   localError.value = null
   if (!name.value.trim()) {
     localError.value = t('dashboard.pieces.errors.name_required')
     return
   }
-  if (selectedTypeIds.value.size === 0) {
-    localError.value = t('dashboard.pieces.errors.type_required')
-    return
-  }
 
   const values: AttributeValueInputDto[] = []
+  for (const attr of sortedOrgAttributes.value) {
+    const v = orgAttributeValues.value[attr.id]
+    if (v != null && v !== '') {
+      values.push({ attributeId: attr.id, scope: 'ORG', value: v })
+    }
+  }
   for (const group of attributeGroups.value) {
     for (const attr of group.attributes) {
       const v = attributeValues.value[attr.id]
       if (v != null && v !== '') {
-        values.push({ attributeId: attr.id, value: v })
+        values.push({ attributeId: attr.id, scope: 'TYPE', value: v })
       }
     }
   }
@@ -114,12 +171,14 @@ function submit() {
     name: name.value.trim(),
     pieceTypeIds: [...selectedTypeIds.value]
   }
+  const trimmedSerial = serialNumber.value.trim()
+  if (trimmedSerial) payload.serialNumber = trimmedSerial
   if (description.value.trim()) payload.description = description.value.trim()
   if (ownerUserId.value != null) payload.ownerUserId = ownerUserId.value
   if (locationId.value != null) payload.locationId = locationId.value
   if (values.length > 0) payload.attributeValues = values
 
-  emit('submit', payload)
+  emit('submit', payload, coverFile.value)
 }
 
 const visibleError = computed(() => props.errorMsg ?? localError.value)
@@ -135,48 +194,95 @@ const selectedTypesCount = computed(() => selectedTypeIds.value.size)
     </div>
 
     <div class="flex flex-col gap-1.5">
-      <span class="form-label">
-        {{ t('dashboard.pieces.form.field_types') }} <span class="text-danger">*</span>
-      </span>
-      <div v-if="sortedPieceTypes.length === 0" class="text-[13px] text-ink-muted">
-        {{ t('dashboard.pieces.form.no_types_yet') }}
-      </div>
-      <div v-else class="flex flex-wrap gap-2 rounded-lg border border-line bg-field px-3 py-2.5">
-        <label
-          v-for="pt in sortedPieceTypes"
-          :key="pt.id"
-          class="type-pill"
-          :class="{ 'is-selected': selectedTypeIds.has(pt.id) }"
-        >
+      <label class="form-label">
+        {{ t('dashboard.pieces.form.field_cover_image') }}
+        <span class="text-ink-muted text-[11.5px] font-normal">
+          ({{ t('dashboard.pieces.form.optional') }})
+        </span>
+      </label>
+      <p class="text-[12px] text-ink-muted">
+        {{ t('dashboard.pieces.form.cover_help') }}
+      </p>
+      <div class="flex items-start gap-3">
+        <div class="cover-preview" :class="{ 'is-empty': !coverPreview }">
+          <img v-if="coverPreview" :src="coverPreview" alt="" class="cover-thumb">
+          <span v-else class="cover-placeholder" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="9" cy="9" r="2" />
+              <path d="m21 15-5-5L5 21" />
+            </svg>
+          </span>
+        </div>
+        <div class="flex flex-col gap-1.5">
           <input
-            type="checkbox"
+            ref="coverInput"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
             class="sr-only"
-            :checked="selectedTypeIds.has(pt.id)"
             :disabled="loading"
-            @change="toggleType(pt.id)"
+            @change="onCoverInput"
           >
-          <span aria-hidden="true" class="type-pill-dot" />
-          {{ pt.name }}
-        </label>
-      </div>
-      <div class="text-[12px] text-ink-muted">
-        {{ t('dashboard.pieces.form.types_help', { n: selectedTypesCount }) }}
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              class="form-btn"
+              :disabled="loading"
+              @click="coverInput?.click()"
+            >
+              {{ coverFile
+                ? t('dashboard.pieces.form.cover_replace')
+                : t('dashboard.pieces.form.cover_choose') }}
+            </button>
+            <button
+              v-if="coverFile"
+              type="button"
+              class="form-btn"
+              :disabled="loading"
+              @click="clearCover"
+            >
+              {{ t('common.cancel') }}
+            </button>
+          </div>
+          <span v-if="coverFile" class="text-[12px] text-ink-muted">{{ coverFile.name }}</span>
+          <span v-if="coverError" class="text-[12px] text-danger">{{ coverError }}</span>
+        </div>
       </div>
     </div>
 
-    <div class="flex flex-col gap-1.5">
-      <label for="piece-name" class="form-label">
-        {{ t('dashboard.pieces.form.field_name') }} <span class="text-danger">*</span>
-      </label>
-      <input
-        id="piece-name"
-        ref="nameInput"
-        v-model="name"
-        type="text"
-        maxlength="255"
-        class="form-input"
-        :disabled="loading"
-      >
+    <div class="grid grid-cols-2 gap-3 max-md:grid-cols-1">
+      <div class="flex flex-col gap-1.5">
+        <label for="piece-name" class="form-label">
+          {{ t('dashboard.pieces.form.field_name') }} <span class="text-danger">*</span>
+        </label>
+        <input
+          id="piece-name"
+          ref="nameInput"
+          v-model="name"
+          type="text"
+          maxlength="255"
+          class="form-input"
+          :disabled="loading"
+        >
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label for="piece-serial" class="form-label">
+          {{ t('dashboard.pieces.form.field_serial_number') }}
+          <span class="text-ink-muted text-[11.5px] font-normal">
+            ({{ t('dashboard.pieces.form.optional') }})
+          </span>
+        </label>
+        <input
+          id="piece-serial"
+          v-model="serialNumber"
+          type="text"
+          maxlength="100"
+          class="form-input"
+          :disabled="loading"
+          :placeholder="t('dashboard.pieces.form.serial_placeholder')"
+        >
+      </div>
     </div>
 
     <div class="flex flex-col gap-1.5">
@@ -225,6 +331,55 @@ const selectedTypesCount = computed(() => selectedTypeIds.value.size)
       </div>
     </div>
 
+    <div class="flex flex-col gap-1.5">
+      <span class="form-label">
+        {{ t('dashboard.pieces.form.field_types') }}
+        <span class="text-ink-muted text-[11.5px] font-normal">
+          ({{ t('dashboard.pieces.form.optional') }})
+        </span>
+      </span>
+      <div v-if="sortedPieceTypes.length === 0" class="text-[13px] text-ink-muted">
+        {{ t('dashboard.pieces.form.no_types_yet') }}
+      </div>
+      <div v-else class="flex flex-wrap gap-2 rounded-lg border border-line bg-field px-3 py-2.5">
+        <label
+          v-for="pt in sortedPieceTypes"
+          :key="pt.id"
+          class="type-pill"
+          :class="{ 'is-selected': selectedTypeIds.has(pt.id) }"
+        >
+          <input
+            type="checkbox"
+            class="sr-only"
+            :checked="selectedTypeIds.has(pt.id)"
+            :disabled="loading"
+            @change="toggleType(pt.id)"
+          >
+          <span aria-hidden="true" class="type-pill-dot" />
+          {{ pt.name }}
+        </label>
+      </div>
+      <div class="text-[12px] text-ink-muted">
+        {{ t('dashboard.pieces.form.types_help_optional', { n: selectedTypesCount }) }}
+      </div>
+    </div>
+
+    <section v-if="sortedOrgAttributes.length > 0" class="attr-group border-t border-line pt-4">
+      <h4 class="attr-group-title">
+        {{ t('dashboard.pieces.form.org_attributes_section') }}
+      </h4>
+      <div class="grid grid-cols-2 gap-3 max-md:grid-cols-1">
+        <DashboardPieceAttributeField
+          v-for="attr in sortedOrgAttributes"
+          :key="attr.id"
+          :attribute="(attr as unknown as PieceTypeAttributeResponseDto)"
+          :model-value="orgAttributeValues[attr.id] ?? null"
+          :disabled="loading"
+          @update:model-value="(v) => setOrgAttrValue(attr.id, v)"
+        />
+      </div>
+    </section>
+
     <div v-if="attributeGroups.length > 0" class="flex flex-col gap-4 border-t border-line pt-4">
       <div class="text-[12px] font-semibold uppercase tracking-[.05em] text-ink-muted">
         {{ t('dashboard.pieces.form.attributes_section') }}
@@ -243,6 +398,7 @@ const selectedTypesCount = computed(() => selectedTypeIds.value.size)
         </div>
       </section>
     </div>
+
 
     <div class="flex items-center justify-end gap-2 border-t border-line pt-4">
       <button type="button" class="form-btn" :disabled="loading" @click="emit('cancel')">
@@ -351,6 +507,22 @@ const selectedTypesCount = computed(() => selectedTypeIds.value.size)
   outline: 2px solid var(--c-accent);
   outline-offset: 2px;
 }
+
+.cover-preview {
+  width: 96px;
+  height: 96px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--c-line);
+  border-radius: 12px;
+  background: var(--c-bg-soft);
+  overflow: hidden;
+}
+.cover-preview.is-empty { color: var(--c-ink-muted); }
+.cover-thumb { width: 100%; height: 100%; object-fit: cover; }
+.cover-placeholder { display: inline-flex; align-items: center; justify-content: center; }
 
 .attr-group { display: flex; flex-direction: column; gap: 10px; }
 .attr-group-title {

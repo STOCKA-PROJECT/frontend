@@ -5,7 +5,12 @@ const props = defineProps<{
   orgId: number
   pieceId: number
   attachments: PieceAttachmentResponseDto[]
+  coverAttachmentId?: number | null
   canWrite: boolean
+}>()
+
+const emit = defineEmits<{
+  'set-cover': [attachmentId: number]
 }>()
 
 const { t, locale } = useI18n()
@@ -257,7 +262,9 @@ async function confirmDelete() {
         {{ t('dashboard.pieces.attachments.images_empty') }}
       </div>
       <div v-else class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-        <div v-for="att in images" :key="att.id" class="image-card">
+        <div v-for="att in images" :key="att.id"
+          class="image-card"
+          :class="{ 'is-cover': coverAttachmentId === att.id }">
           <button
             type="button"
             class="image-thumb"
@@ -273,23 +280,37 @@ async function confirmDelete() {
             <span v-else class="image-placeholder">
               <DashboardIcon name="box" :size="22" />
             </span>
+            <span v-if="coverAttachmentId === att.id" class="cover-badge">
+              {{ t('dashboard.pieces.attachments.cover_badge') }}
+            </span>
           </button>
           <div class="image-meta">
             <div class="truncate text-[12.5px] text-ink" :title="att.originalFilename">
               {{ att.originalFilename }}
             </div>
-            <div class="flex items-center justify-between text-[11.5px] text-ink-muted">
+            <div class="flex items-center justify-between gap-2 text-[11.5px] text-ink-muted">
               <span>{{ humanSize(att.sizeBytes) }}</span>
-              <button
-                v-if="canWrite"
-                type="button"
-                class="image-delete"
-                :disabled="deletingId === att.id"
-                :aria-label="t('dashboard.pieces.actions.delete')"
-                @click="askDelete(att)"
-              >
-                <DashboardIcon name="trash" :size="13" />
-              </button>
+              <div class="flex items-center gap-1.5">
+                <button
+                  v-if="canWrite && coverAttachmentId !== att.id"
+                  type="button"
+                  class="cover-btn"
+                  :title="t('dashboard.pieces.attachments.set_cover')"
+                  @click="emit('set-cover', att.id)"
+                >
+                  {{ t('dashboard.pieces.attachments.set_cover') }}
+                </button>
+                <button
+                  v-if="canWrite"
+                  type="button"
+                  class="image-delete"
+                  :disabled="deletingId === att.id"
+                  :aria-label="t('dashboard.pieces.actions.delete')"
+                  @click="askDelete(att)"
+                >
+                  <DashboardIcon name="trash" :size="13" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -414,7 +435,9 @@ async function confirmDelete() {
 }
 
 .image-card { display: flex; flex-direction: column; gap: 6px; }
+.image-card.is-cover .image-thumb { border-color: var(--c-accent); }
 .image-thumb {
+  position: relative;
   display: block;
   width: 100%;
   aspect-ratio: 1;
@@ -423,6 +446,34 @@ async function confirmDelete() {
   background: var(--c-bg-soft);
   overflow: hidden;
   padding: 0;
+}
+.cover-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-accent);
+  color: var(--c-bg-card);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+.cover-btn {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid var(--c-line);
+  background: var(--c-bg-card);
+  font-size: 11px;
+  color: var(--c-ink-soft);
+  transition: background .12s, color .12s, border-color .12s;
+}
+.cover-btn:hover {
+  background: var(--c-bg-soft);
+  color: var(--c-ink);
+  border-color: var(--c-line-strong);
 }
 .image-thumb img {
   width: 100%;

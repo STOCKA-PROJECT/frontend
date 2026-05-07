@@ -113,7 +113,6 @@ watch(displayName, (next) => {
 })
 
 watch(type, (next, prev) => {
-  if (props.mode !== 'create') return
   if (next !== prev) {
     validators.value = {}
     optionError.value = null
@@ -132,7 +131,6 @@ const submitLabel = computed(() => props.mode === 'edit'
   : t('dashboard.pieceTypes.attribute_form.create'))
 
 const nameInvalid = computed(() => {
-  if (props.mode === 'edit') return false
   return name.value.length > 0 && !NAME_PATTERN.test(name.value)
 })
 
@@ -143,9 +141,7 @@ const optionsRequired = computed(() => type.value === 'SELECT' || type.value ===
 const canSubmit = computed(() => {
   if (props.loading) return false
   if (!displayName.value.trim()) return false
-  if (props.mode === 'create') {
-    if (!NAME_PATTERN.test(name.value)) return false
-  }
+  if (!NAME_PATTERN.test(name.value)) return false
   if (optionsRequired.value && optionsList.value.length === 0) return false
   return true
 })
@@ -252,6 +248,8 @@ function submit() {
       required: required.value,
       validators: cleaned ?? {}
     }
+    if (name.value !== props.initial?.name) payload.name = name.value
+    if (type.value !== props.initial?.type) payload.type = type.value
     emit('submit', payload)
   }
 }
@@ -295,7 +293,6 @@ function isVisible(key: ValidatorKey) {
                 {{ t('dashboard.pieceTypes.attribute_form.field_name') }}
               </label>
               <input id="attr-name" :value="name" type="text" required maxlength="80"
-                :disabled="mode === 'edit'"
                 :placeholder="t('dashboard.pieceTypes.attribute_form.field_name_placeholder')"
                 class="field-input field-input-mono" :class="{ 'field-input-error': nameInvalid }"
                 @input="onNameInput">
@@ -304,7 +301,7 @@ function isVisible(key: ValidatorKey) {
               </p>
               <p v-else class="field-help">
                 {{ mode === 'edit'
-                  ? t('dashboard.pieceTypes.attribute_form.field_type_locked_help')
+                  ? t('dashboard.pieceTypes.attribute_form.field_name_edit_help')
                   : t('dashboard.pieceTypes.attribute_form.field_name_help') }}
               </p>
             </div>
@@ -313,14 +310,14 @@ function isVisible(key: ValidatorKey) {
               <label for="attr-type" class="field-label">
                 {{ t('dashboard.pieceTypes.attribute_form.field_type') }}
               </label>
-              <select id="attr-type" v-model="type" :disabled="mode === 'edit'"
+              <select id="attr-type" v-model="type"
                 class="field-input">
                 <option v-for="opt in ATTRIBUTE_TYPES" :key="opt" :value="opt">
                   {{ t(`dashboard.pieceTypes.types.${opt}`) }}
                 </option>
               </select>
               <p v-if="mode === 'edit'" class="field-help">
-                {{ t('dashboard.pieceTypes.attribute_form.field_type_locked_help') }}
+                {{ t('dashboard.pieceTypes.attribute_form.field_type_edit_help') }}
               </p>
             </div>
 

@@ -220,6 +220,7 @@ function pieceLink(piece: PieceListItemDto) {
       <DashboardPiecesTable
         :pieces="pieces.list"
         :loading="pieces.loadingList"
+        :org-id="orgId"
         :show-location="true"
         :show-owner="true"
         :can-write="canWrite"

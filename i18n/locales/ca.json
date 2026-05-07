@@ -423,7 +423,8 @@
         "field_display_name": "Etiqueta visible",
         "field_display_name_placeholder": "Color, Pes (kg), Data de compra…",
         "field_type": "Tipus de dada",
-        "field_type_locked_help": "El nom tècnic i el tipus no es poden modificar després de crear l'atribut.",
+        "field_name_edit_help": "Canviar el nom tècnic no afecta els valors existents.",
+        "field_type_edit_help": "Només pots canviar el tipus si cap peça té valor desat per a aquest atribut.",
         "field_required": "Obligatori",
         "validators_title": "Regles de validació",
         "validators": {
@@ -484,6 +485,49 @@
         "type_required": "Selecciona un tipus de dada."
       }
     },
+    "account": {
+      "menu_entry": "El meu compte",
+      "title": "El meu compte",
+      "subtitle": "Gestiona la configuració del teu compte personal.",
+      "profile": {
+        "section_title": "Perfil",
+        "name": "Nom",
+        "name_placeholder": "El teu nom",
+        "last_name": "Cognom",
+        "last_name_placeholder": "El teu cognom",
+        "email": "Correu",
+        "email_placeholder": "el-teu\\@correu.com",
+        "email_change_warning": "Hauràs de tornar a verificar el nou correu.",
+        "language": "Idioma",
+        "language_options": {
+          "ES": "Español",
+          "CA": "Català",
+          "EN": "English"
+        },
+        "submit": "Desar canvis",
+        "saved": "Perfil actualitzat correctament.",
+        "errors": {
+          "generic": "No s'han pogut desar els canvis. Torna-ho a provar."
+        }
+      },
+      "change_password": {
+        "section_title": "Canviar contrasenya",
+        "subtitle": "Després de desar, mantindrem la teva sessió activa amb la nova contrasenya.",
+        "current_password": "Contrasenya actual",
+        "current_password_placeholder": "La teva contrasenya actual",
+        "new_password": "Nova contrasenya",
+        "new_password_placeholder": "Mínim 8 caràcters",
+        "repeat_password": "Repeteix la nova contrasenya",
+        "repeat_password_placeholder": "Torna-la a escriure",
+        "submit": "Actualitzar contrasenya",
+        "success": "La teva contrasenya s'ha actualitzat correctament.",
+        "errors": {
+          "generic": "No s'ha pogut canviar la contrasenya. Torna-ho a provar.",
+          "passwords_mismatch": "Les contrasenyes no coincideixen.",
+          "too_short": "Mínim 8 caràcters."
+        }
+      }
+    },
     "org_settings": {
       "breadcrumb": "Configuració",
       "title": "Configuració de l'organització",
@@ -495,6 +539,22 @@
       "errors": {
         "forbidden": "No tens permisos per editar aquesta organització.",
         "generic": "No s'han pogut desar els canvis. Torna-ho a provar."
+      },
+      "attributes": {
+        "title": "Atributs bàsics de l'article",
+        "subtitle": "Camps extra que s'aplicaran a tots els articles de l'organització, a més del nom, descripció, ubicació i propietari.",
+        "scope_label": "Organització",
+        "add": "Afegir atribut",
+        "empty": "Encara no has afegit cap atribut a nivell d'organització.",
+        "delete_title": "Eliminar atribut",
+        "delete_message": "Vols eliminar l'atribut «{name}»? Els valors desats es conservaran per si el restaures més endavant.",
+        "delete_confirm": "Eliminar",
+        "errors": {
+          "load": "No s'han pogut carregar els atributs.",
+          "duplicate": "Ja existeix un atribut amb aquest nom.",
+          "generic": "No s'ha pogut desar l'atribut.",
+          "delete": "No s'ha pogut eliminar l'atribut."
+        }
       }
     },
     "create_org": {
@@ -602,6 +662,9 @@
         "field_type": "Tipus d'article",
         "type_placeholder": "Selecciona un tipus…",
         "field_name": "Nom",
+        "field_serial_number": "Núm. de sèrie",
+        "serial_placeholder": "p. ex. SN-000123",
+        "optional": "opcional",
         "field_description": "Descripció",
         "field_location": "Ubicació",
         "field_owner": "Propietari",
@@ -609,9 +672,17 @@
         "unassigned": "Sense ubicació",
         "no_owner": "Sense propietari",
         "attributes_section": "Atributs del tipus",
+        "org_attributes_section": "Atributs bàsics",
+        "field_cover_image": "Imatge de portada",
+        "cover_help": "S'utilitzarà com a imatge principal de l'article. La pots canviar més tard des de la pestanya d'adjunts.",
+        "cover_choose": "Selecciona imatge",
+        "cover_replace": "Canvia imatge",
+        "cover_invalid_type": "Format no suportat. Fes servir JPG, PNG, WEBP o GIF.",
+        "cover_too_large": "La imatge supera el límit de 25 MB.",
         "submit_create": "Crea article",
         "field_types": "Tipus d’article",
         "types_help": "Selecciona un o més tipus. Els seus atributs es combinen al formulari. | {n} tipus seleccionat | {n} tipus seleccionats",
+        "types_help_optional": "Sense tipus assignats | {n} tipus seleccionat | {n} tipus seleccionats",
         "no_types_yet": "Encara no has creat cap tipus d’article. Crea’n un des de “Tipus d’article” abans d’afegir articles."
       },
       "info": {
@@ -631,6 +702,8 @@
         "images_empty": "Encara no hi ha imatges. Puja la primera per veure-la aquí.",
         "documents_title": "Documents",
         "documents_empty": "Encara no hi ha documents.",
+        "cover_badge": "Portada",
+        "set_cover": "Fer portada",
         "upload_image": "Puja imatge",
         "upload_document": "Puja document",
         "uploading": "Pujant…",
@@ -674,6 +747,7 @@
         "delete": "No s'ha pogut eliminar l'article.",
         "name_required": "El nom és obligatori.",
         "type_required": "Has de seleccionar un tipus d'article.",
+        "cover_upload": "S'ha creat l'article, però no s'ha pogut pujar la imatge. Torna-ho a provar des de la pestanya d'adjunts.",
         "not_found": "Article no trobat."
       },
       "new_breadcrumb": "Nou"
@@ -715,7 +789,10 @@
       "verification_token_invalid": "L'enllaç de verificació no és vàlid o ha caducat.",
       "passwords_mismatch": "Les contrasenyes no coincideixen.",
       "unauthenticated": "Sessió no vàlida o expirada.",
-      "forbidden": "No tens permís per fer aquesta acció."
+      "forbidden": "No tens permís per fer aquesta acció.",
+      "current_password_invalid": "La contrasenya actual no és correcta.",
+      "password_too_short": "La contrasenya ha de tenir com a mínim 8 caràcters.",
+      "new_password_same_as_current": "La nova contrasenya ha de ser diferent de l'actual."
     },
     "users": {
       "email_taken": "Ja existeix un usuari amb aquest correu.",

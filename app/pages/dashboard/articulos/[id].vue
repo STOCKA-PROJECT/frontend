@@ -11,6 +11,7 @@ const route = useRoute()
 const orgs = useOrganizationsStore()
 const pieces = usePiecesStore()
 const pieceTypes = usePieceTypesStore()
+const orgAttributes = useOrganizationPieceAttributesStore()
 const locations = useLocationsStore()
 const team = useTeamStore()
 
@@ -98,7 +99,10 @@ async function loadAll() {
         : locations.fetchTree(orgIdValue).catch(() => undefined),
       team.getMembers(orgIdValue)
         ? Promise.resolve()
-        : team.fetchMembers(orgIdValue).catch(() => undefined)
+        : team.fetchMembers(orgIdValue).catch(() => undefined),
+      orgAttributes.loadedOrgIds.has(orgIdValue)
+        ? Promise.resolve()
+        : orgAttributes.fetchAll(orgIdValue).catch(() => undefined)
     ])
   } catch (e) {
     if (e instanceof FetchError && e.response?.status === 404) {
@@ -135,6 +139,16 @@ async function onSave(payload: UpdatePieceDto) {
   }
 }
 
+async function setCoverFromGallery(attachmentId: number) {
+  if (orgId.value == null || piece.value == null) return
+  saveError.value = null
+  try {
+    await pieces.update(orgId.value, piece.value.id, { coverAttachmentId: attachmentId })
+  } catch (e) {
+    saveError.value = extractErrorMessage(e, t('dashboard.pieces.errors.save'))
+  }
+}
+
 const confirmDelete = ref(false)
 const deleting = ref(false)
 function askDelete() {
@@ -160,6 +174,37 @@ async function doDelete() {
 }
 
 const members = computed(() => (orgId.value != null && team.getMembers(orgId.value)) || [])
+const currentOrgAttributes = computed(() =>
+  orgId.value != null ? orgAttributes.listFor(orgId.value) : []
+)
+
+const coverBlobUrl = ref<string | null>(null)
+const coverLoadedFor = ref<{ pieceId: number; attachmentId: number } | null>(null)
+
+watch(
+  () => piece.value?.coverAttachmentId ?? null,
+  async (coverId) => {
+    if (orgId.value == null || piece.value == null || coverId == null) {
+      coverBlobUrl.value = null
+      coverLoadedFor.value = null
+      return
+    }
+    if (coverLoadedFor.value
+        && coverLoadedFor.value.pieceId === piece.value.id
+        && coverLoadedFor.value.attachmentId === coverId) {
+      return
+    }
+    try {
+      const url = await pieces.fetchAttachmentBlobUrl(orgId.value, piece.value.id, coverId)
+      coverBlobUrl.value = url
+      coverLoadedFor.value = { pieceId: piece.value.id, attachmentId: coverId }
+    } catch {
+      coverBlobUrl.value = null
+      coverLoadedFor.value = null
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -179,20 +224,25 @@ const members = computed(() => (orgId.value != null && team.getMembers(orgId.val
 
     <template v-else-if="piece && orgId != null">
       <header class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-        <div class="min-w-0">
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <h1 class="truncate text-[20px] font-semibold tracking-[-0.02em] text-ink sm:text-[24px]">
-              {{ piece.name }}
-            </h1>
-            <span :class="['tag', piece.status === 'PENDING' ? 'tag-warn' : 'tag-ok']">
-              {{ piece.status === 'PENDING'
-                ? t('dashboard.pieces_table.status_pending')
-                : t('dashboard.pieces_table.status_active') }}
-            </span>
+        <div class="flex min-w-0 items-start gap-3">
+          <div v-if="coverBlobUrl" class="cover-thumb">
+            <img :src="coverBlobUrl" alt="" class="cover-thumb-img">
           </div>
-          <p class="mt-1 text-[13.5px] text-ink-soft">
-            {{ pieceTypesLabel || '—' }} · #{{ piece.id }}
-          </p>
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <h1 class="truncate text-[20px] font-semibold tracking-[-0.02em] text-ink sm:text-[24px]">
+                {{ piece.name }}
+              </h1>
+              <span :class="['tag', piece.status === 'PENDING' ? 'tag-warn' : 'tag-ok']">
+                {{ piece.status === 'PENDING'
+                  ? t('dashboard.pieces_table.status_pending')
+                  : t('dashboard.pieces_table.status_active') }}
+              </span>
+            </div>
+            <p class="mt-1 text-[13.5px] text-ink-soft">
+              {{ pieceTypesLabel || '—' }}<template v-if="piece.serialNumber"> · #{{ piece.serialNumber }}</template>
+            </p>
+          </div>
         </div>
         <div class="flex flex-wrap gap-2">
           <button
@@ -240,6 +290,7 @@ const members = computed(() => (orgId.value != null && team.getMembers(orgId.val
           :piece-types="piecePieceTypes.length > 0 ? pieceTypes.list : piecePieceTypes"
           :locations="flatLocations"
           :members="members"
+          :org-attributes="currentOrgAttributes"
           :can-write="canWrite"
           :saving="saving"
           :error-msg="saveError"
@@ -250,7 +301,9 @@ const members = computed(() => (orgId.value != null && team.getMembers(orgId.val
           :org-id="orgId"
           :piece-id="piece.id"
           :attachments="piece.attachments"
+          :cover-attachment-id="piece.coverAttachmentId ?? null"
           :can-write="canWrite"
+          @set-cover="setCoverFromGallery"
         />
         <DashboardPieceHistoryPanel
           v-else
@@ -374,4 +427,23 @@ const members = computed(() => (orgId.value != null && team.getMembers(orgId.val
 }
 .tag-ok { background: var(--c-accent-soft); color: var(--c-accent-ink); }
 .tag-warn { background: var(--c-warn-soft); color: #8a6324; }
+
+.cover-thumb {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--c-line);
+  background: var(--c-bg-soft);
+}
+@media (min-width: 640px) {
+  .cover-thumb { width: 64px; height: 64px; }
+}
+.cover-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 </style>

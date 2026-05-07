@@ -423,7 +423,8 @@
         "field_display_name": "Display label",
         "field_display_name_placeholder": "Color, Weight (kg), Purchase date…",
         "field_type": "Data type",
-        "field_type_locked_help": "The technical name and the data type cannot be changed after the attribute is created.",
+        "field_name_edit_help": "Renaming an attribute does not affect existing values.",
+        "field_type_edit_help": "You can only change the data type if no piece has a saved value for this attribute.",
         "field_required": "Required",
         "validators_title": "Validation rules",
         "validators": {
@@ -484,6 +485,49 @@
         "type_required": "Pick a data type."
       }
     },
+    "account": {
+      "menu_entry": "My account",
+      "title": "My account",
+      "subtitle": "Manage your personal account settings.",
+      "profile": {
+        "section_title": "Profile",
+        "name": "First name",
+        "name_placeholder": "Your first name",
+        "last_name": "Last name",
+        "last_name_placeholder": "Your last name",
+        "email": "Email",
+        "email_placeholder": "you\\@email.com",
+        "email_change_warning": "You'll need to verify the new email again.",
+        "language": "Language",
+        "language_options": {
+          "ES": "Español",
+          "CA": "Català",
+          "EN": "English"
+        },
+        "submit": "Save changes",
+        "saved": "Profile updated successfully.",
+        "errors": {
+          "generic": "Could not save the changes. Please try again."
+        }
+      },
+      "change_password": {
+        "section_title": "Change password",
+        "subtitle": "After saving, we'll keep your session active with the new password.",
+        "current_password": "Current password",
+        "current_password_placeholder": "Your current password",
+        "new_password": "New password",
+        "new_password_placeholder": "At least 8 characters",
+        "repeat_password": "Repeat the new password",
+        "repeat_password_placeholder": "Type it again",
+        "submit": "Update password",
+        "success": "Your password has been updated successfully.",
+        "errors": {
+          "generic": "Could not change the password. Please try again.",
+          "passwords_mismatch": "Passwords do not match.",
+          "too_short": "At least 8 characters."
+        }
+      }
+    },
     "org_settings": {
       "breadcrumb": "Settings",
       "title": "Organization settings",
@@ -495,6 +539,22 @@
       "errors": {
         "forbidden": "You don't have permission to edit this organization.",
         "generic": "Couldn't save the changes. Please try again."
+      },
+      "attributes": {
+        "title": "Item base attributes",
+        "subtitle": "Extra fields that will apply to every item in the organization, on top of name, description, location and owner.",
+        "scope_label": "Organization",
+        "add": "Add attribute",
+        "empty": "You haven't added any organization-level attributes yet.",
+        "delete_title": "Delete attribute",
+        "delete_message": "Delete the «{name}» attribute? Stored values will be preserved in case you restore it later.",
+        "delete_confirm": "Delete",
+        "errors": {
+          "load": "Couldn't load the attributes.",
+          "duplicate": "An attribute with that name already exists.",
+          "generic": "Couldn't save the attribute.",
+          "delete": "Couldn't delete the attribute."
+        }
       }
     },
     "create_org": {
@@ -602,6 +662,9 @@
         "field_type": "Item type",
         "type_placeholder": "Choose a type…",
         "field_name": "Name",
+        "field_serial_number": "Serial number",
+        "serial_placeholder": "e.g. SN-000123",
+        "optional": "optional",
         "field_description": "Description",
         "field_location": "Location",
         "field_owner": "Owner",
@@ -609,9 +672,17 @@
         "unassigned": "No location",
         "no_owner": "No owner",
         "attributes_section": "Type attributes",
+        "org_attributes_section": "Base attributes",
+        "field_cover_image": "Cover image",
+        "cover_help": "Used as the main image of the item. You can change it later from the attachments tab.",
+        "cover_choose": "Choose image",
+        "cover_replace": "Replace image",
+        "cover_invalid_type": "Unsupported format. Use JPG, PNG, WEBP or GIF.",
+        "cover_too_large": "Image exceeds the 25 MB limit.",
         "submit_create": "Create item",
         "field_types": "Item types",
         "types_help": "Pick one or more types. Their attributes are combined in the form. | {n} type selected | {n} types selected",
+        "types_help_optional": "No types assigned | {n} type selected | {n} types selected",
         "no_types_yet": "You haven’t created any item types yet. Add one from “Item types” before creating items."
       },
       "info": {
@@ -631,6 +702,8 @@
         "images_empty": "No images yet. Upload one to see it here.",
         "documents_title": "Documents",
         "documents_empty": "No documents yet.",
+        "cover_badge": "Cover",
+        "set_cover": "Make cover",
         "upload_image": "Upload image",
         "upload_document": "Upload document",
         "uploading": "Uploading…",
@@ -674,6 +747,7 @@
         "delete": "The item could not be deleted.",
         "name_required": "Name is required.",
         "type_required": "You must choose an item type.",
+        "cover_upload": "The item was created, but the cover image could not be uploaded. Try again from the attachments tab.",
         "not_found": "Item not found."
       },
       "new_breadcrumb": "New"
@@ -715,7 +789,10 @@
       "verification_token_invalid": "The verification link is invalid or has expired.",
       "passwords_mismatch": "Passwords do not match.",
       "unauthenticated": "Session invalid or expired.",
-      "forbidden": "You don't have permission to perform this action."
+      "forbidden": "You don't have permission to perform this action.",
+      "current_password_invalid": "The current password is incorrect.",
+      "password_too_short": "The password must be at least 8 characters long.",
+      "new_password_same_as_current": "The new password must be different from the current one."
     },
     "users": {
       "email_taken": "A user with that email already exists.",

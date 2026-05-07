@@ -177,5 +177,11 @@ async function submit() {
         </AuthSubmitButton>
       </form>
     </div>
+
+    <DashboardOrgPieceAttributesPanel
+      v-if="orgs.current"
+      class="max-w-[760px]"
+      :org-id="orgs.current.id"
+      :can-write="isOwner" />
   </div>
 </template>

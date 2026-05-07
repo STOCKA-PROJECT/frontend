@@ -3,6 +3,7 @@ import type { PieceListItemDto } from '~/types/api'
 
 const props = withDefaults(defineProps<{
   pieces: PieceListItemDto[]
+  orgId?: number | null
   loading?: boolean
   showLocation?: boolean
   showOwner?: boolean
@@ -14,7 +15,8 @@ const props = withDefaults(defineProps<{
   loading: false,
   showLocation: false,
   showOwner: false,
-  canWrite: false
+  canWrite: false,
+  orgId: null
 })
 
 const emit = defineEmits<{
@@ -24,11 +26,68 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n()
 const router = useRouter()
+const piecesStore = usePiecesStore()
 
 const thumbVariant = (piece: PieceListItemDto) => {
   const seed = piece.pieceTypes[0]?.id ?? piece.id
   return `t-${(seed % 5) + 1}` as const
 }
+
+// Lazily resolved blob URLs for cover thumbnails, keyed by `${pieceId}:${attachmentId}`.
+const coverUrls = ref<Record<string, string>>({})
+const loadingCovers = ref<Set<string>>(new Set())
+
+function coverKey(pieceId: number, attachmentId: number): string {
+  return `${pieceId}:${attachmentId}`
+}
+
+function coverUrlFor(piece: PieceListItemDto): string | null {
+  if (!piece.coverAttachmentId) return null
+  return coverUrls.value[coverKey(piece.id, piece.coverAttachmentId)] ?? null
+}
+
+async function loadCover(pieceId: number, attachmentId: number) {
+  if (props.orgId == null) return
+  const key = coverKey(pieceId, attachmentId)
+  if (coverUrls.value[key] || loadingCovers.value.has(key)) return
+  loadingCovers.value.add(key)
+  try {
+    const url = await piecesStore.fetchAttachmentBlobUrl(props.orgId, pieceId, attachmentId)
+    coverUrls.value = { ...coverUrls.value, [key]: url }
+  } catch {
+    // Si falla la presigned URL no rompemos la tabla — caemos al thumb por defecto.
+  } finally {
+    loadingCovers.value.delete(key)
+  }
+}
+
+watch(
+  () => props.pieces.map(p => coverKey(p.id, p.coverAttachmentId ?? 0)),
+  () => {
+    const stillNeeded = new Set<string>()
+    for (const p of props.pieces) {
+      if (!p.coverAttachmentId) continue
+      const key = coverKey(p.id, p.coverAttachmentId)
+      stillNeeded.add(key)
+      void loadCover(p.id, p.coverAttachmentId)
+    }
+    // Revoca URLs que ya no aparecen (cover cambiado o pieza eliminada).
+    const next: Record<string, string> = {}
+    for (const [key, url] of Object.entries(coverUrls.value)) {
+      if (stillNeeded.has(key)) {
+        next[key] = url
+      } else {
+        URL.revokeObjectURL(url)
+      }
+    }
+    coverUrls.value = next
+  },
+  { immediate: true, deep: true }
+)
+
+onBeforeUnmount(() => {
+  for (const url of Object.values(coverUrls.value)) URL.revokeObjectURL(url)
+})
 
 const dateLocale = computed(() => {
   const l = locale.value as string
@@ -124,12 +183,27 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
           >
             <td class="td">
               <div class="flex min-w-0 items-center gap-3">
-                <div :class="['piece-thumb flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-lg text-bg-card', thumbVariant(p)]">
-                  <DashboardIcon name="box" :size="16" />
+                <div class="piece-thumb-wrap">
+                  <img
+                    v-if="coverUrlFor(p)"
+                    :src="coverUrlFor(p)!"
+                    :alt="p.name"
+                    class="piece-thumb-img"
+                    loading="lazy"
+                  >
+                  <div
+                    v-else
+                    :class="['piece-thumb flex h-full w-full items-center justify-center rounded-lg text-bg-card', thumbVariant(p)]"
+                  >
+                    <DashboardIcon name="box" :size="16" />
+                  </div>
                 </div>
                 <div class="min-w-0">
                   <div class="truncate font-medium tracking-[-0.005em] text-ink">{{ p.name }}</div>
-                  <div class="truncate font-mono text-[11.5px] tabular-nums text-ink-muted">#{{ p.id }}</div>
+                  <div v-if="p.serialNumber"
+                    class="truncate font-mono text-[11.5px] tabular-nums text-ink-muted">
+                    #{{ p.serialNumber }}
+                  </div>
                 </div>
               </div>
             </td>
@@ -214,6 +288,20 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
 .row-interactive { cursor: pointer; }
 .row-interactive:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -2px; background: var(--c-bg-soft); }
 
+.piece-thumb-wrap {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--c-bg-soft);
+}
+.piece-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 .piece-thumb.t-1 { background: linear-gradient(135deg, #dccfb8, #c8b89c); }
 .piece-thumb.t-2 { background: linear-gradient(135deg, #cdd9c8, #a8baa3); }
 .piece-thumb.t-3 { background: linear-gradient(135deg, #d3dde6, #b6c1cd); }
