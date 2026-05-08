@@ -328,7 +328,7 @@ watch(
 </template>
 
 <style scoped>
-.page { min-height: calc(100vh - var(--topbar-h, 56px)); }
+.page { min-height: calc(100vh - var(--topbar-h, 60px)); }
 
 .back-link {
   align-self: flex-start;

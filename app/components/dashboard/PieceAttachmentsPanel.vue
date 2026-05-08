@@ -492,8 +492,8 @@ async function confirmDelete() {
 }
 .image-meta { padding: 0 2px; }
 .image-delete {
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   border-radius: 6px;
   border: 1px solid transparent;
   background: transparent;
@@ -509,8 +509,8 @@ async function confirmDelete() {
 .image-delete:disabled { opacity: .4; cursor: not-allowed; }
 
 .ghost-btn {
-  height: 36px;
-  padding: 0 12px;
+  height: 40px;
+  padding: 0 14px;
   border: 1px solid var(--c-line);
   border-radius: 8px;
   background: var(--c-bg-card);

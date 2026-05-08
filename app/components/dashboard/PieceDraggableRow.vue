@@ -94,6 +94,12 @@ const updatedAtLabel = computed(() => {
 .piece-row.is-dragging { opacity: .5; }
 .grip { display: inline-flex; align-items: center; padding: 0 2px; cursor: grab; }
 
+/* Drag is desktop-only — hide affordances on touch devices. */
+@media (hover: none) and (pointer: coarse) {
+  .grip { display: none; }
+  .piece-row.is-draggable { cursor: default; }
+}
+
 .piece-thumb.t-1 { background: linear-gradient(135deg, #dccfb8, #c8b89c); }
 .piece-thumb.t-2 { background: linear-gradient(135deg, #cdd9c8, #a8baa3); }
 .piece-thumb.t-3 { background: linear-gradient(135deg, #d3dde6, #b6c1cd); }

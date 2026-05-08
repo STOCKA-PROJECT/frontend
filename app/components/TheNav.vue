@@ -24,7 +24,7 @@ watch(menuOpen, (open) => {
 watch(() => route.fullPath, closeMenu)
 
 onMounted(() => {
-  const onResize = () => { if (window.innerWidth > 900) closeMenu() }
+  const onResize = () => { if (window.innerWidth >= 960) closeMenu() }
   const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeMenu() }
   window.addEventListener('resize', onResize)
   window.addEventListener('keydown', onKey)

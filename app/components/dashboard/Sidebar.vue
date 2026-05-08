@@ -170,7 +170,7 @@ async function handleLogout() {
     <Transition name="drawer">
       <aside
         v-if="isOpen"
-        class="mobile-nav-drawer fixed inset-y-0 left-0 z-50 flex w-[min(320px,85vw)] flex-col gap-[18px] overflow-y-auto border-r border-line bg-bg-card px-3.5 py-4.5 shadow-elevated lg:hidden"
+        class="mobile-nav-drawer fixed inset-y-0 left-0 z-50 flex w-[min(320px,85vw)] flex-col gap-[18px] overflow-y-auto border-r border-line bg-bg-card px-3.5 pt-[max(1.125rem,env(safe-area-inset-top))] pb-[max(1.125rem,env(safe-area-inset-bottom))] shadow-elevated lg:hidden"
         role="dialog"
         aria-modal="true"
         :aria-label="t('common.main_nav')"

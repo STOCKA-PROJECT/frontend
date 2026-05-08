@@ -47,12 +47,26 @@ export function useMobileNav(options: { observeSideEffects?: boolean } = {}) {
       if (e.key === 'Escape' && isOpen.value) close()
     }
 
+    let mq: MediaQueryList | null = null
+    function onMqChange(e: MediaQueryListEvent) {
+      if (e.matches && isOpen.value) close()
+    }
+
     onMounted(() => {
       document.addEventListener('keydown', onKeydown)
+      if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+        mq = window.matchMedia('(min-width: 960px)')
+        if (mq.matches && isOpen.value) close()
+        mq.addEventListener('change', onMqChange)
+      }
     })
 
     onBeforeUnmount(() => {
       document.removeEventListener('keydown', onKeydown)
+      if (mq) {
+        mq.removeEventListener('change', onMqChange)
+        mq = null
+      }
       if (typeof document !== 'undefined') {
         document.body.style.overflow = ''
       }

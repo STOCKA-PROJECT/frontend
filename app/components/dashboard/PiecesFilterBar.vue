@@ -67,20 +67,14 @@ const hasAnyFilter = computed(() =>
       <label for="filter-q" class="filter-label">
         {{ t('dashboard.pieces.filters.search') }}
       </label>
-      <div class="relative">
-        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted">
-          <DashboardIcon name="search" :size="14" />
-        </span>
-        <input
-          id="filter-q"
-          type="text"
-          :value="qLocal"
-          :placeholder="t('dashboard.pieces.filters.search_placeholder')"
-          :disabled="loading"
-          class="filter-input w-full pl-8"
-          @input="onQInput"
-        >
-      </div>
+      <input
+        id="filter-q"
+        type="text"
+        :value="qLocal"
+        :placeholder="t('dashboard.pieces.filters.search_placeholder')"
+        class="filter-input w-full"
+        @input="onQInput"
+      >
     </div>
 
     <div class="flex flex-col gap-1">
@@ -153,7 +147,7 @@ const hasAnyFilter = computed(() =>
   font-size: 14px;
   transition: border-color .12s, background .12s;
 }
-@media (min-width: 1024px) {
+@media (min-width: 960px) {
   .filter-input,
   .filter-select {
     height: 36px;
@@ -182,7 +176,7 @@ const hasAnyFilter = computed(() =>
   font-size: 13px;
   transition: background .12s;
 }
-@media (min-width: 1024px) {
+@media (min-width: 960px) {
   .clear-btn {
     height: 36px;
     font-size: 12.5px;

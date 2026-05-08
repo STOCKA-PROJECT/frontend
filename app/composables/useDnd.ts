@@ -15,6 +15,17 @@ export function useCurrentDrag() {
   return computed(() => currentDrag.value)
 }
 
+/**
+ * HTML5 native drag-and-drop is not reliably triggered on touch devices
+ * (Safari iOS / Chrome Android do not dispatch dragstart from a finger).
+ * We disable the source/target on coarse pointers so users get a deterministic
+ * "drag is desktop-only" experience instead of half-broken interactions.
+ */
+function isTouchOnlyDevice(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
+  return window.matchMedia('(hover: none) and (pointer: coarse)').matches
+}
+
 export interface UseDragSourceOptions {
   disabled?: () => boolean
   onStart?: (payload: DragPayload) => void
@@ -25,7 +36,7 @@ export function useDragSource(payloadFn: () => DragPayload, opts: UseDragSourceO
   const dragging = ref(false)
 
   function onDragStart(e: DragEvent) {
-    if (opts.disabled?.()) {
+    if (opts.disabled?.() || isTouchOnlyDevice()) {
       e.preventDefault()
       return
     }
@@ -45,7 +56,7 @@ export function useDragSource(payloadFn: () => DragPayload, opts: UseDragSourceO
     opts.onEnd?.()
   }
 
-  const draggable = computed(() => !opts.disabled?.())
+  const draggable = computed(() => !opts.disabled?.() && !isTouchOnlyDevice())
 
   return { onDragStart, onDragEnd, draggable, dragging }
 }

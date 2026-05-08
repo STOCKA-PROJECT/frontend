@@ -148,8 +148,8 @@ const { t } = useI18n()
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 6px;
   border: 1px solid var(--c-line);
   background: var(--c-bg-card);
@@ -161,5 +161,10 @@ const { t } = useI18n()
   color: var(--c-danger);
   border-color: color-mix(in oklab, var(--c-danger) 35%, transparent);
   background: var(--c-danger-soft);
+}
+
+/* Touch devices never trigger :hover, so row actions must be permanently visible. */
+@media (hover: none) and (pointer: coarse) {
+  .row-actions { display: flex !important; }
 }
 </style>

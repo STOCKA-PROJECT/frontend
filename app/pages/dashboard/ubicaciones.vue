@@ -40,7 +40,7 @@ const role = computed(() => orgs.current?.currentUserRole ?? null)
 </template>
 
 <style scoped>
-.page { min-height: calc(100vh - var(--topbar-h, 56px)); }
+.page { min-height: calc(100vh - var(--topbar-h, 60px)); }
 .board-host { flex: 1; min-height: 480px; display: flex; flex-direction: column; }
 .board-host > * { flex: 1; min-height: 0; }
 </style>

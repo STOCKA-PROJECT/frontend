@@ -5,9 +5,15 @@ const API_BASE_URL = process.env.NUXT_API_BASE_URL ?? "http://localhost:9095";
 
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   future: { compatibilityVersion: 4 },
-  modules: ["@nuxtjs/i18n", "@nuxtjs/tailwindcss", "@pinia/nuxt", "@nuxt/eslint", "@sentry/nuxt/module"],
+  modules: [
+    "@nuxtjs/i18n",
+    "@nuxtjs/tailwindcss",
+    "@pinia/nuxt",
+    "@nuxt/eslint",
+    "@sentry/nuxt/module",
+  ],
   css: ["~/assets/css/main.css"],
 
   runtimeConfig: {

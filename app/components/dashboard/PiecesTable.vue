@@ -146,110 +146,208 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
 </script>
 
 <template>
-  <div class="overflow-x-auto">
-    <table v-if="!isEmpty" class="w-full min-w-[680px] border-collapse text-[13.5px]">
-      <thead>
-        <tr>
-          <th class="th">{{ t('dashboard.pieces_table.col_item') }}</th>
-          <th class="th">{{ t('dashboard.pieces_table.col_type') }}</th>
-          <th v-if="showLocation" class="th">{{ t('dashboard.pieces.filters.location') }}</th>
-          <th v-if="showOwner" class="th">{{ t('dashboard.pieces.filters.owner') }}</th>
-          <th class="th">{{ t('dashboard.pieces_table.col_status') }}</th>
-          <th class="th">{{ t('dashboard.pieces_table.col_updated') }}</th>
-          <th v-if="canWrite" class="th th-actions"><span class="sr-only">{{ t('dashboard.pieces.actions.delete') }}</span></th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-if="loading">
-          <tr v-for="i in 4" :key="`s-${i}`">
-            <td class="td"><span class="block h-5 w-48 animate-pulse rounded bg-bg-soft" /></td>
-            <td class="td"><span class="block h-4 w-24 animate-pulse rounded bg-bg-soft" /></td>
-            <td v-if="showLocation" class="td"><span class="block h-4 w-24 animate-pulse rounded bg-bg-soft" /></td>
-            <td v-if="showOwner" class="td"><span class="block h-4 w-24 animate-pulse rounded bg-bg-soft" /></td>
-            <td class="td"><span class="block h-5 w-20 animate-pulse rounded bg-bg-soft" /></td>
-            <td class="td"><span class="block h-4 w-16 animate-pulse rounded bg-bg-soft" /></td>
-            <td v-if="canWrite" class="td" />
+  <div>
+    <!-- Vista escritorio (md+): tabla completa -->
+    <div class="hidden overflow-x-auto md:block">
+      <table v-if="!isEmpty" class="w-full min-w-[680px] border-collapse text-[13.5px]">
+        <thead>
+          <tr>
+            <th class="th">{{ t('dashboard.pieces_table.col_item') }}</th>
+            <th class="th">{{ t('dashboard.pieces_table.col_type') }}</th>
+            <th v-if="showLocation" class="th">{{ t('dashboard.pieces.filters.location') }}</th>
+            <th v-if="showOwner" class="th">{{ t('dashboard.pieces.filters.owner') }}</th>
+            <th class="th">{{ t('dashboard.pieces_table.col_status') }}</th>
+            <th class="th">{{ t('dashboard.pieces_table.col_updated') }}</th>
+            <th v-if="canWrite" class="th th-actions"><span class="sr-only">{{ t('dashboard.pieces.actions.delete') }}</span></th>
           </tr>
-        </template>
-        <template v-else>
-          <tr
-            v-for="p in pieces"
-            :key="p.id"
-            class="row"
-            :class="{ 'row-interactive': isInteractive }"
-            :tabindex="isInteractive ? 0 : -1"
-            @click="onRowClick(p)"
-            @keydown="(e) => onRowKey(e, p)"
-          >
-            <td class="td">
-              <div class="flex min-w-0 items-center gap-3">
-                <div class="piece-thumb-wrap">
-                  <img
-                    v-if="coverUrlFor(p)"
-                    :src="coverUrlFor(p)!"
-                    :alt="p.name"
-                    class="piece-thumb-img"
-                    loading="lazy"
-                  >
-                  <div
-                    v-else
-                    :class="['piece-thumb flex h-full w-full items-center justify-center rounded-lg text-bg-card', thumbVariant(p)]"
-                  >
-                    <DashboardIcon name="box" :size="16" />
+        </thead>
+        <tbody>
+          <template v-if="loading">
+            <tr v-for="i in 4" :key="`s-${i}`">
+              <td class="td"><span class="block h-5 w-48 animate-pulse rounded bg-bg-soft" /></td>
+              <td class="td"><span class="block h-4 w-24 animate-pulse rounded bg-bg-soft" /></td>
+              <td v-if="showLocation" class="td"><span class="block h-4 w-24 animate-pulse rounded bg-bg-soft" /></td>
+              <td v-if="showOwner" class="td"><span class="block h-4 w-24 animate-pulse rounded bg-bg-soft" /></td>
+              <td class="td"><span class="block h-5 w-20 animate-pulse rounded bg-bg-soft" /></td>
+              <td class="td"><span class="block h-4 w-16 animate-pulse rounded bg-bg-soft" /></td>
+              <td v-if="canWrite" class="td" />
+            </tr>
+          </template>
+          <template v-else>
+            <tr
+              v-for="p in pieces"
+              :key="p.id"
+              class="row"
+              :class="{ 'row-interactive': isInteractive }"
+              :tabindex="isInteractive ? 0 : -1"
+              @click="onRowClick(p)"
+              @keydown="(e) => onRowKey(e, p)"
+            >
+              <td class="td">
+                <div class="flex min-w-0 items-center gap-3">
+                  <div class="piece-thumb-wrap">
+                    <img
+                      v-if="coverUrlFor(p)"
+                      :src="coverUrlFor(p)!"
+                      :alt="p.name"
+                      class="piece-thumb-img"
+                      loading="lazy"
+                    >
+                    <div
+                      v-else
+                      :class="['piece-thumb flex h-full w-full items-center justify-center rounded-lg text-bg-card', thumbVariant(p)]"
+                    >
+                      <DashboardIcon name="box" :size="16" />
+                    </div>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="truncate font-medium tracking-[-0.005em] text-ink">{{ p.name }}</div>
+                    <div v-if="p.serialNumber"
+                      class="truncate font-mono text-[11.5px] tabular-nums text-ink-muted">
+                      #{{ p.serialNumber }}
+                    </div>
                   </div>
                 </div>
-                <div class="min-w-0">
-                  <div class="truncate font-medium tracking-[-0.005em] text-ink">{{ p.name }}</div>
-                  <div v-if="p.serialNumber"
-                    class="truncate font-mono text-[11.5px] tabular-nums text-ink-muted">
-                    #{{ p.serialNumber }}
-                  </div>
+              </td>
+              <td class="td">
+                <div v-if="p.pieceTypes.length > 0" class="flex flex-wrap gap-1">
+                  <span v-for="t in p.pieceTypes" :key="t.id" class="type-chip">{{ t.name }}</span>
                 </div>
+                <span v-else class="text-ink-muted">—</span>
+              </td>
+              <td v-if="showLocation" class="td">
+                <span class="text-ink-soft">{{ locationLabel(p.locationId) }}</span>
+              </td>
+              <td v-if="showOwner" class="td">
+                <span class="text-ink-soft">{{ ownerLabel(p.ownerUserId) }}</span>
+              </td>
+              <td class="td">
+                <span :class="['tag', statusClass(p.status)]">
+                  <span class="dt" />{{ statusLabel(p.status) }}
+                </span>
+              </td>
+              <td class="td">
+                <span class="text-[12.5px] text-ink-muted">{{ relativeDate(p.updatedAt) }}</span>
+              </td>
+              <td v-if="canWrite" class="td td-actions">
+                <button
+                  type="button"
+                  class="trash-btn"
+                  :aria-label="t('dashboard.pieces.actions.delete')"
+                  :title="t('dashboard.pieces.actions.delete')"
+                  @click="(e) => onDelete(e, p)"
+                >
+                  <DashboardIcon name="trash" :size="15" />
+                </button>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
+      <div v-else class="flex flex-col items-center gap-3 px-5 py-12 text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-bg-soft text-ink-muted">
+          <DashboardIcon name="box" :size="20" />
+        </div>
+        <p class="max-w-[280px] text-[13.5px] text-ink-soft">
+          {{ t('dashboard.pieces_table.empty') }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Vista móvil (<md): tarjetas -->
+    <div class="flex flex-col gap-2 md:hidden">
+      <template v-if="loading">
+        <div v-for="i in 4" :key="`sc-${i}`" class="piece-card piece-card-skel">
+          <span class="piece-thumb-wrap-card animate-pulse rounded-lg bg-bg-soft" />
+          <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+            <span class="block h-4 w-3/4 animate-pulse rounded bg-bg-soft" />
+            <span class="block h-3 w-1/2 animate-pulse rounded bg-bg-soft" />
+            <span class="block h-3 w-1/3 animate-pulse rounded bg-bg-soft" />
+          </div>
+        </div>
+      </template>
+
+      <div v-else-if="isEmpty" class="flex flex-col items-center gap-3 px-5 py-12 text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-bg-soft text-ink-muted">
+          <DashboardIcon name="box" :size="20" />
+        </div>
+        <p class="max-w-[280px] text-[13.5px] text-ink-soft">
+          {{ t('dashboard.pieces_table.empty') }}
+        </p>
+      </div>
+
+      <template v-else>
+        <article
+          v-for="p in pieces"
+          :key="p.id"
+          class="piece-card"
+          :class="{ 'piece-card-interactive': isInteractive }"
+          :tabindex="isInteractive ? 0 : -1"
+          :role="isInteractive ? 'button' : undefined"
+          @click="onRowClick(p)"
+          @keydown="(e) => onRowKey(e, p)"
+        >
+          <div class="piece-thumb-wrap-card">
+            <img
+              v-if="coverUrlFor(p)"
+              :src="coverUrlFor(p)!"
+              :alt="p.name"
+              class="piece-thumb-img"
+              loading="lazy"
+            >
+            <div
+              v-else
+              :class="['piece-thumb flex h-full w-full items-center justify-center rounded-lg text-bg-card', thumbVariant(p)]"
+            >
+              <DashboardIcon name="box" :size="18" />
+            </div>
+          </div>
+
+          <div class="flex min-w-0 flex-1 flex-col gap-1">
+            <div class="flex min-w-0 items-center gap-2">
+              <div class="min-w-0 flex-1 truncate font-medium tracking-[-0.005em] text-ink">
+                {{ p.name }}
               </div>
-            </td>
-            <td class="td">
-              <div v-if="p.pieceTypes.length > 0" class="flex flex-wrap gap-1">
-                <span v-for="t in p.pieceTypes" :key="t.id" class="type-chip">{{ t.name }}</span>
-              </div>
-              <span v-else class="text-ink-muted">—</span>
-            </td>
-            <td v-if="showLocation" class="td">
-              <span class="text-ink-soft">{{ locationLabel(p.locationId) }}</span>
-            </td>
-            <td v-if="showOwner" class="td">
-              <span class="text-ink-soft">{{ ownerLabel(p.ownerUserId) }}</span>
-            </td>
-            <td class="td">
               <span :class="['tag', statusClass(p.status)]">
                 <span class="dt" />{{ statusLabel(p.status) }}
               </span>
-            </td>
-            <td class="td">
-              <span class="text-[12.5px] text-ink-muted">{{ relativeDate(p.updatedAt) }}</span>
-            </td>
-            <td v-if="canWrite" class="td td-actions">
-              <button
-                type="button"
-                class="trash-btn"
-                :aria-label="t('dashboard.pieces.actions.delete')"
-                :title="t('dashboard.pieces.actions.delete')"
-                @click="(e) => onDelete(e, p)"
-              >
-                <DashboardIcon name="trash" :size="15" />
-              </button>
-            </td>
-          </tr>
-        </template>
-      </tbody>
-    </table>
+            </div>
 
-    <div v-else class="flex flex-col items-center gap-3 px-5 py-12 text-center">
-      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-bg-soft text-ink-muted">
-        <DashboardIcon name="box" :size="20" />
-      </div>
-      <p class="max-w-[280px] text-[13.5px] text-ink-soft">
-        {{ t('dashboard.pieces_table.empty') }}
-      </p>
+            <div v-if="p.serialNumber"
+              class="truncate font-mono text-[11.5px] tabular-nums text-ink-muted">
+              #{{ p.serialNumber }}
+            </div>
+
+            <div v-if="p.pieceTypes.length > 0" class="flex flex-wrap gap-1">
+              <span v-for="t in p.pieceTypes" :key="t.id" class="type-chip">{{ t.name }}</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-ink-muted">
+              <span v-if="showLocation" class="truncate">
+                {{ locationLabel(p.locationId) }}
+              </span>
+              <span v-if="showLocation && (showOwner || p.updatedAt)" class="text-ink-muted/60">·</span>
+              <span v-if="showOwner" class="truncate">
+                {{ ownerLabel(p.ownerUserId) }}
+              </span>
+              <span v-if="showOwner && p.updatedAt" class="text-ink-muted/60">·</span>
+              <span>{{ relativeDate(p.updatedAt) }}</span>
+            </div>
+          </div>
+
+          <button
+            v-if="canWrite"
+            type="button"
+            class="trash-btn-card"
+            :aria-label="t('dashboard.pieces.actions.delete')"
+            :title="t('dashboard.pieces.actions.delete')"
+            @click="(e) => onDelete(e, p)"
+          >
+            <DashboardIcon name="trash" :size="16" />
+          </button>
+        </article>
+      </template>
     </div>
   </div>
 </template>
@@ -340,8 +438,8 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
 }
 
 .trash-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
@@ -351,18 +449,58 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
   justify-content: center;
   transition: background .12s, border-color .12s, color .12s;
 }
-@media (min-width: 640px) {
-  .trash-btn {
-    width: 30px;
-    height: 30px;
-  }
-}
 .trash-btn:hover {
   background: color-mix(in oklab, var(--c-danger) 8%, transparent);
   border-color: color-mix(in oklab, var(--c-danger) 30%, transparent);
   color: var(--c-danger);
 }
 .trash-btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 1px; }
+
+/* Vista de tarjetas (móvil) */
+.piece-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 12px;
+  background: var(--c-bg-card);
+  transition: background .12s, border-color .12s;
+}
+.piece-card-skel { align-items: center; }
+.piece-card-interactive { cursor: pointer; }
+.piece-card-interactive:hover { background: var(--c-bg-soft); }
+.piece-card-interactive:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+.piece-thumb-wrap-card {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--c-bg-soft);
+}
+.trash-btn-card {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--c-ink-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .12s, border-color .12s, color .12s;
+}
+.trash-btn-card:hover {
+  background: color-mix(in oklab, var(--c-danger) 8%, transparent);
+  border-color: color-mix(in oklab, var(--c-danger) 30%, transparent);
+  color: var(--c-danger);
+}
+.trash-btn-card:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 1px; }
 
 .sr-only {
   position: absolute;

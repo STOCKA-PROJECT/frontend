@@ -355,7 +355,7 @@ const attrDialogTypeName = computed(() => {
   min-height: 0;
   height: 100%;
 }
-@media (min-width: 1024px) {
+@media (min-width: 960px) {
   .board-grid {
     grid-template-columns: minmax(280px, 360px) 1fr;
     grid-template-rows: 1fr;

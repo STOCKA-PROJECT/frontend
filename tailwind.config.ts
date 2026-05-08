@@ -13,6 +13,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        lg: '960px'
+      },
       colors: {
         bg: {
           DEFAULT: 'var(--c-bg)',

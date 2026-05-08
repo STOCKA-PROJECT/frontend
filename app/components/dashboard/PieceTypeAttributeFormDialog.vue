@@ -266,7 +266,7 @@ function isVisible(key: ValidatorKey) {
     <div v-if="open" class="dialog-backdrop" role="presentation"
       @click="onBackdropClick" @keydown="onKey">
       <div role="dialog" aria-modal="true" :aria-label="title"
-        class="dialog-card flex max-h-[calc(100vh-24px)] w-[560px] max-w-[calc(100vw-24px)] flex-col rounded-[14px] border border-line bg-bg-card shadow-card">
+        class="dialog-card flex max-h-[calc(100vh-24px)] w-full max-w-[560px] flex-col rounded-[14px] border border-line bg-bg-card shadow-card">
         <h2 class="border-b border-line px-6 py-4 text-[17px] font-semibold tracking-[-0.015em] text-ink">
           {{ title }}
         </h2>

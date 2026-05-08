@@ -63,7 +63,7 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
       </template>
     </nav>
 
-    <div class="ml-auto hidden h-9 w-[280px] items-center gap-2 rounded-[9px] border border-line bg-field px-3 text-[13.5px] transition-[border-color,box-shadow] duration-150 focus-within:border-accent focus-within:shadow-[0_0_0_3px_color-mix(in_oklab,var(--c-accent)_16%,transparent)] lg:flex xl:w-[280px]">
+    <div class="ml-auto hidden h-9 items-center gap-2 rounded-[9px] border border-line bg-field px-3 text-[13.5px] transition-[border-color,box-shadow] duration-150 focus-within:border-accent focus-within:shadow-[0_0_0_3px_color-mix(in_oklab,var(--c-accent)_16%,transparent)] lg:flex lg:w-[260px] xl:w-[320px]">
       <DashboardIcon name="search" :size="14" />
       <input
         type="search"
@@ -97,9 +97,11 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
 </template>
 
 <style scoped>
-.icon-btn {
-  width: 40px;
-  height: 40px;
+/* Use :where() so these scoped selectors stay at specificity 0,1,0 and do
+   not override Tailwind's display utilities (lg:hidden, lg:flex, etc.). */
+:where(.icon-btn) {
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -112,9 +114,9 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
   opacity: .65;
 }
 
-.hamburger-btn {
-  width: 40px;
-  height: 40px;
+:where(.hamburger-btn) {
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -125,6 +127,13 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
   transition: border-color .15s, color .15s, background .15s;
   cursor: pointer;
   flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  :where(.icon-btn, .hamburger-btn) {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 .hamburger-btn:hover {

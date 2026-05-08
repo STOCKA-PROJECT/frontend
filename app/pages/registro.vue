@@ -117,7 +117,7 @@ async function submit() {
         {{ errorMsg }}
       </div>
 
-      <div class="grid grid-cols-2 gap-3 max-[480px]:grid-cols-1">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <AuthTextField
           id="firstName"
           v-model="firstName"

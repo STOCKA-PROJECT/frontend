@@ -85,7 +85,7 @@ const previewLine = computed(() => preview(props.attr.validators ?? {}))
       </div>
     </div>
 
-    <div v-if="canWrite" class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+    <div v-if="canWrite" class="row-actions-pulse flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
       <button type="button" class="row-btn"
         :aria-label="t('dashboard.pieceTypes.attribute_form.edit_title', { name: attr.displayName })"
         @click="emit('edit')">
@@ -145,8 +145,8 @@ const previewLine = computed(() => preview(props.attr.validators ?? {}))
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 7px;
   border: 1px solid transparent;
   background: transparent;
@@ -162,5 +162,10 @@ const previewLine = computed(() => preview(props.attr.validators ?? {}))
   color: var(--c-danger);
   border-color: color-mix(in oklab, var(--c-danger) 35%, transparent);
   background: var(--c-danger-soft);
+}
+
+/* Touch devices never trigger :hover, so row actions must always be visible. */
+@media (hover: none) and (pointer: coarse) {
+  .row-actions-pulse { opacity: 1 !important; }
 }
 </style>

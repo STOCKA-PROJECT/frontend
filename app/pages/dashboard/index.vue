@@ -100,7 +100,7 @@ function pieceLink(piece: PieceListItemDto): string {
   <div class="flex flex-col gap-7 px-4 pb-10 pt-5 sm:px-5 sm:pb-16 sm:pt-7 lg:px-8">
     <DashboardPageHeader />
 
-    <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
+    <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
       <DashboardStatCard
         :label="t('dashboard.stats.items')"
         :value="formatNumber(totalPieces)"

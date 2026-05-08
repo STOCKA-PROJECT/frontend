@@ -69,7 +69,7 @@ const stats = computed(() => [
         </span>
       </div>
 
-      <div class="mb-2 grid grid-cols-3 gap-2.5">
+      <div class="mb-2 grid grid-cols-3 gap-1.5 sm:gap-2.5">
         <div
           v-for="stat in stats"
           :key="stat.label"

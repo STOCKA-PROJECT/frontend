@@ -33,7 +33,7 @@ function onKey(e: KeyboardEvent) {
     <div v-if="open" class="dialog-backdrop" role="presentation"
       @click="onBackdropClick" @keydown="onKey">
       <div role="alertdialog" aria-modal="true" :aria-label="title"
-        class="flex w-[420px] max-h-[calc(100vh-24px)] max-w-[calc(100vw-24px)] flex-col rounded-[14px] border border-line bg-bg-card shadow-card">
+        class="flex w-full max-w-[420px] max-h-[calc(100vh-24px)] flex-col rounded-[14px] border border-line bg-bg-card shadow-card">
         <div class="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
           <h2 class="text-[17px] font-semibold tracking-[-0.015em] text-ink">{{ title }}</h2>
           <p class="mt-2 whitespace-pre-line text-[13.5px] leading-relaxed text-ink-soft">
