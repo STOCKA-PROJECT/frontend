@@ -755,6 +755,9 @@
         "by_actor": "per {actor}",
         "before": "Abans",
         "after": "Ara",
+        "none": "Cap",
+        "added": "Afegit",
+        "removed": "Tret",
         "unknown_actor": "Desconegut",
         "removed_actor": "Usuari eliminat",
         "action": {
@@ -766,7 +769,23 @@
           "STATUS_CHANGED": "Canvi d'estat",
           "ATTRIBUTE_VALUE_CHANGED": "Atribut modificat",
           "ATTACHMENT_ADDED": "Adjunt afegit",
-          "ATTACHMENT_REMOVED": "Adjunt eliminat"
+          "ATTACHMENT_REMOVED": "Adjunt eliminat",
+          "PIECE_TYPES_CHANGED": "Canvi de tipus"
+        },
+        "field": {
+          "name": "Nom",
+          "serialNumber": "Número de sèrie",
+          "description": "Descripció",
+          "owner": "Propietari",
+          "location": "Ubicació",
+          "status": "Estat",
+          "pieceTypes": "Tipus",
+          "attachment": "Adjunt",
+          "coverAttachmentId": "Portada"
+        },
+        "status": {
+          "ACTIVE": "Actiu",
+          "PENDING": "Pendent"
         }
       },
       "confirm": {

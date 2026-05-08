@@ -755,6 +755,9 @@
         "by_actor": "por {actor}",
         "before": "Antes",
         "after": "Ahora",
+        "none": "Ninguno",
+        "added": "Añadido",
+        "removed": "Quitado",
         "unknown_actor": "Desconocido",
         "removed_actor": "Usuario eliminado",
         "action": {
@@ -766,7 +769,23 @@
           "STATUS_CHANGED": "Cambio de estado",
           "ATTRIBUTE_VALUE_CHANGED": "Atributo modificado",
           "ATTACHMENT_ADDED": "Adjunto añadido",
-          "ATTACHMENT_REMOVED": "Adjunto eliminado"
+          "ATTACHMENT_REMOVED": "Adjunto eliminado",
+          "PIECE_TYPES_CHANGED": "Cambio de tipos"
+        },
+        "field": {
+          "name": "Nombre",
+          "serialNumber": "Número de serie",
+          "description": "Descripción",
+          "owner": "Propietario",
+          "location": "Ubicación",
+          "status": "Estado",
+          "pieceTypes": "Tipos",
+          "attachment": "Adjunto",
+          "coverAttachmentId": "Portada"
+        },
+        "status": {
+          "ACTIVE": "Activo",
+          "PENDING": "Pendiente"
         }
       },
       "confirm": {

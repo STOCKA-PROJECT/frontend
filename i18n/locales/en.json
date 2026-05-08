@@ -755,6 +755,9 @@
         "by_actor": "by {actor}",
         "before": "Before",
         "after": "After",
+        "none": "None",
+        "added": "Added",
+        "removed": "Removed",
         "unknown_actor": "Unknown",
         "removed_actor": "Deleted user",
         "action": {
@@ -766,7 +769,23 @@
           "STATUS_CHANGED": "Status changed",
           "ATTRIBUTE_VALUE_CHANGED": "Attribute changed",
           "ATTACHMENT_ADDED": "Attachment added",
-          "ATTACHMENT_REMOVED": "Attachment removed"
+          "ATTACHMENT_REMOVED": "Attachment removed",
+          "PIECE_TYPES_CHANGED": "Types changed"
+        },
+        "field": {
+          "name": "Name",
+          "serialNumber": "Serial number",
+          "description": "Description",
+          "owner": "Owner",
+          "location": "Location",
+          "status": "Status",
+          "pieceTypes": "Types",
+          "attachment": "Attachment",
+          "coverAttachmentId": "Cover"
+        },
+        "status": {
+          "ACTIVE": "Active",
+          "PENDING": "Pending"
         }
       },
       "confirm": {

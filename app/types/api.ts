@@ -198,6 +198,7 @@ export type PieceHistoryAction =
   | 'ATTRIBUTE_VALUE_CHANGED'
   | 'ATTACHMENT_ADDED'
   | 'ATTACHMENT_REMOVED'
+  | 'PIECE_TYPES_CHANGED'
 
 export type AttributeScope = 'TYPE' | 'ORG'
 

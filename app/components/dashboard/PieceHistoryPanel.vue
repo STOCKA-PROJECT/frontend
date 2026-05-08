@@ -34,6 +34,44 @@ function actionLabel(action: PieceHistoryAction): string {
   return t(`dashboard.pieces.history.action.${action}`)
 }
 
+const KNOWN_FIELDS = new Set([
+  'name', 'serialNumber', 'description', 'owner', 'location',
+  'status', 'pieceTypes', 'attachment', 'coverAttachmentId'
+])
+
+function fieldLabel(fieldName: string): string {
+  if (KNOWN_FIELDS.has(fieldName)) return t(`dashboard.pieces.history.field.${fieldName}`)
+  if (fieldName.startsWith('org:')) return fieldName.slice(4)
+  return fieldName
+}
+
+function statusLabel(value: string): string {
+  const key = `dashboard.pieces.history.status.${value}`
+  const translated = t(key)
+  return translated === key ? value : translated
+}
+
+function diffValue(item: PieceHistoryItemDto, side: 'old' | 'new'): string {
+  const raw = side === 'old' ? item.oldValue : item.newValue
+  if (raw == null || raw === '') return t('dashboard.pieces.history.none')
+  if (item.action === 'STATUS_CHANGED') return statusLabel(raw)
+  return raw
+}
+
+function parseTypeList(value?: string | null): string[] {
+  if (!value) return []
+  return value.split(',').map(s => s.trim()).filter(Boolean)
+}
+
+function typeDiffs(item: PieceHistoryItemDto): { added: string[]; removed: string[] } {
+  const oldSet = new Set(parseTypeList(item.oldValue))
+  const newSet = new Set(parseTypeList(item.newValue))
+  return {
+    added: [...newSet].filter(v => !oldSet.has(v)),
+    removed: [...oldSet].filter(v => !newSet.has(v))
+  }
+}
+
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString(dateLocale.value, {
     day: '2-digit',
@@ -85,6 +123,9 @@ const showingDiff = (item: PieceHistoryItemDto) =>
   || item.action === 'LOCATION_CHANGED'
   || item.action === 'STATUS_CHANGED'
   || item.action === 'ATTRIBUTE_VALUE_CHANGED'
+
+const showingTypeDiff = (item: PieceHistoryItemDto) =>
+  item.action === 'PIECE_TYPES_CHANGED'
 </script>
 
 <template>
@@ -114,16 +155,28 @@ const showingDiff = (item: PieceHistoryItemDto) =>
             {{ t('dashboard.pieces.history.by_actor', { actor: actorName(item.actorUserId) }) }}
           </div>
           <div v-if="item.fieldName" class="mt-1 text-[12px] text-ink-soft">
-            <span class="rounded bg-bg-soft px-1.5 py-0.5 font-mono text-[11px] text-ink">{{ item.fieldName }}</span>
+            <span class="field-pill">{{ fieldLabel(item.fieldName) }}</span>
           </div>
-          <div v-if="showingDiff(item)" class="mt-2 grid grid-cols-1 gap-2 text-[12.5px] sm:grid-cols-2">
+          <div v-if="showingTypeDiff(item)" class="mt-2 flex flex-col gap-1.5 text-[12.5px]">
+            <div v-if="typeDiffs(item).added.length" class="chip-row">
+              <span class="diff-label">{{ t('dashboard.pieces.history.added') }}</span>
+              <span v-for="t2 in typeDiffs(item).added" :key="`add-${item.id}-${t2}`"
+                class="chip chip-add">{{ t2 }}</span>
+            </div>
+            <div v-if="typeDiffs(item).removed.length" class="chip-row">
+              <span class="diff-label">{{ t('dashboard.pieces.history.removed') }}</span>
+              <span v-for="t2 in typeDiffs(item).removed" :key="`rem-${item.id}-${t2}`"
+                class="chip chip-remove">{{ t2 }}</span>
+            </div>
+          </div>
+          <div v-else-if="showingDiff(item)" class="mt-2 grid grid-cols-1 gap-2 text-[12.5px] sm:grid-cols-2">
             <div class="diff-block diff-old">
               <span class="diff-label">{{ t('dashboard.pieces.history.before') }}</span>
-              <span class="diff-value">{{ shortValue(item.oldValue) }}</span>
+              <span class="diff-value">{{ shortValue(diffValue(item, 'old')) }}</span>
             </div>
             <div class="diff-block diff-new">
               <span class="diff-label">{{ t('dashboard.pieces.history.after') }}</span>
-              <span class="diff-value">{{ shortValue(item.newValue) }}</span>
+              <span class="diff-value">{{ shortValue(diffValue(item, 'new')) }}</span>
             </div>
           </div>
           <div v-else-if="item.newValue || item.oldValue" class="mt-2 text-[12.5px] text-ink-soft">
@@ -223,4 +276,46 @@ const showingDiff = (item: PieceHistoryItemDto) =>
 }
 .diff-old { background: color-mix(in oklab, var(--c-danger) 6%, transparent); }
 .diff-new { background: color-mix(in oklab, var(--c-accent) 8%, transparent); }
+
+.field-pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 9px;
+  background: var(--c-bg-soft);
+  border: 1px solid var(--c-line);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--c-ink);
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid;
+}
+.chip-add {
+  background: color-mix(in oklab, var(--c-accent) 12%, transparent);
+  border-color: color-mix(in oklab, var(--c-accent) 35%, transparent);
+  color: var(--c-ink);
+}
+.chip-add::before { content: '+'; opacity: .65; }
+.chip-remove {
+  background: color-mix(in oklab, var(--c-danger) 10%, transparent);
+  border-color: color-mix(in oklab, var(--c-danger) 35%, transparent);
+  color: var(--c-ink);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in oklab, var(--c-danger) 50%, transparent);
+}
+.chip-remove::before { content: '−'; opacity: .65; text-decoration: none; }
 </style>
