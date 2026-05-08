@@ -287,7 +287,7 @@ watch(
         <DashboardPieceInfoPanel
           v-if="tab === 'info'"
           :piece="piece"
-          :piece-types="piecePieceTypes.length > 0 ? pieceTypes.list : piecePieceTypes"
+          :piece-types="pieceTypes.list.length > 0 ? pieceTypes.list : piecePieceTypes"
           :locations="flatLocations"
           :members="members"
           :org-attributes="currentOrgAttributes"
