@@ -281,6 +281,40 @@
     "create_organization": "Crear organització",
     "logout": "Tancar sessió",
     "organization_label": "Organització",
+    "my_invitations": {
+      "menu_entry": "Invitacions",
+      "menu_pending_aria": "{n} invitació pendent | {n} invitacions pendents",
+      "page_title": "Les meves invitacions",
+      "page_subtitle": "Aquí pots veure les invitacions a organitzacions que has rebut i revisar el teu historial.",
+      "pending_section_title": "Pendents",
+      "pending_section_count": "{n} pendent | {n} pendent | {n} pendents",
+      "pending_empty": "No tens cap invitació pendent ara mateix.",
+      "history_section_title": "Historial",
+      "history_section_subtitle": "Invitacions acceptades, rebutjades, cancel·lades o caducades.",
+      "history_empty": "Encara no tens invitacions a l'historial.",
+      "received_on": "Rebuda el {date}",
+      "expires_on": "Caduca el {date}",
+      "expired_on": "Va caducar el {date}",
+      "accepted_on": "Acceptada el {date}",
+      "invitation_to": "Invitació a {org}",
+      "as_role": "Com a {role}",
+      "accept": "Acceptar",
+      "reject": "Rebutjar",
+      "accepting": "Acceptant…",
+      "rejecting": "Rebutjant…",
+      "status": {
+        "PENDING": "Pendent",
+        "ACCEPTED": "Acceptada",
+        "REJECTED": "Rebutjada",
+        "CANCELLED": "Cancel·lada",
+        "EXPIRED": "Caducada"
+      },
+      "errors": {
+        "load": "No s'han pogut carregar les teves invitacions.",
+        "accept": "No s'ha pogut acceptar la invitació.",
+        "reject": "No s'ha pogut rebutjar la invitació."
+      }
+    },
     "nav": {
       "items": "Articles",
       "locations": "Ubicacions",

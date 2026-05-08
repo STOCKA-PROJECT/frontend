@@ -281,6 +281,40 @@
     "create_organization": "Crear organización",
     "logout": "Cerrar sesión",
     "organization_label": "Organización",
+    "my_invitations": {
+      "menu_entry": "Invitaciones",
+      "menu_pending_aria": "{n} invitación pendiente | {n} invitaciones pendientes",
+      "page_title": "Mis invitaciones",
+      "page_subtitle": "Aquí puedes ver las invitaciones a organizaciones que has recibido y revisar tu historial.",
+      "pending_section_title": "Pendientes",
+      "pending_section_count": "{n} pendiente | {n} pendiente | {n} pendientes",
+      "pending_empty": "No tienes invitaciones pendientes ahora mismo.",
+      "history_section_title": "Historial",
+      "history_section_subtitle": "Invitaciones aceptadas, rechazadas, canceladas o caducadas.",
+      "history_empty": "Aún no tienes invitaciones en el historial.",
+      "received_on": "Recibida el {date}",
+      "expires_on": "Caduca el {date}",
+      "expired_on": "Caducó el {date}",
+      "accepted_on": "Aceptada el {date}",
+      "invitation_to": "Invitación a {org}",
+      "as_role": "Como {role}",
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "accepting": "Aceptando…",
+      "rejecting": "Rechazando…",
+      "status": {
+        "PENDING": "Pendiente",
+        "ACCEPTED": "Aceptada",
+        "REJECTED": "Rechazada",
+        "CANCELLED": "Cancelada",
+        "EXPIRED": "Caducada"
+      },
+      "errors": {
+        "load": "No se han podido cargar tus invitaciones.",
+        "accept": "No se ha podido aceptar la invitación.",
+        "reject": "No se ha podido rechazar la invitación."
+      }
+    },
     "nav": {
       "items": "Artículos",
       "locations": "Ubicaciones",

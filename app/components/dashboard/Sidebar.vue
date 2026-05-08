@@ -5,6 +5,7 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const auth = useAuthStore()
 const orgs = useOrganizationsStore()
+const team = useTeamStore()
 const { isOpen, close } = useMobileNav()
 
 const hasOrgs = computed(() => orgs.list.length >= 1)
@@ -15,6 +16,9 @@ const userFullName = computed(() => {
   if (!u) return ''
   return `${u.name} ${u.lastName}`.trim()
 })
+
+const pendingInvitationsCount = computed(() => team.myPendingInvitationsCount)
+const hasPendingInvitations = computed(() => pendingInvitationsCount.value > 0)
 
 const menuOpen = shallowRef(false)
 const userMenuRef = ref<HTMLElement | null>(null)
@@ -28,6 +32,9 @@ function onDocClick(e: MouseEvent) {
 
 onMounted(() => {
   document.addEventListener('click', onDocClick)
+  if (auth.isAuthenticated && !team.myInvitationsLoaded) {
+    team.fetchMyInvitations({ includeHistory: true }).catch(() => { /* silent: dot stays hidden */ })
+  }
   onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 })
 
@@ -123,9 +130,16 @@ async function handleLogout() {
       <button type="button"
         class="flex w-full items-center gap-2.5 rounded-[10px] px-2.5 py-2 text-left transition-colors hover:bg-bg-soft"
         :aria-expanded="menuOpen" aria-haspopup="menu" @click="menuOpen = !menuOpen">
-        <div
-          class="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#c4b5a3] to-[#a89786] text-[12px] font-semibold text-white">
-          {{ userInitials }}
+        <div class="relative flex-shrink-0">
+          <div
+            class="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-gradient-to-br from-[#c4b5a3] to-[#a89786] text-[12px] font-semibold text-white">
+            {{ userInitials }}
+          </div>
+          <span
+            v-if="hasPendingInvitations"
+            class="notification-dot"
+            :aria-label="t('dashboard.my_invitations.menu_pending_aria', pendingInvitationsCount, { named: { n: pendingInvitationsCount } })"
+          />
         </div>
         <div class="flex min-w-0 flex-1 flex-col">
           <span class="truncate text-[13px] font-medium text-ink">{{ userFullName || t('common.user_fallback') }}</span>
@@ -146,6 +160,15 @@ async function handleLogout() {
           @click="menuOpen = false">
           <DashboardIcon name="user" :size="14" />
           {{ t('dashboard.account.menu_entry') }}
+        </NuxtLink>
+        <NuxtLink :to="localePath('/dashboard/invitaciones')" role="menuitem"
+          class="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-[13.5px] text-ink transition-colors hover:bg-bg-soft"
+          @click="menuOpen = false">
+          <DashboardIcon name="mail" :size="14" />
+          <span>{{ t('dashboard.my_invitations.menu_entry') }}</span>
+          <span v-if="hasPendingInvitations" class="ml-auto inline-flex items-center justify-center rounded-full bg-accent px-1.5 text-[11px] font-semibold text-bg-card min-w-[18px] h-[18px]">
+            {{ pendingInvitationsCount }}
+          </span>
         </NuxtLink>
         <button type="button" role="menuitem"
           class="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-[13.5px] text-ink transition-colors hover:bg-bg-soft"
@@ -262,8 +285,15 @@ async function handleLogout() {
             type="button"
             class="flex w-full items-center gap-2.5 rounded-[10px] px-2.5 py-2.5 text-left transition-colors hover:bg-bg-soft"
           >
-            <div class="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#c4b5a3] to-[#a89786] text-[12px] font-semibold text-white">
-              {{ userInitials }}
+            <div class="relative flex-shrink-0">
+              <div class="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-gradient-to-br from-[#c4b5a3] to-[#a89786] text-[12px] font-semibold text-white">
+                {{ userInitials }}
+              </div>
+              <span
+                v-if="hasPendingInvitations"
+                class="notification-dot"
+                :aria-label="t('dashboard.my_invitations.menu_pending_aria', pendingInvitationsCount, { named: { n: pendingInvitationsCount } })"
+              />
             </div>
             <div class="flex min-w-0 flex-1 flex-col">
               <span class="truncate text-[13px] font-medium text-ink">{{ userFullName || t('common.user_fallback') }}</span>
@@ -277,6 +307,17 @@ async function handleLogout() {
           >
             <DashboardIcon name="user" :size="14" />
             {{ t('dashboard.account.menu_entry') }}
+          </NuxtLink>
+          <NuxtLink
+            :to="localePath('/dashboard/invitaciones')"
+            class="mt-1 flex w-full items-center gap-2 rounded-[10px] px-2.5 py-2.5 text-left text-[13.5px] text-ink transition-colors hover:bg-bg-soft"
+            @click="close"
+          >
+            <DashboardIcon name="mail" :size="14" />
+            <span>{{ t('dashboard.my_invitations.menu_entry') }}</span>
+            <span v-if="hasPendingInvitations" class="ml-auto inline-flex items-center justify-center rounded-full bg-accent px-1.5 text-[11px] font-semibold text-bg-card min-w-[18px] h-[18px]">
+              {{ pendingInvitationsCount }}
+            </span>
           </NuxtLink>
           <button
             type="button"
@@ -334,6 +375,18 @@ async function handleLogout() {
 .nav-item.is-disabled {
   cursor: not-allowed;
   opacity: .55;
+}
+
+.notification-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: var(--c-danger);
+  border: 2px solid var(--c-bg-card);
+  pointer-events: none;
 }
 
 .backdrop-enter-active,

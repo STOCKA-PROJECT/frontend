@@ -9,8 +9,15 @@ import type {
 export const useTeamStore = defineStore('team', () => {
   const membersByOrg = ref<Record<number, MemberResponseDto[]>>({})
   const invitationsByOrg = ref<Record<number, InvitationResponseDto[]>>({})
+  const myInvitations = ref<InvitationResponseDto[]>([])
   const loadingMembers = ref(false)
   const loadingInvitations = ref(false)
+  const loadingMyInvitations = ref(false)
+  const myInvitationsLoaded = ref(false)
+
+  const myPendingInvitationsCount = computed(
+    () => myInvitations.value.filter(i => i.status === 'PENDING').length
+  )
 
   async function fetchMembers(orgId: number) {
     const api = useApi()
@@ -87,6 +94,21 @@ export const useTeamStore = defineStore('team', () => {
     })
   }
 
+  async function fetchMyInvitations(options?: { includeHistory?: boolean }) {
+    const api = useApi()
+    loadingMyInvitations.value = true
+    try {
+      const data = await api<InvitationResponseDto[]>('/invitations/me', {
+        query: { includeHistory: options?.includeHistory ? 'true' : 'false' }
+      })
+      myInvitations.value = data
+      myInvitationsLoaded.value = true
+      return data
+    } finally {
+      loadingMyInvitations.value = false
+    }
+  }
+
   function getMembers(orgId: number): MemberResponseDto[] | undefined {
     return membersByOrg.value[orgId]
   }
@@ -98,17 +120,25 @@ export const useTeamStore = defineStore('team', () => {
   function reset() {
     membersByOrg.value = {}
     invitationsByOrg.value = {}
+    myInvitations.value = []
+    myInvitationsLoaded.value = false
     loadingMembers.value = false
     loadingInvitations.value = false
+    loadingMyInvitations.value = false
   }
 
   return {
     membersByOrg,
     invitationsByOrg,
+    myInvitations,
+    myInvitationsLoaded,
+    myPendingInvitationsCount,
     loadingMembers,
     loadingInvitations,
+    loadingMyInvitations,
     fetchMembers,
     fetchInvitations,
+    fetchMyInvitations,
     invite,
     updateRole,
     removeMember,

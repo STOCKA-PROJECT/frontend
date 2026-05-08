@@ -420,6 +420,8 @@ export interface InvitationResponseDto {
   role: OrganizationRole
   status: InvitationStatus
   expiresAt: string
+  createdAt?: string | null
+  acceptedAt?: string | null
   token: string | null
   organization: OrganizationSummaryDto
 }

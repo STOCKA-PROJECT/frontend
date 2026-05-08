@@ -281,6 +281,40 @@
     "create_organization": "Create organization",
     "logout": "Sign out",
     "organization_label": "Organization",
+    "my_invitations": {
+      "menu_entry": "Invitations",
+      "menu_pending_aria": "{n} pending invitation | {n} pending invitations",
+      "page_title": "My invitations",
+      "page_subtitle": "Here you can review the organization invitations you have received and check your history.",
+      "pending_section_title": "Pending",
+      "pending_section_count": "{n} pending | {n} pending | {n} pending",
+      "pending_empty": "You have no pending invitations right now.",
+      "history_section_title": "History",
+      "history_section_subtitle": "Invitations you have accepted, rejected, cancelled or that have expired.",
+      "history_empty": "You don't have any past invitations yet.",
+      "received_on": "Received on {date}",
+      "expires_on": "Expires on {date}",
+      "expired_on": "Expired on {date}",
+      "accepted_on": "Accepted on {date}",
+      "invitation_to": "Invitation to {org}",
+      "as_role": "As {role}",
+      "accept": "Accept",
+      "reject": "Reject",
+      "accepting": "Accepting…",
+      "rejecting": "Rejecting…",
+      "status": {
+        "PENDING": "Pending",
+        "ACCEPTED": "Accepted",
+        "REJECTED": "Rejected",
+        "CANCELLED": "Cancelled",
+        "EXPIRED": "Expired"
+      },
+      "errors": {
+        "load": "We couldn't load your invitations.",
+        "accept": "We couldn't accept the invitation.",
+        "reject": "We couldn't reject the invitation."
+      }
+    },
     "nav": {
       "items": "Items",
       "locations": "Locations",
