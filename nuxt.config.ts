@@ -101,7 +101,7 @@ export default defineNuxtConfig({
     },
     compilation: {
       strictMessage: false,
-      escapeHtml: false,
+      escapeHtml: true,
     },
   },
 
