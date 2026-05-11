@@ -244,12 +244,8 @@ export const usePiecesStore = defineStore('pieces', () => {
   }
 
   async function fetchAttachmentBlobUrl(orgId: number, pieceId: number, attachmentId: number): Promise<string> {
-    const auth = useAuthStore()
-    const headers: Record<string, string> = {}
-    if (auth.token) headers.Authorization = `Bearer ${auth.token}`
     const res = await fetch(
-      `/api/organizations/${orgId}/pieces/${pieceId}/attachments/${attachmentId}/download`,
-      { headers }
+      `/api/organizations/${orgId}/pieces/${pieceId}/attachments/${attachmentId}/download`
     )
     if (!res.ok) {
       throw new Error(`download_failed_${res.status}`)
