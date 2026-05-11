@@ -3,7 +3,6 @@ import type {
   AvailabilityResponse,
   ChangePasswordDto,
   ForgotPasswordRequestDto,
-  LoginResponseDto,
   LoginUserDto,
   RegisterUserDto,
   ResendVerificationRequestDto,
@@ -13,20 +12,20 @@ import type {
   VerifyEmailRequestDto
 } from '~/types/api'
 
+interface LoginSessionResponse {
+  user: User
+  expiresIn: number
+}
+
 export const useAuthStore = defineStore('auth', () => {
-  const tokenCookie = useCookie<string | null>('stocka_token', {
-    sameSite: 'lax',
-    secure: !import.meta.dev
-  })
   const userCookie = useCookie<User | null>('stocka_user', {
     sameSite: 'lax',
     secure: !import.meta.dev
   })
 
-  const isAuthenticated = computed(() => !!tokenCookie.value && !!userCookie.value)
+  const isAuthenticated = computed(() => !!userCookie.value)
 
-  function setSession(payload: LoginResponseDto) {
-    tokenCookie.value = payload.token
+  function setSession(payload: LoginSessionResponse) {
     userCookie.value = payload.user
   }
 
@@ -43,7 +42,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function login(payload: LoginUserDto) {
     const api = useApi()
-    const data = await api<LoginResponseDto>('/auth/login', {
+    const data = await api<LoginSessionResponse>('/auth/login', {
       method: 'POST',
       body: payload
     })
@@ -53,7 +52,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function loginNoRedirect(payload: LoginUserDto) {
     const api = useApi()
-    const data = await api<LoginResponseDto>('/auth/login', {
+    const data = await api<LoginSessionResponse>('/auth/login', {
       method: 'POST',
       body: payload
     })
@@ -149,7 +148,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function clearLocalSession() {
-    tokenCookie.value = null
     userCookie.value = null
     useOrganizationsStore().reset()
     useLocationsStore().reset()
@@ -160,14 +158,8 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout() {
     const api = useApi()
     const localePath = useLocalePath()
-    const token = tokenCookie.value
     try {
-      if (token) {
-        await api('/auth/logout', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      }
+      await api('/auth/logout', { method: 'POST' })
     } catch {
       // logout is fire-and-forget; clear local session regardless
     }
@@ -177,7 +169,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     user: userCookie,
-    token: tokenCookie,
     isAuthenticated,
     setSession,
     login,

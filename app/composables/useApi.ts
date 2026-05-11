@@ -45,10 +45,6 @@ export function useApi() {
     onRequest({ options, request }) {
       const headers = new Headers(options.headers as HeadersInit | undefined)
 
-      const token = auth.token
-      if (token && !headers.has('Authorization')) {
-        headers.set('Authorization', `Bearer ${token}`)
-      }
       if (!headers.has('Accept-Language')) {
         headers.set('Accept-Language', readLocale())
       }
