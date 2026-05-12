@@ -16,6 +16,8 @@ const SECURITY_HEADERS = {
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: https:",
     "connect-src 'self' https://*.sentry.io",
+    "frame-src 'self'",
+    "worker-src 'self' blob:",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",

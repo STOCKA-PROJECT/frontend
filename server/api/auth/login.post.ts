@@ -13,13 +13,18 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<LoginBody>(event)
   const base = getBackendBaseUrl()
 
-  const data = await $fetch<BackendLoginResponse>(`${base}/auth/login`, {
-    method: 'POST',
-    body,
-    headers: {
-      'Accept-Language': getHeader(event, 'accept-language') ?? 'es'
-    }
-  })
+  let data: BackendLoginResponse
+  try {
+    data = await $fetch<BackendLoginResponse>(`${base}/auth/login`, {
+      method: 'POST',
+      body,
+      headers: {
+        'Accept-Language': getHeader(event, 'accept-language') ?? 'es'
+      }
+    })
+  } catch (err) {
+    return forwardBackendError(event, err)
+  }
 
   setCookie(event, 'stocka_token', data.token, {
     httpOnly: true,

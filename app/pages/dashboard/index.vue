@@ -1,7 +1,38 @@
 <script setup lang="ts">
 import type { LocationTreeNodeDto, PagePieceListItemDto, PieceListItemDto } from '~/types/api'
 
-definePageMeta({ layout: 'dashboard' })
+definePageMeta({
+  layout: 'dashboard',
+  // Decide the redirect to /crear-organizacion BEFORE page setup runs so it
+  // doesn't fire inside <Suspense> and leave the view frozen during the
+  // navigation. Middleware runs after the layout is selected but before
+  // either layout or page setup, so we fetch the org list here.
+  middleware: [
+    async function dashboardIndexRedirect() {
+      const nuxtApp = useNuxtApp()
+      const localePath = useLocalePath()
+      const auth = useAuthStore()
+      if (!auth.isAuthenticated) return
+      const orgs = useOrganizationsStore()
+      if (orgs.list.length === 0) {
+        try {
+          await orgs.fetchList()
+        } catch {
+          // useApi may have cleared the session below; fall through
+        }
+      }
+      // After the await, the Nuxt async context can be lost on SSR. Run
+      // navigateTo through nuxtApp.runWithContext so it can resolve
+      // useRouter() internally.
+      if (!auth.isAuthenticated) {
+        return nuxtApp.runWithContext(() => navigateTo(localePath('/login')))
+      }
+      if (orgs.list.length === 0) {
+        return nuxtApp.runWithContext(() => navigateTo(localePath('/dashboard/crear-organizacion')))
+      }
+    }
+  ]
+})
 
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
@@ -12,13 +43,6 @@ useSeoMeta({
 })
 
 const orgs = useOrganizationsStore()
-
-if (orgs.list.length === 0) {
-  await orgs.fetchList()
-}
-if (orgs.list.length === 0) {
-  await navigateTo(localePath('/dashboard/crear-organizacion'))
-}
 
 const orgId = computed(() => orgs.currentId)
 

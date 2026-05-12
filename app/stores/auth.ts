@@ -17,6 +17,8 @@ interface LoginSessionResponse {
   expiresIn: number
 }
 
+type LocalePathFn = (path: string) => string
+
 export const useAuthStore = defineStore('auth', () => {
   const userCookie = useCookie<User | null>('stocka_user', {
     sameSite: 'lax',
@@ -25,18 +27,29 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!userCookie.value)
 
+  /**
+   * Resolves a localized path via the Nuxt i18n plugin instance instead of
+   * `useLocalePath()`. Store actions run outside any component setup scope,
+   * so `useI18n()` (used internally by `useLocalePath()`) would emit
+   * `[intlify] Not found parent scope.` Reaching into `$localePath` keeps the
+   * resolution synchronous and silent, matching `useApi.ts`.
+   */
+  function resolveLocalePath(path: string): string {
+    const fn = useNuxtApp().$localePath as LocalePathFn | undefined
+    return fn ? fn(path) : path
+  }
+
   function setSession(payload: LoginSessionResponse) {
     userCookie.value = payload.user
   }
 
   async function routeAfterAuth() {
     const orgs = useOrganizationsStore()
-    const localePath = useLocalePath()
     await orgs.fetchList()
     if (orgs.list.length === 0) {
-      await navigateTo(localePath('/dashboard/crear-organizacion'))
+      await navigateTo(resolveLocalePath('/dashboard/crear-organizacion'))
     } else {
-      await navigateTo(localePath('/dashboard'))
+      await navigateTo(resolveLocalePath('/dashboard'))
     }
   }
 
@@ -63,13 +76,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function signup(payload: RegisterUserDto) {
     const api = useApi()
-    const localePath = useLocalePath()
     await api<User>('/auth/signup', {
       method: 'POST',
       body: payload
     })
     await navigateTo({
-      path: localePath('/login'),
+      path: resolveLocalePath('/login'),
       query: { registered: 'ok', email: payload.email }
     })
   }
@@ -150,21 +162,17 @@ export const useAuthStore = defineStore('auth', () => {
   function clearLocalSession() {
     userCookie.value = null
     useOrganizationsStore().reset()
-    useLocationsStore().reset()
-    usePiecesStore().reset()
-    useTeamStore().reset()
   }
 
   async function logout() {
     const api = useApi()
-    const localePath = useLocalePath()
     try {
       await api('/auth/logout', { method: 'POST' })
     } catch {
       // logout is fire-and-forget; clear local session regardless
     }
     clearLocalSession()
-    await navigateTo(localePath('/login'))
+    await navigateTo(resolveLocalePath('/login'))
   }
 
   return {

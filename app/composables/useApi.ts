@@ -27,6 +27,7 @@ type LocalePathFn = (path: string) => string
 export function useApi() {
   const auth = useAuthStore()
   const nuxtApp = useNuxtApp()
+  const ssrCookie = import.meta.server ? useRequestHeaders(['cookie']).cookie : undefined
 
   const readLocale = (): string => {
     const i18n = nuxtApp.$i18n as I18nLike | undefined
@@ -50,6 +51,9 @@ export function useApi() {
       }
       if (!headers.has('Accept')) {
         headers.set('Accept', 'application/problem+json, application/json')
+      }
+      if (ssrCookie && !headers.has('cookie')) {
+        headers.set('cookie', ssrCookie)
       }
 
       options.headers = headers
