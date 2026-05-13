@@ -270,5 +270,8 @@ async function submitPassword() {
         </AuthSubmitButton>
       </form>
     </section>
+
+    <!-- Notifications -->
+    <NotificationsSection v-if="auth.user" />
   </div>
 </template>

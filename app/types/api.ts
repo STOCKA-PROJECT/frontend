@@ -445,3 +445,26 @@ export interface AvailabilityResponse {
   available: boolean
   reason: AvailabilityReason | null
 }
+
+// ---- Notification preferences -----------------------------------------
+
+export type LifecycleAction = 'CREATED' | 'EDITED' | 'DELETED'
+
+export type PieceScope = 'ALL' | 'OWNED_ONLY'
+
+export interface NotificationPreferenceResponseDto {
+  organizationId: number
+  organizationName: string
+  organizationSlug: string
+  pieces: LifecycleAction[]
+  pieceScope: PieceScope
+  locations: LifecycleAction[]
+  pieceTypes: LifecycleAction[]
+}
+
+export interface UpdateNotificationPreferenceDto {
+  pieces: LifecycleAction[]
+  pieceScope: PieceScope
+  locations: LifecycleAction[]
+  pieceTypes: LifecycleAction[]
+}
