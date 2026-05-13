@@ -560,6 +560,31 @@
           "passwords_mismatch": "Passwords do not match.",
           "too_short": "At least 8 characters."
         }
+      },
+      "notifications": {
+        "section_title": "Notifications",
+        "subtitle": "Pick which events you want to receive by email for each organization.",
+        "empty": "You don't belong to any organization yet.",
+        "resource": {
+          "pieces": "Items",
+          "locations": "Locations",
+          "pieceTypes": "Item types"
+        },
+        "action": {
+          "CREATED": "When created",
+          "EDITED": "When edited",
+          "DELETED": "When deleted"
+        },
+        "scope_label": "Which items",
+        "scope": {
+          "ALL": "All items",
+          "OWNED_ONLY": "Only items I own"
+        },
+        "saved": "Preferences saved.",
+        "errors": {
+          "load": "Couldn't load the preferences.",
+          "save": "Couldn't save the preferences."
+        }
       }
     },
     "org_settings": {
