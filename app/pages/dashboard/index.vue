@@ -173,6 +173,7 @@ function pieceLink(piece: PieceListItemDto): string {
       >
         <DashboardPiecesTable
           :pieces="pieces?.content ?? []"
+          :org-id="orgId ?? undefined"
           :loading="piecesPending"
           :link-to="pieceLink"
         />

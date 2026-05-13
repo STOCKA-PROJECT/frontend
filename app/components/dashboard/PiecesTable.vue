@@ -33,61 +33,39 @@ const thumbVariant = (piece: PieceListItemDto) => {
   return `t-${(seed % 5) + 1}` as const
 }
 
-// Lazily resolved blob URLs for cover thumbnails, keyed by `${pieceId}:${attachmentId}`.
-const coverUrls = ref<Record<string, string>>({})
-const loadingCovers = ref<Set<string>>(new Set())
-
-function coverKey(pieceId: number, attachmentId: number): string {
-  return `${pieceId}:${attachmentId}`
-}
-
+// Las blob URLs de las portadas viven en el store de piezas, así que se
+// reutilizan entre listados y vista detalle sin volver a descargar la imagen
+// al navegar. Aquí sólo disparamos las descargas que faltan.
 function coverUrlFor(piece: PieceListItemDto): string | null {
-  if (!piece.coverAttachmentId) return null
-  return coverUrls.value[coverKey(piece.id, piece.coverAttachmentId)] ?? null
-}
-
-async function loadCover(pieceId: number, attachmentId: number) {
-  if (props.orgId == null) return
-  const key = coverKey(pieceId, attachmentId)
-  if (coverUrls.value[key] || loadingCovers.value.has(key)) return
-  loadingCovers.value.add(key)
-  try {
-    const url = await piecesStore.fetchAttachmentBlobUrl(props.orgId, pieceId, attachmentId)
-    coverUrls.value = { ...coverUrls.value, [key]: url }
-  } catch {
-    // Si falla la presigned URL no rompemos la tabla — caemos al thumb por defecto.
-  } finally {
-    loadingCovers.value.delete(key)
-  }
+  if (!piece.coverAttachmentId || props.orgId == null) return null
+  return piecesStore.attachmentBlobUrls[`${props.orgId}:${piece.id}:${piece.coverAttachmentId}`] ?? null
 }
 
 watch(
-  () => props.pieces.map(p => coverKey(p.id, p.coverAttachmentId ?? 0)),
+  () => props.pieces.map(p => `${p.id}:${p.coverAttachmentId ?? 0}`),
   () => {
-    const stillNeeded = new Set<string>()
+    if (props.orgId == null) return
     for (const p of props.pieces) {
       if (!p.coverAttachmentId) continue
-      const key = coverKey(p.id, p.coverAttachmentId)
-      stillNeeded.add(key)
-      void loadCover(p.id, p.coverAttachmentId)
+      // Idempotente: si está cacheada o en vuelo, no relanza el fetch.
+      void piecesStore.fetchAttachmentBlobUrl(props.orgId, p.id, p.coverAttachmentId)
     }
-    // Revoca URLs que ya no aparecen (cover cambiado o pieza eliminada).
-    const next: Record<string, string> = {}
-    for (const [key, url] of Object.entries(coverUrls.value)) {
-      if (stillNeeded.has(key)) {
-        next[key] = url
-      } else {
-        URL.revokeObjectURL(url)
-      }
-    }
-    coverUrls.value = next
   },
   { immediate: true, deep: true }
 )
 
-onBeforeUnmount(() => {
-  for (const url of Object.values(coverUrls.value)) URL.revokeObjectURL(url)
-})
+// Vista previa de la portada en lightbox, abierta al pulsar la miniatura.
+const previewOpen = ref(false)
+const previewUrl = ref<string | null>(null)
+const previewName = ref('')
+
+function openPreview(piece: PieceListItemDto) {
+  const url = coverUrlFor(piece)
+  if (!url) return
+  previewUrl.value = url
+  previewName.value = piece.name
+  previewOpen.value = true
+}
 
 const dateLocale = computed(() => {
   const l = locale.value as string
@@ -125,18 +103,24 @@ function ownerLabel(id?: number): string {
   return props.ownerName?.(id) ?? `#${id}`
 }
 
-function onRowClick(piece: PieceListItemDto) {
+function onRowClick(piece: PieceListItemDto, e: MouseEvent) {
   if (!props.linkTo) return
+  // Si el click viene de un botón/enlace dentro de la fila (miniatura,
+  // papelera, etc.) no navegamos: el botón ya tiene su propia acción.
+  const target = e.target
+  if (target instanceof Element && target.closest('button, a')) return
   emit('open', piece)
   void router.push(props.linkTo(piece))
 }
 
 function onRowKey(e: KeyboardEvent, piece: PieceListItemDto) {
   if (!props.linkTo) return
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault()
-    onRowClick(piece)
-  }
+  if (e.key !== 'Enter' && e.key !== ' ') return
+  const target = e.target
+  if (target instanceof Element && target.closest('button, a')) return
+  e.preventDefault()
+  emit('open', piece)
+  void router.push(props.linkTo(piece))
 }
 
 function onDelete(e: MouseEvent, piece: PieceListItemDto) {
@@ -180,12 +164,18 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
               class="row"
               :class="{ 'row-interactive': isInteractive }"
               :tabindex="isInteractive ? 0 : -1"
-              @click="onRowClick(p)"
+              @click="onRowClick(p, $event)"
               @keydown="(e) => onRowKey(e, p)"
             >
               <td class="td">
                 <div class="flex min-w-0 items-center gap-3">
-                  <div class="piece-thumb-wrap">
+                  <button
+                    type="button"
+                    class="piece-thumb-btn piece-thumb-wrap"
+                    :disabled="!coverUrlFor(p)"
+                    :aria-label="t('dashboard.pieces_table.preview_cover_aria', { name: p.name })"
+                    @click.stop="openPreview(p)"
+                  >
                     <img
                       v-if="coverUrlFor(p)"
                       :src="coverUrlFor(p)!"
@@ -193,13 +183,13 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
                       class="piece-thumb-img"
                       loading="lazy"
                     >
-                    <div
+                    <span
                       v-else
                       :class="['piece-thumb flex h-full w-full items-center justify-center rounded-lg text-bg-card', thumbVariant(p)]"
                     >
                       <DashboardIcon name="box" :size="16" />
-                    </div>
-                  </div>
+                    </span>
+                  </button>
                   <div class="min-w-0">
                     <div class="truncate font-medium tracking-[-0.005em] text-ink">{{ p.name }}</div>
                     <div v-if="p.serialNumber"
@@ -285,10 +275,17 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
           :class="{ 'piece-card-interactive': isInteractive }"
           :tabindex="isInteractive ? 0 : -1"
           :role="isInteractive ? 'button' : undefined"
-          @click="onRowClick(p)"
+          @click="onRowClick(p, $event)"
           @keydown="(e) => onRowKey(e, p)"
         >
-          <div class="piece-thumb-wrap-card">
+          <button
+            type="button"
+            class="piece-thumb-btn piece-thumb-wrap-card"
+            :disabled="!coverUrlFor(p)"
+            :aria-disabled="coverUrlFor(p) ? undefined : 'true'"
+            :aria-label="t('dashboard.pieces_table.preview_cover_aria', { name: p.name })"
+            @click.stop="openPreview(p)"
+          >
             <img
               v-if="coverUrlFor(p)"
               :src="coverUrlFor(p)!"
@@ -296,13 +293,13 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
               class="piece-thumb-img"
               loading="lazy"
             >
-            <div
+            <span
               v-else
               :class="['piece-thumb flex h-full w-full items-center justify-center rounded-lg text-bg-card', thumbVariant(p)]"
             >
               <DashboardIcon name="box" :size="18" />
-            </div>
-          </div>
+            </span>
+          </button>
 
           <div class="flex min-w-0 flex-1 flex-col gap-1">
             <div class="flex min-w-0 items-center gap-2">
@@ -349,6 +346,12 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
         </article>
       </template>
     </div>
+
+    <DashboardImageLightbox
+      v-model:open="previewOpen"
+      :url="previewUrl"
+      :name="previewName"
+    />
   </div>
 </template>
 
@@ -386,13 +389,32 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
 .row-interactive { cursor: pointer; }
 .row-interactive:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -2px; background: var(--c-bg-soft); }
 
+.piece-thumb-btn {
+  /* Reseteo del botón nativo para que la miniatura conserve su aspecto. */
+  padding: 0;
+  border: 0;
+  background: var(--c-bg-soft);
+  cursor: pointer;
+  display: block;
+  transition: box-shadow .15s, transform .15s;
+}
+.piece-thumb-btn:disabled {
+  cursor: default;
+}
+.piece-thumb-btn:not(:disabled):hover {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--c-accent) 35%, transparent);
+}
+.piece-thumb-btn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
 .piece-thumb-wrap {
   width: 38px;
   height: 38px;
   flex: none;
   border-radius: 8px;
   overflow: hidden;
-  background: var(--c-bg-soft);
 }
 .piece-thumb-img {
   width: 100%;
@@ -480,7 +502,6 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
   flex: none;
   border-radius: 10px;
   overflow: hidden;
-  background: var(--c-bg-soft);
 }
 .trash-btn-card {
   flex-shrink: 0;

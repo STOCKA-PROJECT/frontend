@@ -75,32 +75,25 @@ async function loadImageUrl(attachmentId: number) {
   }
 }
 
-watch(images, (next, prev) => {
-  // Cargar nuevas
+watch(images, (next) => {
+  // Sólo disparamos descargas pendientes. Las blob URLs viven en el store
+  // (`pieces.attachmentBlobUrls`) y se revocan allí cuando se borra el
+  // adjunto o se resetea la sesión, así que no las revocamos localmente.
   for (const att of next) {
     if (!blobUrlByAttachmentId.value[att.id]) void loadImageUrl(att.id)
   }
-  // Revocar las que ya no existen
-  if (prev) {
-    const stillExists = new Set(next.map(a => a.id))
-    const map = blobUrlByAttachmentId.value
-    const updated: Record<number, string> = {}
-    for (const [idStr, url] of Object.entries(map)) {
-      const id = Number(idStr)
-      if (stillExists.has(id)) {
-        updated[id] = url
-      } else {
-        URL.revokeObjectURL(url)
-      }
-    }
-    blobUrlByAttachmentId.value = updated
+  // Mantenemos el espejo local en sintonía con la lista de imágenes vigentes.
+  const stillExists = new Set(next.map(a => a.id))
+  const map = blobUrlByAttachmentId.value
+  const updated: Record<number, string> = {}
+  for (const [idStr, url] of Object.entries(map)) {
+    const id = Number(idStr)
+    if (stillExists.has(id)) updated[id] = url
   }
+  blobUrlByAttachmentId.value = updated
 }, { immediate: true })
 
 onBeforeUnmount(() => {
-  for (const url of Object.values(blobUrlByAttachmentId.value)) {
-    URL.revokeObjectURL(url)
-  }
   if (errorTimer) clearTimeout(errorTimer)
 })
 
@@ -145,26 +138,22 @@ function onDocumentSelect(e: Event) {
   input.value = ''
 }
 
-const lightbox = ref<{ open: boolean; url: string | null; name: string }>({
-  open: false,
-  url: null,
-  name: ''
-})
+const lightboxOpen = ref(false)
+const lightboxUrl = ref<string | null>(null)
+const lightboxName = ref('')
 
 function openLightbox(att: PieceAttachmentResponseDto) {
   const url = blobUrlByAttachmentId.value[att.id]
   if (!url) return
-  lightbox.value = { open: true, url, name: att.originalFilename }
-}
-function closeLightbox() {
-  lightbox.value = { open: false, url: null, name: '' }
-}
-function onLightboxKey(e: KeyboardEvent) {
-  if (e.key === 'Escape') closeLightbox()
+  lightboxUrl.value = url
+  lightboxName.value = att.originalFilename
+  lightboxOpen.value = true
 }
 
 async function downloadDocument(att: PieceAttachmentResponseDto) {
   try {
+    // La URL la sirve el store cacheada: no la revocamos aquí o invalidaríamos
+    // el caché compartido. El store la libera al borrar el adjunto o resetear.
     const url = await pieces.fetchAttachmentBlobUrl(props.orgId, props.pieceId, att.id)
     const a = document.createElement('a')
     a.href = url
@@ -172,7 +161,6 @@ async function downloadDocument(att: PieceAttachmentResponseDto) {
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
-    setTimeout(() => URL.revokeObjectURL(url), 4000)
   } catch (e) {
     showError(extractErrorMessage(e, t('dashboard.pieces.attachments.errors.download')))
   }
@@ -371,22 +359,11 @@ async function confirmDelete() {
       @confirm="confirmDelete"
     />
 
-    <Teleport to="body">
-      <div
-        v-if="lightbox.open"
-        class="lightbox"
-        role="dialog"
-        aria-modal="true"
-        :aria-label="lightbox.name"
-        @click="closeLightbox"
-        @keydown="onLightboxKey"
-      >
-        <img v-if="lightbox.url" :src="lightbox.url" :alt="lightbox.name" class="lightbox-image">
-        <button type="button" class="lightbox-close" :aria-label="t('common.close')" @click.stop="closeLightbox">
-          <DashboardIcon name="x" :size="18" />
-        </button>
-      </div>
-    </Teleport>
+    <DashboardImageLightbox
+      v-model:open="lightboxOpen"
+      :url="lightboxUrl"
+      :name="lightboxName"
+    />
   </div>
 </template>
 
@@ -532,35 +509,4 @@ async function confirmDelete() {
   background: color-mix(in oklab, var(--c-danger) 8%, transparent);
 }
 
-.lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: color-mix(in oklab, var(--c-ink) 70%, transparent);
-  padding: 32px;
-}
-.lightbox-image {
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: 8px;
-  box-shadow: 0 18px 36px -8px rgba(0,0,0,.4);
-}
-.lightbox-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.2);
-  background: rgba(0,0,0,.45);
-  color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.lightbox-close:hover { background: rgba(0,0,0,.7); }
 </style>

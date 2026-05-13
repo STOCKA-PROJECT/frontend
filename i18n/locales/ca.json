@@ -360,7 +360,8 @@
       "now": "Ara",
       "minutes_ago": "Fa {min} min",
       "hours_ago": "Fa {h} h",
-      "days_ago": "Fa {d} d"
+      "days_ago": "Fa {d} d",
+      "preview_cover_aria": "Veure imatge de portada de {name}"
     },
     "locations_tree": {
       "empty": "Encara no hi ha ubicacions. Crea'n una per organitzar el teu inventari."
@@ -670,6 +671,7 @@
       "page_subtitle": "Gestiona l'inventari de la teva organització: crea articles, edita els seus atributs i consulta l'historial.",
       "back_to_list": "Torna a articles",
       "tabs_aria": "Pestanyes de l'article",
+      "cover_preview_aria": "Veure imatge de portada de {name}",
       "unassigned_location": "Sense ubicació",
       "no_owner": "Sense propietari",
       "total_count": "{n} articles en total | {n} article | {n} articles",
