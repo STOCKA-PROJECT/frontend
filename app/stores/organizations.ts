@@ -18,8 +18,22 @@ export const useOrganizationsStore = defineStore('organizations', () => {
     return list.value.find(o => o.id === currentIdCookie.value) ?? null
   })
 
-  function setCurrent(id: number | null) {
+  function clearOrgScopedStores() {
+    useLocationsStore().reset()
+    usePiecesStore().reset()
+    usePieceTypesStore().reset()
+    useTeamStore().reset()
+    useOrganizationPieceAttributesStore().reset()
+  }
+
+  function applyCurrent(id: number | null) {
+    if (currentIdCookie.value === id) return
     currentIdCookie.value = id
+    clearOrgScopedStores()
+  }
+
+  function setCurrent(id: number | null) {
+    applyCurrent(id)
   }
 
   async function fetchList() {
@@ -27,10 +41,10 @@ export const useOrganizationsStore = defineStore('organizations', () => {
     const data = await api<OrganizationResponseDto[]>('/organizations')
     list.value = data
     if (data.length > 0 && (!currentIdCookie.value || !data.find(o => o.id === currentIdCookie.value))) {
-      currentIdCookie.value = data[0]!.id
+      applyCurrent(data[0]!.id)
     }
     if (data.length === 0) {
-      currentIdCookie.value = null
+      applyCurrent(null)
     }
     return data
   }
@@ -42,7 +56,7 @@ export const useOrganizationsStore = defineStore('organizations', () => {
       body: payload
     })
     list.value = [...list.value, created]
-    currentIdCookie.value = created.id
+    applyCurrent(created.id)
     return created
   }
 
@@ -67,7 +81,7 @@ export const useOrganizationsStore = defineStore('organizations', () => {
 
   function reset() {
     list.value = []
-    currentIdCookie.value = null
+    applyCurrent(null)
   }
 
   return {

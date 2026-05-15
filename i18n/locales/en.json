@@ -360,7 +360,8 @@
       "now": "Now",
       "minutes_ago": "{min} min ago",
       "hours_ago": "{h}h ago",
-      "days_ago": "{d}d ago"
+      "days_ago": "{d}d ago",
+      "preview_cover_aria": "View cover image of {name}"
     },
     "locations_tree": {
       "empty": "No locations yet. Create one to organize your inventory."
@@ -695,6 +696,7 @@
       "page_subtitle": "Manage your organization's inventory: create items, edit their attributes, and review their history.",
       "back_to_list": "Back to items",
       "tabs_aria": "Item tabs",
+      "cover_preview_aria": "View cover image of {name}",
       "unassigned_location": "No location",
       "no_owner": "No owner",
       "total_count": "{n} items total | {n} item | {n} items",

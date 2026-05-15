@@ -3,7 +3,6 @@ import type {
   AvailabilityResponse,
   ChangePasswordDto,
   ForgotPasswordRequestDto,
-  LoginResponseDto,
   LoginUserDto,
   RegisterUserDto,
   ResendVerificationRequestDto,
@@ -13,37 +12,50 @@ import type {
   VerifyEmailRequestDto
 } from '~/types/api'
 
+interface LoginSessionResponse {
+  user: User
+  expiresIn: number
+}
+
+type LocalePathFn = (path: string) => string
+
 export const useAuthStore = defineStore('auth', () => {
-  const tokenCookie = useCookie<string | null>('stocka_token', {
-    sameSite: 'lax',
-    secure: !import.meta.dev
-  })
   const userCookie = useCookie<User | null>('stocka_user', {
     sameSite: 'lax',
     secure: !import.meta.dev
   })
 
-  const isAuthenticated = computed(() => !!tokenCookie.value && !!userCookie.value)
+  const isAuthenticated = computed(() => !!userCookie.value)
 
-  function setSession(payload: LoginResponseDto) {
-    tokenCookie.value = payload.token
+  /**
+   * Resolves a localized path via the Nuxt i18n plugin instance instead of
+   * `useLocalePath()`. Store actions run outside any component setup scope,
+   * so `useI18n()` (used internally by `useLocalePath()`) would emit
+   * `[intlify] Not found parent scope.` Reaching into `$localePath` keeps the
+   * resolution synchronous and silent, matching `useApi.ts`.
+   */
+  function resolveLocalePath(path: string): string {
+    const fn = useNuxtApp().$localePath as LocalePathFn | undefined
+    return fn ? fn(path) : path
+  }
+
+  function setSession(payload: LoginSessionResponse) {
     userCookie.value = payload.user
   }
 
   async function routeAfterAuth() {
     const orgs = useOrganizationsStore()
-    const localePath = useLocalePath()
     await orgs.fetchList()
     if (orgs.list.length === 0) {
-      await navigateTo(localePath('/dashboard/crear-organizacion'))
+      await navigateTo(resolveLocalePath('/dashboard/crear-organizacion'))
     } else {
-      await navigateTo(localePath('/dashboard'))
+      await navigateTo(resolveLocalePath('/dashboard'))
     }
   }
 
   async function login(payload: LoginUserDto) {
     const api = useApi()
-    const data = await api<LoginResponseDto>('/auth/login', {
+    const data = await api<LoginSessionResponse>('/auth/login', {
       method: 'POST',
       body: payload
     })
@@ -53,7 +65,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function loginNoRedirect(payload: LoginUserDto) {
     const api = useApi()
-    const data = await api<LoginResponseDto>('/auth/login', {
+    const data = await api<LoginSessionResponse>('/auth/login', {
       method: 'POST',
       body: payload
     })
@@ -64,13 +76,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function signup(payload: RegisterUserDto) {
     const api = useApi()
-    const localePath = useLocalePath()
     await api<User>('/auth/signup', {
       method: 'POST',
       body: payload
     })
     await navigateTo({
-      path: localePath('/login'),
+      path: resolveLocalePath('/login'),
       query: { registered: 'ok', email: payload.email }
     })
   }
@@ -149,35 +160,23 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function clearLocalSession() {
-    tokenCookie.value = null
     userCookie.value = null
     useOrganizationsStore().reset()
-    useLocationsStore().reset()
-    usePiecesStore().reset()
-    useTeamStore().reset()
   }
 
   async function logout() {
     const api = useApi()
-    const localePath = useLocalePath()
-    const token = tokenCookie.value
     try {
-      if (token) {
-        await api('/auth/logout', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      }
+      await api('/auth/logout', { method: 'POST' })
     } catch {
       // logout is fire-and-forget; clear local session regardless
     }
     clearLocalSession()
-    await navigateTo(localePath('/login'))
+    await navigateTo(resolveLocalePath('/login'))
   }
 
   return {
     user: userCookie,
-    token: tokenCookie,
     isAuthenticated,
     setSession,
     login,

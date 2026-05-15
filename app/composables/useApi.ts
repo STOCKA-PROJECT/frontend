@@ -27,6 +27,7 @@ type LocalePathFn = (path: string) => string
 export function useApi() {
   const auth = useAuthStore()
   const nuxtApp = useNuxtApp()
+  const ssrCookie = import.meta.server ? useRequestHeaders(['cookie']).cookie : undefined
 
   const readLocale = (): string => {
     const i18n = nuxtApp.$i18n as I18nLike | undefined
@@ -45,15 +46,14 @@ export function useApi() {
     onRequest({ options, request }) {
       const headers = new Headers(options.headers as HeadersInit | undefined)
 
-      const token = auth.token
-      if (token && !headers.has('Authorization')) {
-        headers.set('Authorization', `Bearer ${token}`)
-      }
       if (!headers.has('Accept-Language')) {
         headers.set('Accept-Language', readLocale())
       }
       if (!headers.has('Accept')) {
         headers.set('Accept', 'application/problem+json, application/json')
+      }
+      if (ssrCookie && !headers.has('cookie')) {
+        headers.set('cookie', ssrCookie)
       }
 
       options.headers = headers

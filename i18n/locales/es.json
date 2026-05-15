@@ -360,7 +360,8 @@
       "now": "Ahora",
       "minutes_ago": "Hace {min} min",
       "hours_ago": "Hace {h} h",
-      "days_ago": "Hace {d} d"
+      "days_ago": "Hace {d} d",
+      "preview_cover_aria": "Ver imagen de portada de {name}"
     },
     "locations_tree": {
       "empty": "Aún no hay ubicaciones. Crea una para organizar tu inventario."
@@ -695,6 +696,7 @@
       "page_subtitle": "Gestiona el inventario de tu organización: crea artículos, edita sus atributos y consulta su historial.",
       "back_to_list": "Volver a artículos",
       "tabs_aria": "Pestañas del artículo",
+      "cover_preview_aria": "Ver imagen de portada de {name}",
       "unassigned_location": "Sin ubicación",
       "no_owner": "Sin propietario",
       "total_count": "{n} artículos en total | {n} artículo | {n} artículos",
