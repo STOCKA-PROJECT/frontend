@@ -108,6 +108,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    preset: process.env.NITRO_PRESET ?? "cloudflare_module",
     compressPublicAssets: true,
     routeRules: {
       "/**": {

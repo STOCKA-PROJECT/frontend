@@ -25,3 +25,7 @@ logs
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Cloudflare / Wrangler
+.wrangler
+.dev.vars
