@@ -88,7 +88,7 @@ async function persist(next: NotificationPreferenceResponseDto) {
 </script>
 
 <template>
-  <section class="max-w-[640px] rounded-[14px] border border-line bg-bg-card p-6 max-md:p-5">
+  <section class="rounded-[14px] border border-line bg-bg-card p-6 max-md:p-5">
     <h2 class="text-[15px] font-semibold tracking-[-0.01em] text-ink">
       {{ t('dashboard.account.notifications.section_title') }}
     </h2>
@@ -109,12 +109,12 @@ async function persist(next: NotificationPreferenceResponseDto) {
       {{ t('dashboard.account.notifications.empty') }}
     </p>
 
-    <div v-else class="flex flex-col gap-3">
-      <NotificationOrganizationCard v-for="pref in preferences"
-                                    :key="pref.organizationId"
-                                    :preference="pref"
-                                    :saving="savingOrgId === pref.organizationId"
-                                    @update="onUpdate" />
+    <div v-else class="grid grid-cols-1 items-start gap-3 md:grid-cols-2 2xl:grid-cols-3">
+      <AccountNotificationOrganizationCard v-for="pref in preferences"
+                                           :key="pref.organizationId"
+                                           :preference="pref"
+                                           :saving="savingOrgId === pref.organizationId"
+                                           @update="onUpdate" />
     </div>
   </section>
 </template>

@@ -50,13 +50,12 @@ const piecesEnabled = computed(() => (props.preference.pieces?.length ?? 0) > 0)
       <span class="text-[12px] text-ink-muted">{{ preference.organizationSlug }}</span>
     </header>
 
-    <ul class="flex flex-col gap-3">
-      <li v-for="resource in RESOURCES" :key="resource.key"
-          class="flex flex-col gap-1.5 max-sm:items-start sm:flex-row sm:items-center sm:justify-between">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+      <div v-for="resource in RESOURCES" :key="resource.key" class="flex flex-col gap-1.5">
         <span class="text-[13px] font-medium text-ink">
           {{ t(resource.labelKey) }}
         </span>
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <div class="flex flex-col gap-1.5">
           <label v-for="action in ACTIONS" :key="action"
                  class="inline-flex cursor-pointer items-center gap-1.5 text-[13px] text-ink-soft">
             <input type="checkbox" :checked="has(preference[resource.key] ?? [], action)"
@@ -66,21 +65,21 @@ const piecesEnabled = computed(() => (props.preference.pieces?.length ?? 0) > 0)
             {{ t(`dashboard.account.notifications.action.${action}`) }}
           </label>
         </div>
-      </li>
+      </div>
+    </div>
 
-      <li v-if="piecesEnabled"
-          class="flex flex-col gap-1.5 border-t border-line/70 pt-3 max-sm:items-start sm:flex-row sm:items-center sm:justify-between">
-        <span class="text-[12.5px] text-ink-soft">
-          {{ t('dashboard.account.notifications.scope_label') }}
-        </span>
-        <select :value="preference.pieceScope"
-                :disabled="saving"
-                class="h-9 rounded-[8px] border border-line bg-field px-2.5 text-[13px] text-ink outline-none transition-[border-color,background,box-shadow] duration-150 hover:border-line-strong focus:border-accent focus:bg-field-focus disabled:cursor-progress"
-                @change="setScope(($event.target as HTMLSelectElement).value as PieceScope)">
-          <option value="ALL">{{ t('dashboard.account.notifications.scope.ALL') }}</option>
-          <option value="OWNED_ONLY">{{ t('dashboard.account.notifications.scope.OWNED_ONLY') }}</option>
-        </select>
-      </li>
-    </ul>
+    <div v-if="piecesEnabled"
+         class="mt-3 flex flex-col gap-1.5 border-t border-line/70 pt-3 max-sm:items-start sm:flex-row sm:items-center sm:justify-between">
+      <span class="text-[12.5px] text-ink-soft">
+        {{ t('dashboard.account.notifications.scope_label') }}
+      </span>
+      <select :value="preference.pieceScope"
+              :disabled="saving"
+              class="h-9 rounded-[8px] border border-line bg-field px-2.5 text-[13px] text-ink outline-none transition-[border-color,background,box-shadow] duration-150 hover:border-line-strong focus:border-accent focus:bg-field-focus disabled:cursor-progress"
+              @change="setScope(($event.target as HTMLSelectElement).value as PieceScope)">
+        <option value="ALL">{{ t('dashboard.account.notifications.scope.ALL') }}</option>
+        <option value="OWNED_ONLY">{{ t('dashboard.account.notifications.scope.OWNED_ONLY') }}</option>
+      </select>
+    </div>
   </article>
 </template>
