@@ -1,10 +1,24 @@
 <script setup lang="ts">
 const { t } = useI18n()
+const localePath = useLocalePath()
 const auth = useAuthStore()
 const orgs = useOrganizationsStore()
 
-if (auth.isAuthenticated && orgs.list.length === 0) {
-  await orgs.fetchList()
+// useAsyncData wraps the fetch so a transient error (e.g. expired token →
+// useApi redirects to /login) does not throw out of <Suspense> and leave
+// the previous view stuck on screen with the new URL.
+const { error } = await useAsyncData('layout-dashboard-orgs', async () => {
+  if (auth.isAuthenticated && orgs.list.length === 0) {
+    await orgs.fetchList()
+  }
+  return true
+})
+
+// If the fetch failed because useApi cleared the session (expired token),
+// bounce to /login. The check in useApi only runs on the client; doing it
+// here lets SSR redirect cleanly too.
+if (error.value && !auth.isAuthenticated) {
+  await navigateTo(localePath('/login'))
 }
 </script>
 

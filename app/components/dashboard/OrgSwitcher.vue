@@ -6,9 +6,6 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const router = useRouter()
 const orgs = useOrganizationsStore()
-const locations = useLocationsStore()
-const pieces = usePiecesStore()
-const team = useTeamStore()
 
 const open = shallowRef(false)
 const rootRef = ref<HTMLElement | null>(null)
@@ -30,9 +27,6 @@ function pickOrg(id: number) {
   open.value = false
   if (orgs.currentId === id) return
   orgs.setCurrent(id)
-  locations.reset()
-  pieces.reset()
-  team.reset()
   router.push(localePath('/dashboard'))
 }
 

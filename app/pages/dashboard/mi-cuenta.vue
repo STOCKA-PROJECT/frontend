@@ -169,8 +169,9 @@ async function submitPassword() {
       </p>
     </div>
 
+    <div class="grid grid-cols-1 items-start gap-5 lg:grid-cols-2 lg:gap-6">
     <!-- Profile -->
-    <section class="max-w-[520px] rounded-[14px] border border-line bg-bg-card p-6 max-md:p-5">
+    <section class="rounded-[14px] border border-line bg-bg-card p-6 max-md:p-5">
       <h2 class="mb-4 text-[15px] font-semibold tracking-[-0.01em] text-ink">
         {{ t('dashboard.account.profile.section_title') }}
       </h2>
@@ -218,7 +219,7 @@ async function submitPassword() {
     </section>
 
     <!-- Change password -->
-    <section class="max-w-[520px] rounded-[14px] border border-line bg-bg-card p-6 max-md:p-5">
+    <section class="rounded-[14px] border border-line bg-bg-card p-6 max-md:p-5">
       <h2 class="text-[15px] font-semibold tracking-[-0.01em] text-ink">
         {{ t('dashboard.account.change_password.section_title') }}
       </h2>
@@ -270,5 +271,10 @@ async function submitPassword() {
         </AuthSubmitButton>
       </form>
     </section>
+
+    </div>
+
+    <!-- Notifications (full width) -->
+    <AccountNotificationsSection v-if="auth.user" />
   </div>
 </template>
