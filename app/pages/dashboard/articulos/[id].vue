@@ -178,33 +178,26 @@ const currentOrgAttributes = computed(() =>
   orgId.value != null ? orgAttributes.listFor(orgId.value) : []
 )
 
-const coverBlobUrl = ref<string | null>(null)
-const coverLoadedFor = ref<{ pieceId: number; attachmentId: number } | null>(null)
+// La blob URL de la portada vive en el store, así que cualquier listado o
+// vista anterior la habrá cacheado ya. Aquí sólo derivamos un computed y
+// disparamos la descarga si todavía no estaba.
+const coverBlobUrl = computed<string | null>(() => {
+  const oid = orgId.value
+  const p = piece.value
+  if (oid == null || !p || p.coverAttachmentId == null) return null
+  return pieces.attachmentBlobUrls[`${oid}:${p.id}:${p.coverAttachmentId}`] ?? null
+})
 
 watch(
-  () => piece.value?.coverAttachmentId ?? null,
-  async (coverId) => {
-    if (orgId.value == null || piece.value == null || coverId == null) {
-      coverBlobUrl.value = null
-      coverLoadedFor.value = null
-      return
-    }
-    if (coverLoadedFor.value
-        && coverLoadedFor.value.pieceId === piece.value.id
-        && coverLoadedFor.value.attachmentId === coverId) {
-      return
-    }
-    try {
-      const url = await pieces.fetchAttachmentBlobUrl(orgId.value, piece.value.id, coverId)
-      coverBlobUrl.value = url
-      coverLoadedFor.value = { pieceId: piece.value.id, attachmentId: coverId }
-    } catch {
-      coverBlobUrl.value = null
-      coverLoadedFor.value = null
-    }
+  [() => piece.value?.id, () => piece.value?.coverAttachmentId, orgId],
+  ([pid, cid, oid]) => {
+    if (pid == null || cid == null || oid == null) return
+    void pieces.fetchAttachmentBlobUrl(oid, pid, cid)
   },
   { immediate: true }
 )
+
+const previewOpen = ref(false)
 </script>
 
 <template>
@@ -225,9 +218,15 @@ watch(
     <template v-else-if="piece && orgId != null">
       <header class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <div class="flex min-w-0 items-start gap-3">
-          <div v-if="coverBlobUrl" class="cover-thumb">
+          <button
+            v-if="coverBlobUrl"
+            type="button"
+            class="cover-thumb cover-thumb-btn"
+            :aria-label="t('dashboard.pieces.cover_preview_aria', { name: piece.name })"
+            @click="previewOpen = true"
+          >
             <img :src="coverBlobUrl" alt="" class="cover-thumb-img">
-          </div>
+          </button>
           <div class="min-w-0">
             <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
               <h1 class="truncate text-[20px] font-semibold tracking-[-0.02em] text-ink sm:text-[24px]">
@@ -322,6 +321,12 @@ watch(
         tone="danger"
         @close="cancelDelete"
         @confirm="doDelete"
+      />
+
+      <DashboardImageLightbox
+        v-model:open="previewOpen"
+        :url="coverBlobUrl"
+        :name="piece.name"
       />
     </template>
   </div>
@@ -445,5 +450,17 @@ watch(
   height: 100%;
   object-fit: cover;
   display: block;
+}
+.cover-thumb-btn {
+  padding: 0;
+  cursor: pointer;
+  transition: box-shadow .15s;
+}
+.cover-thumb-btn:hover {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--c-accent) 35%, transparent);
+}
+.cover-thumb-btn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
 }
 </style>

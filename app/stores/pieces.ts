@@ -39,6 +39,18 @@ export const usePiecesStore = defineStore('pieces', () => {
   const historyByPiece = ref<Record<number, Page<PieceHistoryItemDto>>>({})
   const loadingHistory = ref<number | null>(null)
 
+  // Caché global de blob URLs de adjuntos. Compartido entre el listado, el
+  // detalle y la pestaña de adjuntos, para evitar re-descargar la misma
+  // imagen al navegar. La clave es `${orgId}:${pieceId}:${attachmentId}`.
+  const attachmentBlobUrls = ref<Record<string, string>>({})
+  // Promesas en vuelo coalescidas por clave, para no lanzar la misma
+  // descarga dos veces simultáneamente.
+  const attachmentBlobInFlight = ref<Record<string, Promise<string>>>({})
+
+  function attachmentKey(orgId: number, pieceId: number, attachmentId: number): string {
+    return `${orgId}:${pieceId}:${attachmentId}`
+  }
+
   function bucketKey(locationId: number | null): number {
     return locationId == null ? UNASSIGNED_KEY : locationId
   }
@@ -179,6 +191,7 @@ export const usePiecesStore = defineStore('pieces', () => {
 
   async function update(orgId: number, pieceId: number, patch: UpdatePieceDto) {
     const api = useApi()
+    const previousCoverId = detailById.value[pieceId]?.coverAttachmentId ?? null
     const updated = await api<PieceResponseDto>(`/organizations/${orgId}/pieces/${pieceId}`, {
       method: 'PATCH',
       body: patch
@@ -186,6 +199,12 @@ export const usePiecesStore = defineStore('pieces', () => {
     detailById.value = { ...detailById.value, [updated.id]: updated }
     applyToList(updated)
     invalidateAll()
+    // Si la portada ha cambiado liberamos la blob URL cacheada de la anterior
+    // para evitar que se acumulen mientras el usuario edita la pieza.
+    const newCoverId = updated.coverAttachmentId ?? null
+    if (previousCoverId != null && previousCoverId !== newCoverId) {
+      revokeAttachmentBlobUrl(orgId, pieceId, previousCoverId)
+    }
     return updated
   }
 
@@ -231,6 +250,7 @@ export const usePiecesStore = defineStore('pieces', () => {
     await api(`/organizations/${orgId}/pieces/${pieceId}/attachments/${attachmentId}`, {
       method: 'DELETE'
     })
+    revokeAttachmentBlobUrl(orgId, pieceId, attachmentId)
     const detail = detailById.value[pieceId]
     if (detail) {
       detailById.value = {
@@ -243,15 +263,45 @@ export const usePiecesStore = defineStore('pieces', () => {
     }
   }
 
-  async function fetchAttachmentBlobUrl(orgId: number, pieceId: number, attachmentId: number): Promise<string> {
-    const res = await fetch(
-      `/api/organizations/${orgId}/pieces/${pieceId}/attachments/${attachmentId}/download`
-    )
-    if (!res.ok) {
-      throw new Error(`download_failed_${res.status}`)
+  function fetchAttachmentBlobUrl(orgId: number, pieceId: number, attachmentId: number): Promise<string> {
+    // Blob URLs son una API de navegador. En SSR no tenemos `URL.createObjectURL`
+    // ni cookies de sesión, así que cortamos antes de hacer nada.
+    if (import.meta.server) {
+      return Promise.reject(new Error('blob_unavailable_on_server'))
     }
-    const blob = await res.blob()
-    return URL.createObjectURL(blob)
+    const key = attachmentKey(orgId, pieceId, attachmentId)
+    const cached = attachmentBlobUrls.value[key]
+    if (cached) return Promise.resolve(cached)
+    const inflight = attachmentBlobInFlight.value[key]
+    if (inflight) return inflight
+    const promise = (async () => {
+      const res = await fetch(
+        `/api/organizations/${orgId}/pieces/${pieceId}/attachments/${attachmentId}/download`
+      )
+      if (!res.ok) {
+        throw new Error(`download_failed_${res.status}`)
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      attachmentBlobUrls.value = { ...attachmentBlobUrls.value, [key]: url }
+      return url
+    })().finally(() => {
+      const next = { ...attachmentBlobInFlight.value }
+      delete next[key]
+      attachmentBlobInFlight.value = next
+    })
+    attachmentBlobInFlight.value = { ...attachmentBlobInFlight.value, [key]: promise }
+    return promise
+  }
+
+  function revokeAttachmentBlobUrl(orgId: number, pieceId: number, attachmentId: number) {
+    const key = attachmentKey(orgId, pieceId, attachmentId)
+    const url = attachmentBlobUrls.value[key]
+    if (!url) return
+    if (import.meta.client) URL.revokeObjectURL(url)
+    const next = { ...attachmentBlobUrls.value }
+    delete next[key]
+    attachmentBlobUrls.value = next
   }
 
   async function fetchHistory(
@@ -285,6 +335,13 @@ export const usePiecesStore = defineStore('pieces', () => {
     loadingDetail.value = null
     historyByPiece.value = {}
     loadingHistory.value = null
+    if (import.meta.client) {
+      for (const url of Object.values(attachmentBlobUrls.value)) {
+        URL.revokeObjectURL(url)
+      }
+    }
+    attachmentBlobUrls.value = {}
+    attachmentBlobInFlight.value = {}
   }
 
   return {
@@ -314,6 +371,9 @@ export const usePiecesStore = defineStore('pieces', () => {
     uploadAttachment,
     deleteAttachment,
     fetchAttachmentBlobUrl,
+    revokeAttachmentBlobUrl,
+    attachmentBlobUrls,
+    attachmentBlobInFlight,
 
     historyByPiece,
     loadingHistory,
