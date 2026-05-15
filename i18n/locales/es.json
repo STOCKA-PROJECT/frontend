@@ -561,6 +561,31 @@
           "passwords_mismatch": "Las contraseñas no coinciden.",
           "too_short": "Mínimo 8 caracteres."
         }
+      },
+      "notifications": {
+        "section_title": "Notificaciones",
+        "subtitle": "Elige qué eventos quieres recibir por correo electrónico para cada organización.",
+        "empty": "No perteneces a ninguna organización todavía.",
+        "resource": {
+          "pieces": "Artículos",
+          "locations": "Ubicaciones",
+          "pieceTypes": "Tipos de artículo"
+        },
+        "action": {
+          "CREATED": "Cuando se crean",
+          "EDITED": "Cuando se editan",
+          "DELETED": "Cuando se eliminan"
+        },
+        "scope_label": "Cuáles artículos",
+        "scope": {
+          "ALL": "Todos los artículos",
+          "OWNED_ONLY": "Solo los que poseo"
+        },
+        "saved": "Preferencias guardadas.",
+        "errors": {
+          "load": "No se han podido cargar las preferencias.",
+          "save": "No se han podido guardar las preferencias."
+        }
       }
     },
     "org_settings": {

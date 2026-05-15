@@ -92,14 +92,17 @@ async function loadAll() {
   }
 }
 
+onMounted(() => {
+  void loadAll()
+})
+
 watch(() => props.orgId, async (next, prev) => {
-  if (prev !== undefined && next !== prev) {
-    pieces.reset()
-    pieceTypes.reset()
-    locations.reset()
-  }
+  if (prev === undefined || next === prev) return
+  pieces.reset()
+  pieceTypes.reset()
+  locations.reset()
   await loadAll()
-}, { immediate: true })
+})
 
 async function onFilterChange(patch: Record<string, unknown>) {
   try {

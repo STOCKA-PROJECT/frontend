@@ -561,6 +561,31 @@
           "passwords_mismatch": "Les contrasenyes no coincideixen.",
           "too_short": "Mínim 8 caràcters."
         }
+      },
+      "notifications": {
+        "section_title": "Notificacions",
+        "subtitle": "Tria quins esdeveniments vols rebre per correu electrònic per a cada organització.",
+        "empty": "Encara no pertanys a cap organització.",
+        "resource": {
+          "pieces": "Articles",
+          "locations": "Ubicacions",
+          "pieceTypes": "Tipus d'article"
+        },
+        "action": {
+          "CREATED": "Quan es creen",
+          "EDITED": "Quan s'editen",
+          "DELETED": "Quan s'eliminen"
+        },
+        "scope_label": "Quins articles",
+        "scope": {
+          "ALL": "Tots els articles",
+          "OWNED_ONLY": "Només els que posseeixo"
+        },
+        "saved": "Preferències desades.",
+        "errors": {
+          "load": "No s'han pogut carregar les preferències.",
+          "save": "No s'han pogut desar les preferències."
+        }
       }
     },
     "org_settings": {
