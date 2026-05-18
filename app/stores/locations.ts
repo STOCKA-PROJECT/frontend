@@ -11,52 +11,52 @@ export const useLocationsStore = defineStore('locations', () => {
   const detailById = ref<Record<number, LocationResponseDto>>({})
   const loadingTree = ref(false)
 
-  async function fetchTree(orgId: number) {
+  async function fetchTree(orgSlug: string) {
     const api = useApi()
     loadingTree.value = true
     try {
-      tree.value = await api<LocationTreeNodeDto[]>(`/organizations/${orgId}/locations/tree`)
+      tree.value = await api<LocationTreeNodeDto[]>(`/organizations/${orgSlug}/locations/tree`)
     } finally {
       loadingTree.value = false
     }
     return tree.value
   }
 
-  async function fetchOne(orgId: number, id: number) {
+  async function fetchOne(orgSlug: string, id: number) {
     const api = useApi()
-    const data = await api<LocationResponseDto>(`/organizations/${orgId}/locations/${id}`)
+    const data = await api<LocationResponseDto>(`/organizations/${orgSlug}/locations/${id}`)
     detailById.value = { ...detailById.value, [id]: data }
     return data
   }
 
-  async function create(orgId: number, payload: CreateLocationDto) {
+  async function create(orgSlug: string, payload: CreateLocationDto) {
     const api = useApi()
-    const created = await api<LocationResponseDto>(`/organizations/${orgId}/locations`, {
+    const created = await api<LocationResponseDto>(`/organizations/${orgSlug}/locations`, {
       method: 'POST',
       body: payload
     })
-    await fetchTree(orgId)
+    await fetchTree(orgSlug)
     return created
   }
 
-  async function update(orgId: number, id: number, payload: UpdateLocationDto) {
+  async function update(orgSlug: string, id: number, payload: UpdateLocationDto) {
     const api = useApi()
-    const updated = await api<LocationResponseDto>(`/organizations/${orgId}/locations/${id}`, {
+    const updated = await api<LocationResponseDto>(`/organizations/${orgSlug}/locations/${id}`, {
       method: 'PATCH',
       body: payload
     })
     detailById.value = { ...detailById.value, [id]: updated }
-    await fetchTree(orgId)
+    await fetchTree(orgSlug)
     return updated
   }
 
-  async function softDelete(orgId: number, id: number) {
+  async function softDelete(orgSlug: string, id: number) {
     const api = useApi()
-    await api(`/organizations/${orgId}/locations/${id}`, { method: 'DELETE' })
+    await api(`/organizations/${orgSlug}/locations/${id}`, { method: 'DELETE' })
     const next = { ...detailById.value }
     delete next[id]
     detailById.value = next
-    await fetchTree(orgId)
+    await fetchTree(orgSlug)
   }
 
   function reset() {

@@ -16,24 +16,20 @@ const orgs = useOrganizationsStore()
 const team = useTeamStore()
 const auth = useAuthStore()
 
-if (orgs.list.length === 0) {
-  await orgs.fetchList()
-}
-if (!orgs.current) {
-  await navigateTo(localePath('/dashboard'))
-}
+// `resolve-org-slug.global.ts` already guarantees the org exists in the store
+// and the user is a member.
+const { slug: orgSlug, org } = useCurrentOrg()
 
 useSeoMeta({
   title: () => t('dashboard.team.page_title'),
   robots: 'noindex, nofollow'
 })
 
-const orgId = computed(() => orgs.current?.id ?? 0)
-const role = computed<OrganizationRole>(() => orgs.current?.currentUserRole ?? 'SPECTATOR')
+const role = computed<OrganizationRole>(() => org.value?.currentUserRole ?? 'SPECTATOR')
 const currentUserId = computed(() => auth.user?.id ?? -1)
 
-const members = computed(() => team.getMembers(orgId.value) ?? [])
-const invitations = computed(() => team.getInvitations(orgId.value) ?? [])
+const members = computed(() => (orgSlug.value && team.getMembers(orgSlug.value)) || [])
+const invitations = computed(() => (orgSlug.value && team.getInvitations(orgSlug.value)) || [])
 const canSeeInvitations = computed(() => role.value === 'OWNER' || role.value === 'MANAGER')
 const ownerCount = computed(() => members.value.filter(m => m.role === 'OWNER').length)
 const isCurrentUserLastOwner = computed(() => {
@@ -44,10 +40,11 @@ const isCurrentUserLastOwner = computed(() => {
 const pageError = ref<string | null>(null)
 
 async function loadAll() {
-  if (!orgId.value) return
+  if (!orgSlug.value) return
+  const slug = orgSlug.value
   pageError.value = null
-  const tasks: Promise<unknown>[] = [team.fetchMembers(orgId.value)]
-  if (canSeeInvitations.value) tasks.push(team.fetchInvitations(orgId.value))
+  const tasks: Promise<unknown>[] = [team.fetchMembers(slug)]
+  if (canSeeInvitations.value) tasks.push(team.fetchInvitations(slug))
   try {
     await Promise.all(tasks)
   } catch (e) {
@@ -57,8 +54,8 @@ async function loadAll() {
   }
 }
 
-watch(() => orgs.current?.id, () => {
-  if (orgs.current) loadAll()
+watch(orgSlug, (slug) => {
+  if (slug) void loadAll()
 }, { immediate: true })
 
 // Invite dialog
@@ -77,11 +74,11 @@ function closeInvite() {
 }
 
 async function submitInvite(payload: CreateInvitationDto) {
-  if (!orgId.value) return
+  if (!orgSlug.value) return
   inviteLoading.value = true
   inviteError.value = null
   try {
-    await team.invite(orgId.value, payload)
+    await team.invite(orgSlug.value, payload)
     inviteOpen.value = false
   } catch (e) {
     inviteError.value = errorMessage(e, t('dashboard.team.errors.invite'))
@@ -108,12 +105,12 @@ const changeRoleMessage = computed(() => {
 })
 
 async function confirmChangeRole() {
-  if (!changeRoleTarget.value || !orgId.value) return
+  if (!changeRoleTarget.value || !orgSlug.value) return
   const { member, newRole } = changeRoleTarget.value
   changeRoleLoading.value = true
   pageError.value = null
   try {
-    await team.updateRole(orgId.value, member.id, newRole)
+    await team.updateRole(orgSlug.value, member.id, newRole)
     changeRoleTarget.value = null
   } catch (e) {
     pageError.value = errorMessage(e, t('dashboard.team.errors.update_role'))
@@ -134,11 +131,11 @@ const removeMessage = computed(() => removeTarget.value
   : '')
 
 async function confirmRemove() {
-  if (!removeTarget.value || !orgId.value) return
+  if (!removeTarget.value || !orgSlug.value) return
   removeLoading.value = true
   pageError.value = null
   try {
-    await team.removeMember(orgId.value, removeTarget.value.id)
+    await team.removeMember(orgSlug.value, removeTarget.value.id)
     removeTarget.value = null
   } catch (e) {
     pageError.value = errorMessage(e, t('dashboard.team.errors.remove'))
@@ -157,11 +154,11 @@ const cancelInviteMessage = computed(() => cancelInviteTarget.value
   : '')
 
 async function confirmCancelInvitation() {
-  if (!cancelInviteTarget.value || !orgId.value) return
+  if (!cancelInviteTarget.value || !orgSlug.value) return
   cancelInviteLoading.value = true
   pageError.value = null
   try {
-    await team.cancelInvitation(orgId.value, cancelInviteTarget.value.id)
+    await team.cancelInvitation(orgSlug.value, cancelInviteTarget.value.id)
     cancelInviteTarget.value = null
   } catch (e) {
     pageError.value = errorMessage(e, t('dashboard.team.errors.cancel_invitation'))
@@ -175,8 +172,8 @@ async function confirmCancelInvitation() {
 const leaveOpen = ref(false)
 const leaveLoading = ref(false)
 
-const leaveMessage = computed(() => orgs.current
-  ? t('dashboard.team.confirm_leave_message', { name: orgs.current.name })
+const leaveMessage = computed(() => org.value
+  ? t('dashboard.team.confirm_leave_message', { name: org.value.name })
   : '')
 
 function askLeave() {
@@ -185,14 +182,15 @@ function askLeave() {
 }
 
 async function confirmLeave() {
-  if (!orgId.value) return
+  if (!orgSlug.value) return
   leaveLoading.value = true
   pageError.value = null
   try {
-    await team.leaveOrg(orgId.value)
+    await team.leaveOrg(orgSlug.value)
     team.reset()
     await orgs.fetchList()
     leaveOpen.value = false
+    // /dashboard is the redirector: it picks the next-best org for the user.
     await navigateTo(localePath('/dashboard'))
   } catch (e) {
     pageError.value = errorMessage(e, t('dashboard.team.errors.leave'))

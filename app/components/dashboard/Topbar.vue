@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const orgs = useOrganizationsStore()
+const { org: currentOrg } = useCurrentOrg()
 const route = useRoute()
 const { isOpen: mobileNavOpen, toggle: toggleMobileNav } = useMobileNav({ observeSideEffects: false })
 
@@ -24,7 +24,11 @@ const here = computed<string[]>(() => {
   // Filtra prefijos de locale (en, ca) y la raíz "dashboard"
   const startIdx = segs[0] === 'en' || segs[0] === 'ca' ? 1 : 0
   if (segs[startIdx] !== 'dashboard') return []
-  const rest = segs.slice(startIdx + 1)
+  let rest = segs.slice(startIdx + 1)
+  // The org slug is the breadcrumb's anchor (shown separately as the org name) — skip it.
+  if (rest[0] && currentOrg.value && rest[0] === currentOrg.value.slug) {
+    rest = rest.slice(1)
+  }
   if (rest.length === 0) return [t('dashboard.summary')]
 
   const parts: string[] = []
@@ -56,7 +60,7 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
     </button>
 
     <nav :aria-label="t('dashboard.main_label')" class="flex min-w-0 flex-1 items-center gap-1.5 text-[13.5px] text-ink-soft">
-      <span v-if="showOrg && orgs.current" class="hover:text-ink truncate">{{ orgs.current.name }}</span>
+      <span v-if="showOrg && currentOrg" class="hover:text-ink truncate">{{ currentOrg.name }}</span>
       <template v-for="(part, idx) in here" :key="`${idx}-${part}`">
         <span aria-hidden="true" class="text-ink-muted">/</span>
         <span :class="idx === here.length - 1 ? 'truncate font-medium text-ink' : 'truncate'">{{ part }}</span>

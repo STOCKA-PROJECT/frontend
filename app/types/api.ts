@@ -86,6 +86,12 @@ export interface OrganizationResponseDto {
   currentUserRole: OrganizationRole
 }
 
+export interface OrganizationLookupResponseDto {
+  org: OrganizationResponseDto
+  historical: boolean
+  currentSlug: string
+}
+
 export interface CreateOrganizationDto {
   name: string
   slug: string

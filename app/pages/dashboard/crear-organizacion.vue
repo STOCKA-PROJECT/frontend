@@ -73,8 +73,11 @@ async function submit() {
   loading.value = true
   errorMsg.value = null
   try {
-    await orgs.create({ name: name.value.trim(), slug: slug.value })
-    await navigateTo(localePath('/dashboard'))
+    const created = await orgs.create({ name: name.value.trim(), slug: slug.value })
+    // Jump straight into the newly created org instead of bouncing through the
+    // /dashboard redirector — the cookie may not be ready in time for the
+    // redirector to land on the brand-new org otherwise.
+    await navigateTo(localePath(`/dashboard/${created.slug}`))
   } catch (e) {
     if (e instanceof FetchError && e.response?.status === 409) {
       errorMsg.value = t('dashboard.create_org.errors.conflict')

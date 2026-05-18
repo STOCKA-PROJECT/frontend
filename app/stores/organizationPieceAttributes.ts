@@ -7,72 +7,72 @@ import type {
 
 /**
  * Pinia store for organization-level piece attributes (OWNER+MANAGER manage; any member reads).
- * Mirrors `usePieceTypesStore` but scopes everything to a single organization id and a flat list.
+ * Mirrors `usePieceTypesStore` but scopes everything to a single organization slug and a flat list.
  */
 export const useOrganizationPieceAttributesStore = defineStore('organizationPieceAttributes', () => {
-  const byOrg = ref<Record<number, OrganizationPieceAttributeResponseDto[]>>({})
+  const byOrg = ref<Record<string, OrganizationPieceAttributeResponseDto[]>>({})
   const loading = ref(false)
-  const loadedOrgIds = ref<Set<number>>(new Set())
+  const loadedOrgSlugs = ref<Set<string>>(new Set())
 
-  function listFor(orgId: number): OrganizationPieceAttributeResponseDto[] {
-    return byOrg.value[orgId] ?? []
+  function listFor(orgSlug: string): OrganizationPieceAttributeResponseDto[] {
+    return byOrg.value[orgSlug] ?? []
   }
 
-  function setList(orgId: number, list: OrganizationPieceAttributeResponseDto[]) {
-    byOrg.value = { ...byOrg.value, [orgId]: list }
+  function setList(orgSlug: string, list: OrganizationPieceAttributeResponseDto[]) {
+    byOrg.value = { ...byOrg.value, [orgSlug]: list }
   }
 
-  async function fetchAll(orgId: number) {
+  async function fetchAll(orgSlug: string) {
     const api = useApi()
     loading.value = true
     try {
       const data = await api<OrganizationPieceAttributeResponseDto[]>(
-        `/organizations/${orgId}/piece-attributes`
+        `/organizations/${orgSlug}/piece-attributes`
       )
-      setList(orgId, data)
-      loadedOrgIds.value = new Set([...loadedOrgIds.value, orgId])
+      setList(orgSlug, data)
+      loadedOrgSlugs.value = new Set([...loadedOrgSlugs.value, orgSlug])
       return data
     } finally {
       loading.value = false
     }
   }
 
-  async function create(orgId: number, payload: CreateOrganizationPieceAttributeDto) {
+  async function create(orgSlug: string, payload: CreateOrganizationPieceAttributeDto) {
     const api = useApi()
     const created = await api<OrganizationPieceAttributeResponseDto>(
-      `/organizations/${orgId}/piece-attributes`,
+      `/organizations/${orgSlug}/piece-attributes`,
       { method: 'POST', body: payload }
     )
-    setList(orgId, [...listFor(orgId), created])
+    setList(orgSlug, [...listFor(orgSlug), created])
     return created
   }
 
-  async function update(orgId: number, attributeId: number, payload: UpdateOrganizationPieceAttributeDto) {
+  async function update(orgSlug: string, attributeId: number, payload: UpdateOrganizationPieceAttributeDto) {
     const api = useApi()
     const updated = await api<OrganizationPieceAttributeResponseDto>(
-      `/organizations/${orgId}/piece-attributes/${attributeId}`,
+      `/organizations/${orgSlug}/piece-attributes/${attributeId}`,
       { method: 'PATCH', body: payload }
     )
-    setList(orgId, listFor(orgId).map(a => (a.id === updated.id ? updated : a)))
+    setList(orgSlug, listFor(orgSlug).map(a => (a.id === updated.id ? updated : a)))
     return updated
   }
 
-  async function softDelete(orgId: number, attributeId: number) {
+  async function softDelete(orgSlug: string, attributeId: number) {
     const api = useApi()
-    await api(`/organizations/${orgId}/piece-attributes/${attributeId}`, { method: 'DELETE' })
-    setList(orgId, listFor(orgId).filter(a => a.id !== attributeId))
+    await api(`/organizations/${orgSlug}/piece-attributes/${attributeId}`, { method: 'DELETE' })
+    setList(orgSlug, listFor(orgSlug).filter(a => a.id !== attributeId))
   }
 
   function reset() {
     byOrg.value = {}
     loading.value = false
-    loadedOrgIds.value = new Set()
+    loadedOrgSlugs.value = new Set()
   }
 
   return {
     byOrg,
     loading,
-    loadedOrgIds,
+    loadedOrgSlugs,
     listFor,
     fetchAll,
     create,

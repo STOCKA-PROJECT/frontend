@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const auth = useAuthStore()
-const orgs = useOrganizationsStore()
-const localePath = useLocalePath()
+const { orgPath } = useOrgPath()
+const { org } = useCurrentOrg()
 
 const greeting = computed(() => {
   const name = auth.user?.name?.trim()
@@ -10,7 +10,7 @@ const greeting = computed(() => {
 })
 
 const canCreatePieces = computed(() => {
-  const role = orgs.current?.currentUserRole
+  const role = org.value?.currentUserRole
   return role === 'OWNER' || role === 'MANAGER' || role === 'USER'
 })
 </script>
@@ -22,10 +22,10 @@ const canCreatePieces = computed(() => {
         {{ greeting }}
       </h1>
       <p class="mt-1 text-[14px] leading-relaxed text-ink-soft">
-        <template v-if="orgs.current">
+        <template v-if="org">
           <i18n-t keypath="dashboard.header.context_named" tag="span">
             <template #org>
-              <span class="font-medium text-ink">{{ orgs.current.name }}</span>
+              <span class="font-medium text-ink">{{ org.name }}</span>
             </template>
           </i18n-t>
         </template>
@@ -41,7 +41,7 @@ const canCreatePieces = computed(() => {
       </button>
       <NuxtLink
         v-if="canCreatePieces"
-        :to="localePath('/dashboard/articulos/nuevo')"
+        :to="orgPath('/articulos/nuevo')"
         class="header-btn header-btn-primary flex-1 sm:flex-none"
       >
         <DashboardIcon name="plus" :size="14" />

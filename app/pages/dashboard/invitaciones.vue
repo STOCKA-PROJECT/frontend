@@ -5,6 +5,7 @@ import type { InvitationResponseDto } from '~/types/api'
 definePageMeta({ layout: 'dashboard' })
 
 const { t, locale } = useI18n()
+const localePath = useLocalePath()
 const team = useTeamStore()
 const orgs = useOrganizationsStore()
 const toast = useToastStore()
@@ -84,6 +85,14 @@ async function accept(inv: InvitationResponseDto) {
       team.fetchMyInvitations({ includeHistory: true }),
       orgs.fetchList()
     ])
+    // Drop the user inside the org they just joined. The summary DTO carries
+    // the slug; fall back to the redirector if for some reason it is missing.
+    const targetSlug = inv.organization?.slug
+    if (targetSlug) {
+      await navigateTo(localePath(`/dashboard/${targetSlug}`))
+    } else {
+      await navigateTo(localePath('/dashboard'))
+    }
   } catch (e) {
     pageError.value = errorMessage(e, t('dashboard.my_invitations.errors.accept'))
   } finally {

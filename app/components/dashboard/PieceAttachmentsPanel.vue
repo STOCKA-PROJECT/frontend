@@ -2,7 +2,7 @@
 import type { PieceAttachmentKind, PieceAttachmentResponseDto } from '~/types/api'
 
 const props = defineProps<{
-  orgId: number
+  orgSlug: string
   pieceId: number
   attachments: PieceAttachmentResponseDto[]
   coverAttachmentId?: number | null
@@ -66,7 +66,7 @@ async function loadImageUrl(attachmentId: number) {
   if (loadingImageIds.value.has(attachmentId)) return
   loadingImageIds.value.add(attachmentId)
   try {
-    const url = await pieces.fetchAttachmentBlobUrl(props.orgId, props.pieceId, attachmentId)
+    const url = await pieces.fetchAttachmentBlobUrl(props.orgSlug, props.pieceId, attachmentId)
     blobUrlByAttachmentId.value = { ...blobUrlByAttachmentId.value, [attachmentId]: url }
   } catch {
     /* silenciamos: la galería muestra placeholder */
@@ -112,7 +112,7 @@ async function uploadFiles(files: FileList | File[], kind: PieceAttachmentKind) 
         continue
       }
       try {
-        await pieces.uploadAttachment(props.orgId, props.pieceId, file, kind)
+        await pieces.uploadAttachment(props.orgSlug, props.pieceId, file, kind)
       } catch (e) {
         showError(extractErrorMessage(e, t('dashboard.pieces.attachments.errors.upload')))
       }
@@ -154,7 +154,7 @@ async function downloadDocument(att: PieceAttachmentResponseDto) {
   try {
     // La URL la sirve el store cacheada: no la revocamos aquí o invalidaríamos
     // el caché compartido. El store la libera al borrar el adjunto o resetear.
-    const url = await pieces.fetchAttachmentBlobUrl(props.orgId, props.pieceId, att.id)
+    const url = await pieces.fetchAttachmentBlobUrl(props.orgSlug, props.pieceId, att.id)
     const a = document.createElement('a')
     a.href = url
     a.download = att.originalFilename
@@ -183,7 +183,7 @@ async function confirmDelete() {
   if (id == null) return
   deletingId.value = id
   try {
-    await pieces.deleteAttachment(props.orgId, props.pieceId, id)
+    await pieces.deleteAttachment(props.orgSlug, props.pieceId, id)
     confirmDeleteId.value = null
     confirmDeleteName.value = ''
   } catch (e) {

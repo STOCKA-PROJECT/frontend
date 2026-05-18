@@ -5,26 +5,23 @@ import type { AvailabilityResponse, UpdateOrganizationDto } from '~/types/api'
 definePageMeta({ layout: 'dashboard' })
 
 const { t } = useI18n()
-const localePath = useLocalePath()
+const { orgPath } = useOrgPath()
 
 const orgs = useOrganizationsStore()
 
-if (orgs.list.length === 0) {
-  await orgs.fetchList()
-}
-if (!orgs.current) {
-  await navigateTo(localePath('/dashboard'))
-}
+// `resolve-org-slug.global.ts` already guarantees the org exists in the store
+// and the user is a member.
+const { slug: orgSlug, org } = useCurrentOrg()
 
-const isOwner = computed(() => orgs.current?.currentUserRole === 'OWNER')
+const isOwner = computed(() => org.value?.currentUserRole === 'OWNER')
 
 useSeoMeta({
   title: () => t('dashboard.org_settings.title'),
   robots: 'noindex, nofollow'
 })
 
-const initialName = computed(() => orgs.current?.name ?? '')
-const initialSlug = computed(() => orgs.current?.slug ?? '')
+const initialName = computed(() => org.value?.name ?? '')
+const initialSlug = computed(() => org.value?.slug ?? '')
 
 const name = ref(initialName.value)
 const slug = ref(initialSlug.value)
@@ -33,7 +30,10 @@ const loading = ref(false)
 const errorMsg = ref<string | null>(null)
 const successVisible = ref(false)
 
-watch(() => orgs.current?.id, () => {
+// Re-seed local form state when the active org changes (org switcher) or its
+// slug rotates after a rename — the watcher key is the org id (stable across
+// renames) so renames refresh form state once the response arrives.
+watch(() => org.value?.id, () => {
   name.value = initialName.value
   slug.value = initialSlug.value
   slugTouched.value = false
@@ -96,7 +96,7 @@ function onSlugInput(value: string) {
 }
 
 async function submit() {
-  if (!canSubmit.value || !orgs.current) return
+  if (!canSubmit.value || !orgSlug.value) return
   loading.value = true
   errorMsg.value = null
   successVisible.value = false
@@ -105,10 +105,17 @@ async function submit() {
   if (nameChanged.value) payload.name = name.value.trim()
   if (slugChanged.value) payload.slug = slug.value
 
+  const previousSlug = orgSlug.value
+
   try {
-    await orgs.update(orgs.current.id, payload)
+    const updated = await orgs.update(previousSlug, payload)
     slugTouched.value = false
     successVisible.value = true
+    // If the slug changed, the URL must follow or all subsequent requests
+    // (and the resolve-org-slug middleware) will keep using the stale slug.
+    if (updated.slug !== previousSlug) {
+      await navigateTo(orgPath('/ajustes-organizacion', updated.slug), { replace: true })
+    }
   } catch (e) {
     if (e instanceof FetchError) {
       if (e.response?.status === 409) {
@@ -179,9 +186,9 @@ async function submit() {
     </div>
 
     <DashboardOrgPieceAttributesPanel
-      v-if="orgs.current"
+      v-if="orgSlug"
       class="max-w-[760px]"
-      :org-id="orgs.current.id"
+      :org-slug="orgSlug"
       :can-write="isOwner" />
   </div>
 </template>
