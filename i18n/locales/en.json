@@ -480,7 +480,9 @@
           "options_duplicate": "That option already exists.",
           "options_empty": "The option cannot be empty.",
           "minItems": "Minimum selections",
-          "maxItems": "Maximum selections"
+          "maxItems": "Maximum selections",
+          "eligibleRoles": "Allowed roles",
+          "eligibleRoles_help": "Only members with one of these roles will appear in the dropdown."
         },
         "create": "Create attribute",
         "save": "Save changes"
@@ -497,7 +499,8 @@
         "SELECT": "Select",
         "MULTI_SELECT": "Multi-select",
         "URL": "URL",
-        "EMAIL": "Email"
+        "EMAIL": "Email",
+        "MEMBER": "Member"
       },
       "delete": {
         "confirm_title": "Delete type",
@@ -517,7 +520,8 @@
         "name_required": "Name is required.",
         "display_name_required": "Display label is required.",
         "options_required": "Add at least one option.",
-        "type_required": "Pick a data type."
+        "type_required": "Pick a data type.",
+        "eligibleRoles_required": "Pick at least one eligible role."
       }
     },
     "account": {
@@ -683,6 +687,12 @@
         "leave": "Couldn't leave the organization.",
         "generic": "Something went wrong. Please try again."
       }
+    },
+    "members": {
+      "no_selection": "No selection",
+      "search_placeholder": "Search member…",
+      "clear_selection": "Clear selection",
+      "no_members_match": "No member matches."
     },
     "pagination": {
       "size": "Size",

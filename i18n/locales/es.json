@@ -480,7 +480,9 @@
           "options_duplicate": "Esa opción ya existe.",
           "options_empty": "La opción no puede estar vacía.",
           "minItems": "Selecciones mínimas",
-          "maxItems": "Selecciones máximas"
+          "maxItems": "Selecciones máximas",
+          "eligibleRoles": "Roles permitidos",
+          "eligibleRoles_help": "Solo los miembros con uno de estos roles aparecerán en el desplegable."
         },
         "create": "Crear atributo",
         "save": "Guardar cambios"
@@ -497,7 +499,8 @@
         "SELECT": "Selección",
         "MULTI_SELECT": "Selección múltiple",
         "URL": "URL",
-        "EMAIL": "Correo electrónico"
+        "EMAIL": "Correo electrónico",
+        "MEMBER": "Miembro"
       },
       "delete": {
         "confirm_title": "Eliminar tipo",
@@ -517,7 +520,8 @@
         "name_required": "El nombre es obligatorio.",
         "display_name_required": "La etiqueta visible es obligatoria.",
         "options_required": "Añade al menos una opción.",
-        "type_required": "Selecciona un tipo de dato."
+        "type_required": "Selecciona un tipo de dato.",
+        "eligibleRoles_required": "Selecciona al menos un rol elegible."
       }
     },
     "account": {
@@ -683,6 +687,12 @@
         "leave": "No se ha podido abandonar la organización.",
         "generic": "Algo ha fallado. Inténtalo de nuevo."
       }
+    },
+    "members": {
+      "no_selection": "Sin selección",
+      "search_placeholder": "Buscar miembro…",
+      "clear_selection": "Quitar selección",
+      "no_members_match": "Ningún miembro coincide."
     },
     "pagination": {
       "size": "Tamaño",
