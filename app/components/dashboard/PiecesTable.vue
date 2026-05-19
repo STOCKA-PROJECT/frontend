@@ -3,7 +3,7 @@ import type { PieceListItemDto } from '~/types/api'
 
 const props = withDefaults(defineProps<{
   pieces: PieceListItemDto[]
-  orgId?: number | null
+  orgSlug?: string | null
   loading?: boolean
   showLocation?: boolean
   showOwner?: boolean
@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<{
   showLocation: false,
   showOwner: false,
   canWrite: false,
-  orgId: null
+  orgSlug: null
 })
 
 const emit = defineEmits<{
@@ -37,18 +37,18 @@ const thumbVariant = (piece: PieceListItemDto) => {
 // reutilizan entre listados y vista detalle sin volver a descargar la imagen
 // al navegar. Aquí sólo disparamos las descargas que faltan.
 function coverUrlFor(piece: PieceListItemDto): string | null {
-  if (!piece.coverAttachmentId || props.orgId == null) return null
-  return piecesStore.attachmentBlobUrls[`${props.orgId}:${piece.id}:${piece.coverAttachmentId}`] ?? null
+  if (!piece.coverAttachmentId || !props.orgSlug) return null
+  return piecesStore.attachmentBlobUrls[`${props.orgSlug}:${piece.id}:${piece.coverAttachmentId}`] ?? null
 }
 
 watch(
   () => props.pieces.map(p => `${p.id}:${p.coverAttachmentId ?? 0}`),
   () => {
-    if (props.orgId == null) return
+    if (!props.orgSlug) return
     for (const p of props.pieces) {
       if (!p.coverAttachmentId) continue
       // Idempotente: si está cacheada o en vuelo, no relanza el fetch.
-      void piecesStore.fetchAttachmentBlobUrl(props.orgId, p.id, p.coverAttachmentId)
+      void piecesStore.fetchAttachmentBlobUrl(props.orgSlug, p.id, p.coverAttachmentId)
     }
   },
   { immediate: true, deep: true }

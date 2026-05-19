@@ -8,7 +8,7 @@ import type {
 } from '~/types/api'
 
 const props = defineProps<{
-  orgId: number
+  orgSlug: string
   role: OrganizationRole | null
 }>()
 
@@ -46,13 +46,13 @@ function extractErrorMessage(e: unknown, fallback: string): string {
 
 async function loadAll() {
   try {
-    await pieceTypes.fetchAll(props.orgId)
+    await pieceTypes.fetchAll(props.orgSlug)
   } catch {
     showError(t('dashboard.pieceTypes.errors.load_list'))
   }
 }
 
-watch(() => props.orgId, async (next, prev) => {
+watch(() => props.orgSlug, async (next, prev) => {
   if (prev !== undefined && next !== prev) pieceTypes.reset()
   selectedId.value = null
   await loadAll()
@@ -62,7 +62,7 @@ watch(selectedId, async (id) => {
   if (id == null) return
   if (!pieceTypes.byId[id]) {
     try {
-      await pieceTypes.fetchOne(props.orgId, id)
+      await pieceTypes.fetchOne(props.orgSlug, id)
     } catch {
       showError(t('dashboard.pieceTypes.errors.load_detail'))
     }
@@ -115,10 +115,10 @@ async function submitFormDialog(payload: { name: string }) {
   formDialog.value.error = null
   try {
     if (formDialog.value.mode === 'create') {
-      const created = await pieceTypes.create(props.orgId, { name: payload.name })
+      const created = await pieceTypes.create(props.orgSlug, { name: payload.name })
       selectedId.value = created.id
     } else if (formDialog.value.targetId) {
-      await pieceTypes.update(props.orgId, formDialog.value.targetId, { name: payload.name })
+      await pieceTypes.update(props.orgSlug, formDialog.value.targetId, { name: payload.name })
     }
     closeFormDialog()
   } catch (e) {
@@ -181,10 +181,10 @@ async function submitAttrDialog(payload: CreatePieceTypeAttributeDto | UpdatePie
   try {
     const typeId = attrFormDialog.value.typeId
     if (attrFormDialog.value.mode === 'create') {
-      await pieceTypes.addAttribute(props.orgId, typeId, payload as CreatePieceTypeAttributeDto)
+      await pieceTypes.addAttribute(props.orgSlug, typeId, payload as CreatePieceTypeAttributeDto)
     } else if (attrFormDialog.value.initial) {
       await pieceTypes.updateAttribute(
-        props.orgId,
+        props.orgSlug,
         typeId,
         attrFormDialog.value.initial.id,
         payload as UpdatePieceTypeAttributeDto
@@ -250,10 +250,10 @@ async function confirmDelete() {
   c.loading = true
   try {
     if (c.kind === 'type' && c.typeId != null) {
-      await pieceTypes.softDelete(props.orgId, c.typeId)
+      await pieceTypes.softDelete(props.orgSlug, c.typeId)
       if (selectedId.value === c.typeId) selectedId.value = null
     } else if (c.kind === 'attribute' && c.typeId != null && c.attrId != null) {
-      await pieceTypes.removeAttribute(props.orgId, c.typeId, c.attrId)
+      await pieceTypes.removeAttribute(props.orgSlug, c.typeId, c.attrId)
     }
     closeConfirm()
   } catch (e) {

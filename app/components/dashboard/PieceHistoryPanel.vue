@@ -3,7 +3,7 @@ import { FetchError } from 'ofetch'
 import type { MemberResponseDto, PieceHistoryAction, PieceHistoryItemDto } from '~/types/api'
 
 const props = defineProps<{
-  orgId: number
+  orgSlug: string
   pieceId: number
   members: MemberResponseDto[]
 }>()
@@ -99,7 +99,7 @@ const items = computed<PieceHistoryItemDto[]>(() => historyPage.value?.content ?
 async function load(page = currentPage.value) {
   errorMsg.value = null
   try {
-    await pieces.fetchHistory(props.orgId, props.pieceId, page, pageSize)
+    await pieces.fetchHistory(props.orgSlug, props.pieceId, page, pageSize)
     currentPage.value = page
   } catch (e) {
     errorMsg.value = extractErrorMessage(e, t('dashboard.pieces.errors.load_history'))

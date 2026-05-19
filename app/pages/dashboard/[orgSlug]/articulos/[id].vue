@@ -5,25 +5,19 @@ import type { LocationResponseDto, LocationTreeNodeDto, UpdatePieceDto } from '~
 definePageMeta({ layout: 'dashboard' })
 
 const { t } = useI18n()
-const localePath = useLocalePath()
+const { orgPath } = useOrgPath()
 const route = useRoute()
 
-const orgs = useOrganizationsStore()
 const pieces = usePiecesStore()
 const pieceTypes = usePieceTypesStore()
 const orgAttributes = useOrganizationPieceAttributesStore()
 const locations = useLocationsStore()
 const team = useTeamStore()
 
-if (orgs.list.length === 0) {
-  await orgs.fetchList()
-}
-if (!orgs.current) {
-  await navigateTo(localePath('/dashboard/crear-organizacion'))
-}
-
-const orgId = computed(() => orgs.current?.id ?? null)
-const role = computed(() => orgs.current?.currentUserRole ?? null)
+// `resolve-org-slug.global.ts` already guarantees the org exists in the store
+// and the user is a member.
+const { slug: orgSlug, id: orgId, org } = useCurrentOrg()
+const role = computed(() => org.value?.currentUserRole ?? null)
 const canWrite = computed(() => role.value === 'OWNER' || role.value === 'MANAGER' || role.value === 'USER')
 
 const pieceId = computed(() => Number(route.params.id))
@@ -51,6 +45,9 @@ function flattenTree(nodes: LocationTreeNodeDto[], parents: string[] = []): Loca
     const path = [...parents, n.name]
     out.push({
       id: n.id,
+      // organizationId is a legacy field — backend is now slug-scoped but the
+      // downstream type still expects a number. Fall back to the resolved id
+      // when available, 0 otherwise.
       organizationId: orgId.value ?? 0,
       name: path.join(' / '),
       description: n.description,
@@ -78,31 +75,31 @@ function extractErrorMessage(e: unknown, fallback: string): string {
 }
 
 async function loadAll() {
-  if (orgId.value == null) return
+  if (!orgSlug.value) return
   loading.value = true
   loadError.value = null
   try {
-    const detail = await pieces.fetchDetail(orgId.value, pieceId.value)
-    const orgIdValue = orgId.value
+    const slug = orgSlug.value
+    const detail = await pieces.fetchDetail(slug, pieceId.value)
     const typeFetches = detail.pieceTypes
       .filter(t => !pieceTypes.byId[t.id])
-      .map(t => pieceTypes.fetchOne(orgIdValue, t.id).catch(() => undefined))
+      .map(t => pieceTypes.fetchOne(slug, t.id).catch(() => undefined))
     // We always (re)fetch the full type list so the edit form has every type available, not
     // only the ones currently attached to the piece.
     if (pieceTypes.list.length === 0) {
-      typeFetches.push(pieceTypes.fetchAll(orgIdValue).then(() => undefined).catch(() => undefined))
+      typeFetches.push(pieceTypes.fetchAll(slug).then(() => undefined).catch(() => undefined))
     }
     await Promise.all([
       ...typeFetches,
       locations.tree.length > 0
         ? Promise.resolve()
-        : locations.fetchTree(orgIdValue).catch(() => undefined),
-      team.getMembers(orgIdValue)
+        : locations.fetchTree(slug).catch(() => undefined),
+      team.getMembers(slug)
         ? Promise.resolve()
-        : team.fetchMembers(orgIdValue).catch(() => undefined),
-      orgAttributes.loadedOrgIds.has(orgIdValue)
+        : team.fetchMembers(slug).catch(() => undefined),
+      orgAttributes.loadedOrgSlugs.has(slug)
         ? Promise.resolve()
-        : orgAttributes.fetchAll(orgIdValue).catch(() => undefined)
+        : orgAttributes.fetchAll(slug).catch(() => undefined)
     ])
   } catch (e) {
     if (e instanceof FetchError && e.response?.status === 404) {
@@ -115,7 +112,7 @@ async function loadAll() {
   }
 }
 
-watch([orgId, pieceId], () => { void loadAll() }, { immediate: true })
+watch([orgSlug, pieceId], () => { void loadAll() }, { immediate: true })
 
 useSeoMeta({
   title: () => piece.value?.name ?? t('dashboard.pieces.page_title'),
@@ -123,7 +120,7 @@ useSeoMeta({
 })
 
 async function onSave(payload: UpdatePieceDto) {
-  if (orgId.value == null || piece.value == null) return
+  if (!orgSlug.value || piece.value == null) return
   if (Object.keys(payload).length === 0) {
     saveError.value = null
     return
@@ -131,7 +128,7 @@ async function onSave(payload: UpdatePieceDto) {
   saving.value = true
   saveError.value = null
   try {
-    await pieces.update(orgId.value, piece.value.id, payload)
+    await pieces.update(orgSlug.value, piece.value.id, payload)
   } catch (e) {
     saveError.value = extractErrorMessage(e, t('dashboard.pieces.errors.save'))
   } finally {
@@ -140,10 +137,10 @@ async function onSave(payload: UpdatePieceDto) {
 }
 
 async function setCoverFromGallery(attachmentId: number) {
-  if (orgId.value == null || piece.value == null) return
+  if (!orgSlug.value || piece.value == null) return
   saveError.value = null
   try {
-    await pieces.update(orgId.value, piece.value.id, { coverAttachmentId: attachmentId })
+    await pieces.update(orgSlug.value, piece.value.id, { coverAttachmentId: attachmentId })
   } catch (e) {
     saveError.value = extractErrorMessage(e, t('dashboard.pieces.errors.save'))
   }
@@ -159,12 +156,12 @@ function cancelDelete() {
   confirmDelete.value = false
 }
 async function doDelete() {
-  if (orgId.value == null || piece.value == null) return
+  if (!orgSlug.value || piece.value == null) return
   deleting.value = true
   try {
-    await pieces.softDelete(orgId.value, piece.value.id)
+    await pieces.softDelete(orgSlug.value, piece.value.id)
     confirmDelete.value = false
-    void navigateTo(localePath('/dashboard/articulos'))
+    void navigateTo(orgPath('/articulos'))
   } catch (e) {
     saveError.value = extractErrorMessage(e, t('dashboard.pieces.errors.delete'))
     confirmDelete.value = false
@@ -173,26 +170,27 @@ async function doDelete() {
   }
 }
 
-const members = computed(() => (orgId.value != null && team.getMembers(orgId.value)) || [])
+const members = computed(() => (orgSlug.value && team.getMembers(orgSlug.value)) || [])
 const currentOrgAttributes = computed(() =>
-  orgId.value != null ? orgAttributes.listFor(orgId.value) : []
+  orgSlug.value ? orgAttributes.listFor(orgSlug.value) : []
 )
 
 // La blob URL de la portada vive en el store, así que cualquier listado o
 // vista anterior la habrá cacheado ya. Aquí sólo derivamos un computed y
-// disparamos la descarga si todavía no estaba.
+// disparamos la descarga si todavía no estaba. La key del cache usa el slug
+// porque el store ahora indexa por slug (no por id).
 const coverBlobUrl = computed<string | null>(() => {
-  const oid = orgId.value
+  const slug = orgSlug.value
   const p = piece.value
-  if (oid == null || !p || p.coverAttachmentId == null) return null
-  return pieces.attachmentBlobUrls[`${oid}:${p.id}:${p.coverAttachmentId}`] ?? null
+  if (!slug || !p || p.coverAttachmentId == null) return null
+  return pieces.attachmentBlobUrls[`${slug}:${p.id}:${p.coverAttachmentId}`] ?? null
 })
 
 watch(
-  [() => piece.value?.id, () => piece.value?.coverAttachmentId, orgId],
-  ([pid, cid, oid]) => {
-    if (pid == null || cid == null || oid == null) return
-    void pieces.fetchAttachmentBlobUrl(oid, pid, cid)
+  [() => piece.value?.id, () => piece.value?.coverAttachmentId, orgSlug],
+  ([pid, cid, slug]) => {
+    if (pid == null || cid == null || !slug) return
+    void pieces.fetchAttachmentBlobUrl(slug, pid, cid)
   },
   { immediate: true }
 )
@@ -202,7 +200,7 @@ const previewOpen = ref(false)
 
 <template>
   <div class="page flex flex-col gap-5 px-4 pb-10 pt-5 sm:px-5 sm:pt-6 lg:px-8">
-    <NuxtLink :to="localePath('/dashboard/articulos')" class="back-link">
+    <NuxtLink :to="orgPath('/articulos')" class="back-link">
       ← {{ t('dashboard.pieces.back_to_list') }}
     </NuxtLink>
 
@@ -215,7 +213,7 @@ const previewOpen = ref(false)
       {{ loadError }}
     </div>
 
-    <template v-else-if="piece && orgId != null">
+    <template v-else-if="piece && orgSlug">
       <header class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <div class="flex min-w-0 items-start gap-3">
           <button
@@ -297,7 +295,7 @@ const previewOpen = ref(false)
         />
         <DashboardPieceAttachmentsPanel
           v-else-if="tab === 'attachments'"
-          :org-id="orgId"
+          :org-slug="orgSlug"
           :piece-id="piece.id"
           :attachments="piece.attachments"
           :cover-attachment-id="piece.coverAttachmentId ?? null"
@@ -306,7 +304,7 @@ const previewOpen = ref(false)
         />
         <DashboardPieceHistoryPanel
           v-else
-          :org-id="orgId"
+          :org-slug="orgSlug"
           :piece-id="piece.id"
           :members="members"
         />

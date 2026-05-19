@@ -5,33 +5,28 @@ import type { CreatePieceDto, LocationResponseDto, LocationTreeNodeDto } from '~
 definePageMeta({ layout: 'dashboard' })
 
 const { t } = useI18n()
-const localePath = useLocalePath()
+const { orgPath } = useOrgPath()
 
-const orgs = useOrganizationsStore()
 const pieces = usePiecesStore()
 const pieceTypes = usePieceTypesStore()
 const orgAttributes = useOrganizationPieceAttributesStore()
 const locations = useLocationsStore()
 const team = useTeamStore()
 
-if (orgs.list.length === 0) {
-  await orgs.fetchList()
-}
-if (!orgs.current) {
-  await navigateTo(localePath('/dashboard/crear-organizacion'))
-}
+// `resolve-org-slug.global.ts` already guarantees the org exists in the store
+// and the user is a member.
+const { slug: orgSlug, id: orgId, org } = useCurrentOrg()
 
 useSeoMeta({
   title: () => t('dashboard.pieces.form.title_create'),
   robots: 'noindex, nofollow'
 })
 
-const orgId = computed(() => orgs.current?.id ?? null)
-const role = computed(() => orgs.current?.currentUserRole ?? null)
+const role = computed(() => org.value?.currentUserRole ?? null)
 const canWrite = computed(() => role.value === 'OWNER' || role.value === 'MANAGER' || role.value === 'USER')
 
 if (!canWrite.value) {
-  await navigateTo(localePath('/dashboard/articulos'))
+  await navigateTo(orgPath('/articulos'))
 }
 
 function flattenTree(nodes: LocationTreeNodeDto[], parents: string[] = []): LocationResponseDto[] {
@@ -40,6 +35,7 @@ function flattenTree(nodes: LocationTreeNodeDto[], parents: string[] = []): Loca
     const path = [...parents, n.name]
     out.push({
       id: n.id,
+      // organizationId is legacy in the flattened payload — backend is now slug-scoped.
       organizationId: orgId.value ?? 0,
       name: path.join(' / '),
       description: n.description,
@@ -50,7 +46,7 @@ function flattenTree(nodes: LocationTreeNodeDto[], parents: string[] = []): Loca
   return out
 }
 const flatLocations = computed(() => flattenTree(locations.tree))
-const members = computed(() => (orgId.value != null && team.getMembers(orgId.value)) || [])
+const members = computed(() => (orgSlug.value && team.getMembers(orgSlug.value)) || [])
 
 const loading = ref(true)
 const saving = ref(false)
@@ -65,22 +61,23 @@ function extractErrorMessage(e: unknown, fallback: string): string {
 }
 
 async function loadDeps() {
-  if (orgId.value == null) return
+  if (!orgSlug.value) return
+  const slug = orgSlug.value
   loading.value = true
   try {
     await Promise.all([
       pieceTypes.list.length > 0
         ? Promise.resolve()
-        : pieceTypes.fetchAll(orgId.value).catch(() => undefined),
+        : pieceTypes.fetchAll(slug).catch(() => undefined),
       locations.tree.length > 0
         ? Promise.resolve()
-        : locations.fetchTree(orgId.value).catch(() => undefined),
-      team.getMembers(orgId.value)
+        : locations.fetchTree(slug).catch(() => undefined),
+      team.getMembers(slug)
         ? Promise.resolve()
-        : team.fetchMembers(orgId.value).catch(() => undefined),
-      orgAttributes.loadedOrgIds.has(orgId.value)
+        : team.fetchMembers(slug).catch(() => undefined),
+      orgAttributes.loadedOrgSlugs.has(slug)
         ? Promise.resolve()
-        : orgAttributes.fetchAll(orgId.value).catch(() => undefined)
+        : orgAttributes.fetchAll(slug).catch(() => undefined)
     ])
   } finally {
     loading.value = false
@@ -90,21 +87,22 @@ async function loadDeps() {
 await loadDeps()
 
 async function onSubmit(payload: CreatePieceDto, coverFile: File | null) {
-  if (orgId.value == null) return
+  if (!orgSlug.value) return
+  const slug = orgSlug.value
   saving.value = true
   errorMsg.value = null
   try {
-    const created = await pieces.create(orgId.value, payload)
+    const created = await pieces.create(slug, payload)
     if (coverFile) {
       try {
-        await pieces.uploadAttachment(orgId.value, created.id, coverFile, 'IMAGE')
+        await pieces.uploadAttachment(slug, created.id, coverFile, 'IMAGE')
       } catch {
         // Non-fatal: the piece is created. Surface a softer warning and let the user retry from
         // the detail page. We still navigate so they can manage attachments there.
         errorMsg.value = t('dashboard.pieces.errors.cover_upload')
       }
     }
-    void navigateTo(localePath(`/dashboard/articulos/${created.id}`))
+    void navigateTo(orgPath(`/articulos/${created.id}`))
   } catch (e) {
     errorMsg.value = extractErrorMessage(e, t('dashboard.pieces.errors.save'))
     saving.value = false
@@ -112,13 +110,13 @@ async function onSubmit(payload: CreatePieceDto, coverFile: File | null) {
 }
 
 function onCancel() {
-  void navigateTo(localePath('/dashboard/articulos'))
+  void navigateTo(orgPath('/articulos'))
 }
 </script>
 
 <template>
   <div class="page flex flex-col gap-5 px-4 pb-10 pt-5 sm:px-5 sm:pt-7 lg:px-8">
-    <NuxtLink :to="localePath('/dashboard/articulos')" class="back-link">
+    <NuxtLink :to="orgPath('/articulos')" class="back-link">
       ← {{ t('dashboard.pieces.back_to_list') }}
     </NuxtLink>
 
@@ -137,7 +135,7 @@ function onCancel() {
         :piece-types="pieceTypes.list"
         :locations="flatLocations"
         :members="members"
-        :org-attributes="orgId !== null ? orgAttributes.listFor(orgId) : []"
+        :org-attributes="orgSlug ? orgAttributes.listFor(orgSlug) : []"
         :loading="saving"
         :error-msg="errorMsg"
         @submit="onSubmit"
