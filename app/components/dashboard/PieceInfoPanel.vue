@@ -4,11 +4,14 @@ import type {
   LocationResponseDto,
   MemberResponseDto,
   OrganizationPieceAttributeResponseDto,
+  OrganizationRole,
   PieceResponseDto,
   PieceTypeAttributeResponseDto,
   PieceTypeResponseDto,
   UpdatePieceDto
 } from '~/types/api'
+
+const ownerEligibleRoles: OrganizationRole[] = ['OWNER', 'MANAGER', 'USER']
 
 const props = withDefaults(defineProps<{
   piece: PieceResponseDto
@@ -248,6 +251,11 @@ function renderValue(
     } catch { /* ignore */ }
     return v
   }
+  if (type === 'MEMBER') {
+    const n = Number(v)
+    if (!Number.isFinite(n)) return v
+    return ownerLabel(n)
+  }
   return v
 }
 </script>
@@ -395,12 +403,14 @@ function renderValue(
           <label for="edit-owner" class="form-label">
             {{ t('dashboard.pieces.form.field_owner') }}
           </label>
-          <select id="edit-owner" v-model.number="editOwnerUserId" class="form-input" :disabled="saving">
-            <option :value="null">{{ t('dashboard.pieces.form.no_owner') }}</option>
-            <option v-for="m in members" :key="m.userId" :value="m.userId">
-              {{ m.name }} {{ m.lastName }}
-            </option>
-          </select>
+          <DashboardMemberSelect
+            input-id="edit-owner"
+            v-model="editOwnerUserId"
+            :members="members"
+            :eligible-roles="ownerEligibleRoles"
+            :placeholder="t('dashboard.pieces.form.no_owner')"
+            :disabled="saving"
+          />
         </div>
       </div>
     </div>
@@ -427,6 +437,7 @@ function renderValue(
           :key="attr.id"
           :attribute="(attr as unknown as PieceTypeAttributeResponseDto)"
           :model-value="editOrgAttributes[attr.id] ?? null"
+          :members="members"
           :disabled="saving"
           @update:model-value="(v) => setOrgAttrValue(attr.id, v)"
         />
@@ -463,6 +474,7 @@ function renderValue(
               :key="attr.id"
               :attribute="attr"
               :model-value="editAttributes[attr.id] ?? null"
+              :members="members"
               :disabled="saving"
               @update:model-value="(v) => setAttrValue(attr.id, v)"
             />

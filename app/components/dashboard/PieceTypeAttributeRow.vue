@@ -69,6 +69,7 @@ const previewLine = computed(() => preview(props.attr.validators ?? {}))
 <template>
   <div class="row group flex items-center gap-3 rounded-[10px] border border-line bg-bg-card px-3.5 py-2.5">
     <span class="type-pill" :data-type="attr.type">
+      <DashboardAttributeTypeIcon :type="attr.type" :size="12" class="opacity-80" />
       {{ typeLabel }}
     </span>
 
@@ -117,6 +118,7 @@ const previewLine = computed(() => preview(props.attr.validators ?? {}))
 .type-pill {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   height: 22px;
   padding: 0 8px;
   border-radius: 6px;
@@ -126,6 +128,10 @@ const previewLine = computed(() => preview(props.attr.validators ?? {}))
   background: var(--c-bg-soft);
   color: var(--c-ink-soft);
   white-space: nowrap;
+}
+.type-pill[data-type="MEMBER"] {
+  background: color-mix(in oklab, var(--c-accent, var(--c-ink)) 10%, transparent);
+  color: var(--c-ink);
 }
 .type-pill[data-type="INTEGER"], .type-pill[data-type="DECIMAL"], .type-pill[data-type="PRICE"] {
   color: var(--c-ink);

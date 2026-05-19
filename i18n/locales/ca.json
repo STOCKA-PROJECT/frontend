@@ -480,7 +480,9 @@
           "options_duplicate": "Aquesta opció ja existeix.",
           "options_empty": "L'opció no pot estar buida.",
           "minItems": "Seleccions mínimes",
-          "maxItems": "Seleccions màximes"
+          "maxItems": "Seleccions màximes",
+          "eligibleRoles": "Rols permesos",
+          "eligibleRoles_help": "Només els membres amb un d'aquests rols apareixeran al desplegable."
         },
         "create": "Crear atribut",
         "save": "Desar canvis"
@@ -497,7 +499,8 @@
         "SELECT": "Selecció",
         "MULTI_SELECT": "Selecció múltiple",
         "URL": "URL",
-        "EMAIL": "Correu electrònic"
+        "EMAIL": "Correu electrònic",
+        "MEMBER": "Membre"
       },
       "delete": {
         "confirm_title": "Eliminar tipus",
@@ -517,7 +520,8 @@
         "name_required": "El nom és obligatori.",
         "display_name_required": "L'etiqueta visible és obligatòria.",
         "options_required": "Afegeix almenys una opció.",
-        "type_required": "Selecciona un tipus de dada."
+        "type_required": "Selecciona un tipus de dada.",
+        "eligibleRoles_required": "Selecciona almenys un rol elegible."
       }
     },
     "account": {
@@ -683,6 +687,12 @@
         "leave": "No s'ha pogut abandonar l'organització.",
         "generic": "Alguna cosa ha fallat. Torna-ho a provar."
       }
+    },
+    "members": {
+      "no_selection": "Sense selecció",
+      "search_placeholder": "Cerca membre…",
+      "clear_selection": "Treure selecció",
+      "no_members_match": "Cap membre coincideix."
     },
     "pagination": {
       "size": "Mida",

@@ -302,6 +302,7 @@ export type AttributeType =
   | 'MULTI_SELECT'
   | 'URL'
   | 'EMAIL'
+  | 'MEMBER'
 
 export interface AttributeValidatorsDto {
   minLength?: number
@@ -318,6 +319,7 @@ export interface AttributeValidatorsDto {
   options?: string[]
   minItems?: number
   maxItems?: number
+  eligibleRoles?: OrganizationRole[]
 }
 
 export interface PieceTypeAttributeResponseDto {

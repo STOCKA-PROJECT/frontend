@@ -5,9 +5,12 @@ import type {
   LocationResponseDto,
   MemberResponseDto,
   OrganizationPieceAttributeResponseDto,
+  OrganizationRole,
   PieceTypeAttributeResponseDto,
   PieceTypeResponseDto
 } from '~/types/api'
+
+const ownerEligibleRoles: OrganizationRole[] = ['OWNER', 'MANAGER', 'USER']
 
 const props = withDefaults(defineProps<{
   pieceTypes: PieceTypeResponseDto[]
@@ -317,17 +320,14 @@ const selectedTypesCount = computed(() => selectedTypeIds.value.size)
         <label for="piece-owner" class="form-label">
           {{ t('dashboard.pieces.form.field_owner') }}
         </label>
-        <select
-          id="piece-owner"
-          v-model.number="ownerUserId"
-          class="form-input"
+        <DashboardMemberSelect
+          input-id="piece-owner"
+          v-model="ownerUserId"
+          :members="members"
+          :eligible-roles="ownerEligibleRoles"
+          :placeholder="t('dashboard.pieces.form.no_owner')"
           :disabled="loading"
-        >
-          <option :value="null">{{ t('dashboard.pieces.form.no_owner') }}</option>
-          <option v-for="m in members" :key="m.userId" :value="m.userId">
-            {{ m.name }} {{ m.lastName }}
-          </option>
-        </select>
+        />
       </div>
     </div>
 
@@ -374,6 +374,7 @@ const selectedTypesCount = computed(() => selectedTypeIds.value.size)
           :key="attr.id"
           :attribute="(attr as unknown as PieceTypeAttributeResponseDto)"
           :model-value="orgAttributeValues[attr.id] ?? null"
+          :members="members"
           :disabled="loading"
           @update:model-value="(v) => setOrgAttrValue(attr.id, v)"
         />
@@ -392,6 +393,7 @@ const selectedTypesCount = computed(() => selectedTypeIds.value.size)
             :key="attr.id"
             :attribute="attr"
             :model-value="attributeValues[attr.id] ?? null"
+            :members="members"
             :disabled="loading"
             @update:model-value="(v) => setAttrValue(attr.id, v)"
           />
