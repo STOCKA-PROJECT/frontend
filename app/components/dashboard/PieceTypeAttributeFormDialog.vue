@@ -116,13 +116,13 @@ watch(displayName, (next) => {
   name.value = slugify(next)
 })
 
-watch(type, (next, prev) => {
-  if (next !== prev) {
-    validators.value = next === 'MEMBER' ? { eligibleRoles: [...ORG_ROLES] } : {}
-    optionError.value = null
-    newOption.value = ''
-  }
-})
+function onTypeChange(next: AttributeType) {
+  if (next === type.value) return
+  type.value = next
+  validators.value = next === 'MEMBER' ? { eligibleRoles: [...ORG_ROLES] } : {}
+  optionError.value = null
+  newOption.value = ''
+}
 
 const visibleValidators = computed(() => VALIDATOR_FIELDS[type.value])
 
@@ -325,8 +325,9 @@ function isVisible(key: ValidatorKey) {
                 {{ t('dashboard.pieceTypes.attribute_form.field_type') }}
               </label>
               <DashboardAttributeTypeSelect
-                v-model="type"
+                :model-value="type"
                 :options="ATTRIBUTE_TYPES"
+                @update:model-value="onTypeChange"
               />
               <p v-if="mode === 'edit'" class="field-help">
                 {{ t('dashboard.pieceTypes.attribute_form.field_type_edit_help') }}
