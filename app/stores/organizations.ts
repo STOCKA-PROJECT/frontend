@@ -70,6 +70,15 @@ export const useOrganizationsStore = defineStore('organizations', () => {
     return updated
   }
 
+  async function remove(orgSlug: string) {
+    const api = useApi()
+    await api(`/organizations/${orgSlug}`, { method: 'DELETE' })
+    list.value = list.value.filter(o => o.slug !== orgSlug)
+    if (lastSlugCookie.value === orgSlug) {
+      lastSlugCookie.value = null
+    }
+  }
+
   async function checkSlug(slug: string, signal?: AbortSignal): Promise<AvailabilityResponse> {
     const api = useApi()
     return await api<AvailabilityResponse>('/organizations/check-slug', {
@@ -110,6 +119,7 @@ export const useOrganizationsStore = defineStore('organizations', () => {
     fetchList,
     create,
     update,
+    remove,
     checkSlug,
     lookupBySlug,
     reset

@@ -619,6 +619,19 @@
           "generic": "No se ha podido guardar el atributo.",
           "delete": "No se ha podido eliminar el atributo."
         }
+      },
+      "delete": {
+        "section_title": "Eliminar organización",
+        "section_subtitle": "Esta acción borra la organización y deja de mostrarla a sus miembros. Esta acción no se puede deshacer.",
+        "button": "Eliminar organización",
+        "title": "Eliminar organización",
+        "message": "Vas a eliminar la organización {name}. Todos los miembros perderán el acceso y no podrás recuperarla.",
+        "confirm_hint": "Para confirmar, escribe el identificador {slug} en el campo siguiente.",
+        "input_label": "Identificador de la organización",
+        "confirm": "Eliminar definitivamente",
+        "errors": {
+          "generic": "No se ha podido eliminar la organización. Inténtalo de nuevo."
+        }
       }
     },
     "create_org": {

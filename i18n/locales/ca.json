@@ -619,6 +619,19 @@
           "generic": "No s'ha pogut desar l'atribut.",
           "delete": "No s'ha pogut eliminar l'atribut."
         }
+      },
+      "delete": {
+        "section_title": "Eliminar organització",
+        "section_subtitle": "Aquesta acció esborra l'organització i deixa de mostrar-la als seus membres. No es pot desfer.",
+        "button": "Eliminar organització",
+        "title": "Eliminar organització",
+        "message": "Estàs a punt d'eliminar l'organització {name}. Tots els membres perdran l'accés i no podràs recuperar-la.",
+        "confirm_hint": "Per confirmar-ho, escriu l'identificador {slug} al camp següent.",
+        "input_label": "Identificador de l'organització",
+        "confirm": "Eliminar definitivament",
+        "errors": {
+          "generic": "No s'ha pogut eliminar l'organització. Torna-ho a provar."
+        }
       }
     },
     "create_org": {

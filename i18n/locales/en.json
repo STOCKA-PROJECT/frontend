@@ -619,6 +619,19 @@
           "generic": "Couldn't save the attribute.",
           "delete": "Couldn't delete the attribute."
         }
+      },
+      "delete": {
+        "section_title": "Delete organization",
+        "section_subtitle": "This action removes the organization and hides it from its members. It cannot be undone.",
+        "button": "Delete organization",
+        "title": "Delete organization",
+        "message": "You're about to delete the organization {name}. All members will lose access and you won't be able to recover it.",
+        "confirm_hint": "To confirm, type the identifier {slug} in the field below.",
+        "input_label": "Organization identifier",
+        "confirm": "Permanently delete",
+        "errors": {
+          "generic": "Couldn't delete the organization. Please try again."
+        }
       }
     },
     "create_org": {

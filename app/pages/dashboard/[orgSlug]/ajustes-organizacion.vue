@@ -5,6 +5,7 @@ import type { AvailabilityResponse, UpdateOrganizationDto } from '~/types/api'
 definePageMeta({ layout: 'dashboard' })
 
 const { t } = useI18n()
+const localePath = useLocalePath()
 const { orgPath } = useOrgPath()
 
 const orgs = useOrganizationsStore()
@@ -95,6 +96,39 @@ function onSlugInput(value: string) {
   slug.value = slugifyOrgName(value)
 }
 
+const deleteDialogOpen = ref(false)
+const deleting = ref(false)
+const deleteError = ref<string | null>(null)
+
+function openDeleteDialog() {
+  deleteError.value = null
+  deleteDialogOpen.value = true
+}
+
+function closeDeleteDialog() {
+  if (deleting.value) return
+  deleteDialogOpen.value = false
+}
+
+async function confirmDelete() {
+  if (!orgSlug.value || deleting.value) return
+  deleting.value = true
+  deleteError.value = null
+  try {
+    await orgs.remove(orgSlug.value)
+    deleteDialogOpen.value = false
+    await navigateTo(localePath('/dashboard'), { replace: true })
+  } catch (e) {
+    if (e instanceof FetchError && e.response?.status === 403) {
+      deleteError.value = t('dashboard.org_settings.errors.forbidden')
+    } else {
+      deleteError.value = t('dashboard.org_settings.delete.errors.generic')
+    }
+  } finally {
+    deleting.value = false
+  }
+}
+
 async function submit() {
   if (!canSubmit.value || !orgSlug.value) return
   loading.value = true
@@ -146,11 +180,11 @@ async function submit() {
     </div>
 
     <div v-if="!isOwner" role="status"
-      class="max-w-[520px] rounded-lg border border-line bg-bg-soft px-4 py-3 text-[13.5px] text-ink-soft">
+      class="rounded-lg border border-line bg-bg-soft px-4 py-3 text-[13.5px] text-ink-soft">
       {{ t('dashboard.org_settings.not_owner') }}
     </div>
 
-    <div class="max-w-[520px] rounded-[14px] border border-line bg-bg-card p-6 max-md:p-5">
+    <div class="rounded-[14px] border border-line bg-bg-card p-6 max-md:p-5">
       <form class="flex flex-col gap-3.5" novalidate @submit.prevent="submit">
         <div v-if="errorMsg" role="alert"
           class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger">
@@ -162,33 +196,83 @@ async function submit() {
           {{ t('dashboard.org_settings.saved') }}
         </div>
 
-        <AuthTextField id="org-name" v-model="name"
-          :label="t('dashboard.create_org.name')"
-          :placeholder="t('dashboard.create_org.name_placeholder')"
-          autocomplete="organization"
-          :disabled="!isOwner"
-          required />
+        <div class="grid grid-cols-1 gap-3.5 md:grid-cols-2">
+          <AuthTextField id="org-name" v-model="name"
+            :label="t('dashboard.create_org.name')"
+            :placeholder="t('dashboard.create_org.name_placeholder')"
+            autocomplete="organization"
+            :disabled="!isOwner"
+            required />
 
-        <AuthTextField id="org-slug" :model-value="slug"
-          :label="t('dashboard.create_org.slug')"
-          :placeholder="t('dashboard.create_org.slug_placeholder')"
-          :spellcheck="false"
-          prefix="stocka.es/"
-          :disabled="!isOwner"
-          :hint="slugHint"
-          :hint-tone="slugHintTone"
-          @update:model-value="onSlugInput" />
+          <AuthTextField id="org-slug" :model-value="slug"
+            :label="t('dashboard.create_org.slug')"
+            :placeholder="t('dashboard.create_org.slug_placeholder')"
+            :spellcheck="false"
+            prefix="stocka.es/"
+            :disabled="!isOwner"
+            :hint="slugHint"
+            :hint-tone="slugHintTone"
+            @update:model-value="onSlugInput" />
+        </div>
 
-        <AuthSubmitButton :loading="loading" :disabled="!canSubmit">
-          {{ t('dashboard.org_settings.save') }}
-        </AuthSubmitButton>
+        <div class="mt-1 flex justify-end">
+          <AuthSubmitButton class="!mt-0 w-full sm:w-auto sm:min-w-[180px]"
+            :loading="loading" :disabled="!canSubmit">
+            {{ t('dashboard.org_settings.save') }}
+          </AuthSubmitButton>
+        </div>
       </form>
     </div>
 
     <DashboardOrgPieceAttributesPanel
       v-if="orgSlug"
-      class="max-w-[760px]"
       :org-slug="orgSlug"
       :can-write="isOwner" />
+
+    <section v-if="isOwner"
+      class="rounded-[14px] border border-danger/30 bg-danger-soft/40 p-6 max-md:p-5">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="min-w-0">
+          <h2 class="text-[16px] font-semibold leading-tight tracking-[-0.015em] text-danger">
+            {{ t('dashboard.org_settings.delete.section_title') }}
+          </h2>
+          <p class="mt-1 text-[13px] text-ink-soft">
+            {{ t('dashboard.org_settings.delete.section_subtitle') }}
+          </p>
+        </div>
+        <button type="button" class="danger-btn shrink-0"
+          @click="openDeleteDialog">
+          {{ t('dashboard.org_settings.delete.button') }}
+        </button>
+      </div>
+    </section>
+
+    <DashboardDeleteOrgDialog
+      v-if="org"
+      :open="deleteDialogOpen"
+      :org-name="org.name"
+      :org-slug="org.slug"
+      :loading="deleting"
+      :error-msg="deleteError"
+      @confirm="confirmDelete"
+      @close="closeDeleteDialog" />
   </div>
 </template>
+
+<style scoped>
+.danger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 500;
+  border: 1px solid var(--c-danger);
+  background: var(--c-danger);
+  color: #fff;
+  transition: background .15s, border-color .15s;
+}
+.danger-btn:hover { background: color-mix(in oklab, var(--c-danger) 92%, transparent); }
+</style>

@@ -139,7 +139,7 @@ function cancelDelete() {
       </p>
     </div>
 
-    <ul v-else class="flex flex-col gap-1.5">
+    <ul v-else class="grid grid-cols-1 gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
       <li v-for="attr in items" :key="attr.id">
         <DashboardPieceTypeAttributeRow
           :attr="(attr as unknown as PieceTypeAttributeResponseDto)"
