@@ -6,11 +6,14 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const router = useRouter()
 const orgs = useOrganizationsStore()
+const { orgPath } = useOrgPath()
+const { slug: currentSlug } = useCurrentOrg()
 
 const open = shallowRef(false)
 const rootRef = ref<HTMLElement | null>(null)
 
 const hasOrgs = computed(() => orgs.list.length >= 1)
+const currentOrg = computed(() => (currentSlug.value ? orgs.findBySlug(currentSlug.value) ?? null : null))
 
 const orgInitials = (name: string) => name
   .split(/\s+/)
@@ -23,11 +26,10 @@ function roleLabel(role: OrganizationRole): string {
   return t(`dashboard.org.roles.${role}`)
 }
 
-function pickOrg(id: number) {
+function pickOrg(targetSlug: string) {
   open.value = false
-  if (orgs.currentId === id) return
-  orgs.setCurrent(id)
-  router.push(localePath('/dashboard'))
+  if (currentSlug.value === targetSlug) return
+  router.push(orgPath('', targetSlug))
 }
 
 function closeMenu() {
@@ -56,17 +58,17 @@ onMounted(() => {
       @click="hasOrgs && (open = !open)"
     >
       <div
-        v-if="orgs.current"
+        v-if="currentOrg"
         class="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-lg bg-accent text-[13px] font-semibold tracking-[-0.01em] text-white"
       >
-        {{ orgInitials(orgs.current.name) }}
+        {{ orgInitials(currentOrg.name) }}
       </div>
       <div class="flex min-w-0 flex-1 flex-col">
         <span class="truncate text-[13.5px] font-semibold tracking-[-0.005em] text-ink">
-          {{ orgs.current?.name ?? t('dashboard.org.no_org') }}
+          {{ currentOrg?.name ?? t('dashboard.org.no_org') }}
         </span>
         <span class="truncate text-[11.5px] text-ink-muted">
-          {{ orgs.current ? roleLabel(orgs.current.currentUserRole) : '—' }}
+          {{ currentOrg ? roleLabel(currentOrg.currentUserRole) : '—' }}
         </span>
       </div>
       <svg v-if="hasOrgs" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 text-ink-muted" aria-hidden="true">
@@ -85,17 +87,17 @@ onMounted(() => {
         :key="o.id"
         type="button"
         role="menuitemradio"
-        :aria-checked="o.id === orgs.currentId"
+        :aria-checked="o.slug === currentSlug"
         class="flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left text-[13.5px] transition-colors hover:bg-bg-soft"
-        :class="{ 'bg-bg-soft': o.id === orgs.currentId }"
-        @click="pickOrg(o.id)"
+        :class="{ 'bg-bg-soft': o.slug === currentSlug }"
+        @click="pickOrg(o.slug)"
       >
         <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-accent text-[11px] font-semibold text-white">
           {{ orgInitials(o.name) }}
         </div>
         <span class="flex-1 truncate font-medium text-ink">{{ o.name }}</span>
         <svg
-          v-if="o.id === orgs.currentId"
+          v-if="o.slug === currentSlug"
           width="14"
           height="14"
           viewBox="0 0 24 24"

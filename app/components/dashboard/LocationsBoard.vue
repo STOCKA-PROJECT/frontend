@@ -2,7 +2,7 @@
 import type { LocationTreeNodeDto, OrganizationRole } from '~/types/api'
 
 const props = defineProps<{
-  orgId: number
+  orgSlug: string
   role: OrganizationRole | null
 }>()
 
@@ -58,7 +58,7 @@ function findInTree(nodes: LocationTreeNodeDto[], id: number): LocationTreeNodeD
 
 async function loadTree() {
   try {
-    await locations.fetchTree(props.orgId)
+    await locations.fetchTree(props.orgSlug)
   } catch (e) {
     notifyError(e)
   }
@@ -67,9 +67,9 @@ async function loadTree() {
 async function loadFocusedPieces() {
   try {
     if (focus.value.kind === 'location') {
-      await pieces.fetchByLocation(props.orgId, focus.value.id)
+      await pieces.fetchByLocation(props.orgSlug, focus.value.id)
     } else if (focus.value.kind === 'unassigned') {
-      await pieces.fetchByLocation(props.orgId, null)
+      await pieces.fetchByLocation(props.orgSlug, null)
     }
   } catch (e) {
     notifyError(e)
@@ -78,13 +78,13 @@ async function loadFocusedPieces() {
 
 async function loadDetail(id: number) {
   try {
-    await locations.fetchOne(props.orgId, id)
+    await locations.fetchOne(props.orgSlug, id)
   } catch (e) {
     notifyError(e)
   }
 }
 
-watch(() => props.orgId, async () => {
+watch(() => props.orgSlug, async () => {
   focus.value = { kind: 'none' }
   pieces.invalidateAll()
   await loadTree()
@@ -112,9 +112,9 @@ async function handleDropLocation(payload: { sourceId: number; targetId: number 
   if (payload.sourceId === payload.targetId) return
   try {
     if (payload.targetId == null) {
-      await locations.update(props.orgId, payload.sourceId, { moveToRoot: true })
+      await locations.update(props.orgSlug, payload.sourceId, { moveToRoot: true })
     } else {
-      await locations.update(props.orgId, payload.sourceId, { parentId: payload.targetId })
+      await locations.update(props.orgSlug, payload.sourceId, { parentId: payload.targetId })
     }
   } catch (e) {
     notifyError(e)
@@ -126,9 +126,9 @@ async function handleDropPiece(payload: { pieceId: number; targetLocationId: num
   const sourceLocationId = locateBucketForPiece(payload.pieceId)
   try {
     if (payload.targetLocationId == null) {
-      await pieces.move(props.orgId, payload.pieceId, { clearLocation: true })
+      await pieces.move(props.orgSlug, payload.pieceId, { clearLocation: true })
     } else {
-      await pieces.move(props.orgId, payload.pieceId, { locationId: payload.targetLocationId })
+      await pieces.move(props.orgSlug, payload.pieceId, { locationId: payload.targetLocationId })
     }
     pieces.invalidate(sourceLocationId)
     pieces.invalidate(payload.targetLocationId)
@@ -214,13 +214,13 @@ async function submitFormDialog(payload: { name: string; description?: string })
   formDialog.value.error = null
   try {
     if (formDialog.value.mode === 'create-root') {
-      const created = await locations.create(props.orgId, payload)
+      const created = await locations.create(props.orgSlug, payload)
       focus.value = { kind: 'location', id: created.id }
     } else if (formDialog.value.mode === 'create-child' && formDialog.value.parentId) {
-      const created = await locations.create(props.orgId, { ...payload, parentId: formDialog.value.parentId })
+      const created = await locations.create(props.orgSlug, { ...payload, parentId: formDialog.value.parentId })
       focus.value = { kind: 'location', id: created.id }
     } else if (formDialog.value.mode === 'rename' && formDialog.value.targetId) {
-      await locations.update(props.orgId, formDialog.value.targetId, payload)
+      await locations.update(props.orgSlug, formDialog.value.targetId, payload)
     }
     closeFormDialog()
   } catch (e) {
@@ -260,7 +260,7 @@ async function confirmDelete() {
   if (!confirmDialog.value.targetId) return
   confirmDialog.value.loading = true
   try {
-    await locations.softDelete(props.orgId, confirmDialog.value.targetId)
+    await locations.softDelete(props.orgSlug, confirmDialog.value.targetId)
     if (focus.value.kind === 'location' && focus.value.id === confirmDialog.value.targetId) {
       focus.value = { kind: 'none' }
     }

@@ -3,6 +3,7 @@ import type {
   AttributeType,
   AttributeValidatorsDto,
   CreatePieceTypeAttributeDto,
+  OrganizationRole,
   PieceTypeAttributeResponseDto,
   UpdatePieceTypeAttributeDto
 } from '~/types/api'
@@ -29,8 +30,10 @@ const { t } = useI18n()
 
 const ATTRIBUTE_TYPES: AttributeType[] = [
   'TEXT', 'LONGTEXT', 'INTEGER', 'DECIMAL', 'PRICE',
-  'DATE', 'DATETIME', 'BOOLEAN', 'SELECT', 'MULTI_SELECT', 'URL', 'EMAIL'
+  'DATE', 'DATETIME', 'BOOLEAN', 'SELECT', 'MULTI_SELECT', 'URL', 'EMAIL', 'MEMBER'
 ]
+
+const ORG_ROLES: OrganizationRole[] = ['OWNER', 'MANAGER', 'USER', 'SPECTATOR']
 
 type ValidatorKey = keyof AttributeValidatorsDto
 
@@ -46,7 +49,8 @@ const VALIDATOR_FIELDS: Record<AttributeType, ValidatorKey[]> = {
   SELECT:      ['options'],
   MULTI_SELECT: ['options', 'minItems', 'maxItems'],
   URL:         ['maxLength'],
-  EMAIL:       ['maxLength']
+  EMAIL:       ['maxLength'],
+  MEMBER:      ['eligibleRoles']
 }
 
 const NAME_PATTERN = /^[a-z][a-z0-9_]{0,79}$/
@@ -112,13 +116,13 @@ watch(displayName, (next) => {
   name.value = slugify(next)
 })
 
-watch(type, (next, prev) => {
-  if (next !== prev) {
-    validators.value = {}
-    optionError.value = null
-    newOption.value = ''
-  }
-})
+function onTypeChange(next: AttributeType) {
+  if (next === type.value) return
+  type.value = next
+  validators.value = next === 'MEMBER' ? { eligibleRoles: [...ORG_ROLES] } : {}
+  optionError.value = null
+  newOption.value = ''
+}
 
 const visibleValidators = computed(() => VALIDATOR_FIELDS[type.value])
 
@@ -138,13 +142,23 @@ const optionsList = computed<string[]>(() => validators.value.options ?? [])
 
 const optionsRequired = computed(() => type.value === 'SELECT' || type.value === 'MULTI_SELECT')
 
+const eligibleRolesList = computed<OrganizationRole[]>(() => validators.value.eligibleRoles ?? [])
+
 const canSubmit = computed(() => {
   if (props.loading) return false
   if (!displayName.value.trim()) return false
   if (!NAME_PATTERN.test(name.value)) return false
   if (optionsRequired.value && optionsList.value.length === 0) return false
+  if (type.value === 'MEMBER' && eligibleRolesList.value.length === 0) return false
   return true
 })
+
+function toggleEligibleRole(role: OrganizationRole, checked: boolean) {
+  const current = new Set(eligibleRolesList.value)
+  if (checked) current.add(role)
+  else current.delete(role)
+  setValidator('eligibleRoles', [...current] as never)
+}
 
 function onBackdropClick(e: MouseEvent) {
   if (e.target === e.currentTarget) emit('close')
@@ -310,12 +324,11 @@ function isVisible(key: ValidatorKey) {
               <label for="attr-type" class="field-label">
                 {{ t('dashboard.pieceTypes.attribute_form.field_type') }}
               </label>
-              <select id="attr-type" v-model="type"
-                class="field-input">
-                <option v-for="opt in ATTRIBUTE_TYPES" :key="opt" :value="opt">
-                  {{ t(`dashboard.pieceTypes.types.${opt}`) }}
-                </option>
-              </select>
+              <DashboardAttributeTypeSelect
+                :model-value="type"
+                :options="ATTRIBUTE_TYPES"
+                @update:model-value="onTypeChange"
+              />
               <p v-if="mode === 'edit'" class="field-help">
                 {{ t('dashboard.pieceTypes.attribute_form.field_type_edit_help') }}
               </p>
@@ -438,6 +451,31 @@ function isVisible(key: ValidatorKey) {
                 <label class="field-label">{{ t('dashboard.pieceTypes.attribute_form.validators.maxItems') }}</label>
                 <input type="number" min="0" :value="validators.maxItems ?? ''" class="field-input"
                   @input="onNumberInput('maxItems', ($event.target as HTMLInputElement).value)">
+              </div>
+
+              <div v-if="isVisible('eligibleRoles')" class="flex flex-col gap-2">
+                <label class="field-label">{{ t('dashboard.pieceTypes.attribute_form.validators.eligibleRoles') }}</label>
+                <div class="flex flex-wrap gap-2">
+                  <label
+                    v-for="role in ORG_ROLES"
+                    :key="role"
+                    class="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-bg-card px-3 py-1.5 text-[13px]"
+                  >
+                    <input
+                      type="checkbox"
+                      class="h-4 w-4 accent-[var(--c-ink)]"
+                      :checked="eligibleRolesList.includes(role)"
+                      @change="toggleEligibleRole(role, ($event.target as HTMLInputElement).checked)"
+                    >
+                    <DashboardRoleChip :role="role" />
+                  </label>
+                </div>
+                <p v-if="eligibleRolesList.length === 0" class="field-error">
+                  {{ t('dashboard.pieceTypes.errors.eligibleRoles_required') }}
+                </p>
+                <p v-else class="field-help">
+                  {{ t('dashboard.pieceTypes.attribute_form.validators.eligibleRoles_help') }}
+                </p>
               </div>
             </div>
           </div>

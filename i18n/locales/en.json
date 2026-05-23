@@ -480,7 +480,9 @@
           "options_duplicate": "That option already exists.",
           "options_empty": "The option cannot be empty.",
           "minItems": "Minimum selections",
-          "maxItems": "Maximum selections"
+          "maxItems": "Maximum selections",
+          "eligibleRoles": "Allowed roles",
+          "eligibleRoles_help": "Only members with one of these roles will appear in the dropdown."
         },
         "create": "Create attribute",
         "save": "Save changes"
@@ -497,7 +499,8 @@
         "SELECT": "Select",
         "MULTI_SELECT": "Multi-select",
         "URL": "URL",
-        "EMAIL": "Email"
+        "EMAIL": "Email",
+        "MEMBER": "Member"
       },
       "delete": {
         "confirm_title": "Delete type",
@@ -517,7 +520,8 @@
         "name_required": "Name is required.",
         "display_name_required": "Display label is required.",
         "options_required": "Add at least one option.",
-        "type_required": "Pick a data type."
+        "type_required": "Pick a data type.",
+        "eligibleRoles_required": "Pick at least one eligible role."
       }
     },
     "account": {
@@ -615,6 +619,19 @@
           "generic": "Couldn't save the attribute.",
           "delete": "Couldn't delete the attribute."
         }
+      },
+      "delete": {
+        "section_title": "Delete organization",
+        "section_subtitle": "This action removes the organization and hides it from its members. It cannot be undone.",
+        "button": "Delete organization",
+        "title": "Delete organization",
+        "message": "You're about to delete the organization {name}. All members will lose access and you won't be able to recover it.",
+        "confirm_hint": "To confirm, type the identifier {slug} in the field below.",
+        "input_label": "Organization identifier",
+        "confirm": "Permanently delete",
+        "errors": {
+          "generic": "Couldn't delete the organization. Please try again."
+        }
       }
     },
     "create_org": {
@@ -684,6 +701,12 @@
         "generic": "Something went wrong. Please try again."
       }
     },
+    "members": {
+      "no_selection": "No selection",
+      "search_placeholder": "Search member…",
+      "clear_selection": "Clear selection",
+      "no_members_match": "No member matches."
+    },
     "pagination": {
       "size": "Size",
       "total": "Total: {n}",
@@ -705,7 +728,8 @@
         "edit": "Edit",
         "delete": "Delete",
         "download": "Download",
-        "row_menu": "Actions"
+        "row_menu": "Actions",
+        "qr": "Share"
       },
       "filters": {
         "search": "Search",
@@ -814,6 +838,18 @@
           "ACTIVE": "Active",
           "PENDING": "Pending"
         }
+      },
+      "qr": {
+        "title": "Item QR code",
+        "link_label": "Share link",
+        "copy_link": "Copy link",
+        "copy_image": "Copy image",
+        "download": "Download PNG",
+        "link_copied": "Link copied to clipboard",
+        "image_copied": "Image copied to clipboard",
+        "image_copy_unsupported": "Your browser does not support copying images; download the PNG instead.",
+        "copy_error": "The link could not be copied.",
+        "aria_canvas": "QR code for {name}"
       },
       "confirm": {
         "delete_title": "Delete item",

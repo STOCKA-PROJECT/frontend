@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import type { PieceTypeAttributeResponseDto } from '~/types/api'
+import type { MemberResponseDto, PieceTypeAttributeResponseDto } from '~/types/api'
 
 const props = withDefaults(defineProps<{
   attribute: PieceTypeAttributeResponseDto
   modelValue: string | null
+  members?: MemberResponseDto[]
   disabled?: boolean
-}>(), { disabled: false })
+}>(), { disabled: false, members: () => [] })
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | null]
@@ -79,6 +80,17 @@ const labelSuffix = computed(() => {
   if (props.attribute.required) return ' *'
   return ''
 })
+
+const memberUserId = computed<number | null>(() => {
+  const raw = props.modelValue
+  if (raw == null || raw === '') return null
+  const n = Number(raw)
+  return Number.isFinite(n) ? n : null
+})
+
+function onMemberChange(userId: number | null) {
+  set(userId == null ? null : String(userId))
+}
 </script>
 
 <template>
@@ -246,6 +258,16 @@ const labelSuffix = computed(() => {
       class="attr-input"
       @input="onTextInput"
     >
+
+    <DashboardMemberSelect
+      v-else-if="attribute.type === 'MEMBER'"
+      :input-id="fieldId"
+      :model-value="memberUserId"
+      :members="members"
+      :eligible-roles="attribute.validators?.eligibleRoles"
+      :disabled="disabled"
+      @update:model-value="onMemberChange"
+    />
   </div>
 </template>
 

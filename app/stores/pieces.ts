@@ -41,21 +41,21 @@ export const usePiecesStore = defineStore('pieces', () => {
 
   // Caché global de blob URLs de adjuntos. Compartido entre el listado, el
   // detalle y la pestaña de adjuntos, para evitar re-descargar la misma
-  // imagen al navegar. La clave es `${orgId}:${pieceId}:${attachmentId}`.
+  // imagen al navegar. La clave es `${orgSlug}:${pieceId}:${attachmentId}`.
   const attachmentBlobUrls = ref<Record<string, string>>({})
   // Promesas en vuelo coalescidas por clave, para no lanzar la misma
   // descarga dos veces simultáneamente.
   const attachmentBlobInFlight = ref<Record<string, Promise<string>>>({})
 
-  function attachmentKey(orgId: number, pieceId: number, attachmentId: number): string {
-    return `${orgId}:${pieceId}:${attachmentId}`
+  function attachmentKey(orgSlug: string, pieceId: number, attachmentId: number): string {
+    return `${orgSlug}:${pieceId}:${attachmentId}`
   }
 
   function bucketKey(locationId: number | null): number {
     return locationId == null ? UNASSIGNED_KEY : locationId
   }
 
-  async function fetchByLocation(orgId: number, locationId: number | null) {
+  async function fetchByLocation(orgSlug: string, locationId: number | null) {
     const api = useApi()
     const key = bucketKey(locationId)
     loadingFor.value = key
@@ -66,7 +66,7 @@ export const usePiecesStore = defineStore('pieces', () => {
         sort: 'updatedAt,desc'
       }
       if (locationId != null) params.locationId = locationId
-      const page = await api<Page<PieceListItemDto>>(`/organizations/${orgId}/pieces`, { params })
+      const page = await api<Page<PieceListItemDto>>(`/organizations/${orgSlug}/pieces`, { params })
       const filtered = locationId == null
         ? page.content.filter(p => p.locationId == null)
         : page.content
@@ -77,9 +77,9 @@ export const usePiecesStore = defineStore('pieces', () => {
     }
   }
 
-  async function move(orgId: number, pieceId: number, target: UpdatePieceLocationDto) {
+  async function move(orgSlug: string, pieceId: number, target: UpdatePieceLocationDto) {
     const api = useApi()
-    await api(`/organizations/${orgId}/pieces/${pieceId}`, {
+    await api(`/organizations/${orgSlug}/pieces/${pieceId}`, {
       method: 'PATCH',
       body: target
     })
@@ -114,14 +114,14 @@ export const usePiecesStore = defineStore('pieces', () => {
     return params
   }
 
-  async function fetchList(orgId: number, partial?: Partial<PieceListFilters>) {
+  async function fetchList(orgSlug: string, partial?: Partial<PieceListFilters>) {
     if (partial) {
       filters.value = { ...filters.value, ...partial }
     }
     const api = useApi()
     loadingList.value = true
     try {
-      const page = await api<Page<PieceListItemDto>>(`/organizations/${orgId}/pieces`, {
+      const page = await api<Page<PieceListItemDto>>(`/organizations/${orgSlug}/pieces`, {
         params: buildListParams(filters.value)
       })
       list.value = page.content
@@ -132,26 +132,26 @@ export const usePiecesStore = defineStore('pieces', () => {
     }
   }
 
-  function setFilters(orgId: number, patch: Partial<PieceListFilters>): Promise<Page<PieceListItemDto>> {
+  function setFilters(orgSlug: string, patch: Partial<PieceListFilters>): Promise<Page<PieceListItemDto>> {
     const next: PieceListFilters = { ...filters.value, ...patch }
     // Cualquier cambio de filtro (no de página/tamaño/orden) reinicia a la primera página.
     const filterKeys: Array<keyof PieceListFilters> = ['typeId', 'locationId', 'ownerUserId', 'status', 'q']
     const filterChanged = filterKeys.some(k => k in patch && patch[k] !== filters.value[k])
     if (filterChanged) next.page = 0
     filters.value = next
-    return fetchList(orgId)
+    return fetchList(orgSlug)
   }
 
-  function resetFilters(orgId: number) {
+  function resetFilters(orgSlug: string) {
     filters.value = { ...DEFAULT_FILTERS }
-    return fetchList(orgId)
+    return fetchList(orgSlug)
   }
 
-  async function fetchDetail(orgId: number, pieceId: number) {
+  async function fetchDetail(orgSlug: string, pieceId: number) {
     const api = useApi()
     loadingDetail.value = pieceId
     try {
-      const piece = await api<PieceResponseDto>(`/organizations/${orgId}/pieces/${pieceId}`)
+      const piece = await api<PieceResponseDto>(`/organizations/${orgSlug}/pieces/${pieceId}`)
       detailById.value = { ...detailById.value, [pieceId]: piece }
       return piece
     } finally {
@@ -178,9 +178,9 @@ export const usePiecesStore = defineStore('pieces', () => {
     }
   }
 
-  async function create(orgId: number, payload: CreatePieceDto) {
+  async function create(orgSlug: string, payload: CreatePieceDto) {
     const api = useApi()
-    const created = await api<PieceResponseDto>(`/organizations/${orgId}/pieces`, {
+    const created = await api<PieceResponseDto>(`/organizations/${orgSlug}/pieces`, {
       method: 'POST',
       body: payload
     })
@@ -189,10 +189,10 @@ export const usePiecesStore = defineStore('pieces', () => {
     return created
   }
 
-  async function update(orgId: number, pieceId: number, patch: UpdatePieceDto) {
+  async function update(orgSlug: string, pieceId: number, patch: UpdatePieceDto) {
     const api = useApi()
     const previousCoverId = detailById.value[pieceId]?.coverAttachmentId ?? null
-    const updated = await api<PieceResponseDto>(`/organizations/${orgId}/pieces/${pieceId}`, {
+    const updated = await api<PieceResponseDto>(`/organizations/${orgSlug}/pieces/${pieceId}`, {
       method: 'PATCH',
       body: patch
     })
@@ -203,14 +203,14 @@ export const usePiecesStore = defineStore('pieces', () => {
     // para evitar que se acumulen mientras el usuario edita la pieza.
     const newCoverId = updated.coverAttachmentId ?? null
     if (previousCoverId != null && previousCoverId !== newCoverId) {
-      revokeAttachmentBlobUrl(orgId, pieceId, previousCoverId)
+      revokeAttachmentBlobUrl(orgSlug, pieceId, previousCoverId)
     }
     return updated
   }
 
-  async function softDelete(orgId: number, pieceId: number) {
+  async function softDelete(orgSlug: string, pieceId: number) {
     const api = useApi()
-    await api(`/organizations/${orgId}/pieces/${pieceId}`, { method: 'DELETE' })
+    await api(`/organizations/${orgSlug}/pieces/${pieceId}`, { method: 'DELETE' })
     const nextDetail = { ...detailById.value }
     delete nextDetail[pieceId]
     detailById.value = nextDetail
@@ -219,7 +219,7 @@ export const usePiecesStore = defineStore('pieces', () => {
   }
 
   async function uploadAttachment(
-    orgId: number,
+    orgSlug: string,
     pieceId: number,
     file: File,
     kind: PieceAttachmentKind
@@ -228,7 +228,7 @@ export const usePiecesStore = defineStore('pieces', () => {
     const form = new FormData()
     form.append('file', file)
     const created = await api<PieceAttachmentResponseDto>(
-      `/organizations/${orgId}/pieces/${pieceId}/attachments`,
+      `/organizations/${orgSlug}/pieces/${pieceId}/attachments`,
       {
         method: 'POST',
         params: { kind },
@@ -245,12 +245,12 @@ export const usePiecesStore = defineStore('pieces', () => {
     return created
   }
 
-  async function deleteAttachment(orgId: number, pieceId: number, attachmentId: number) {
+  async function deleteAttachment(orgSlug: string, pieceId: number, attachmentId: number) {
     const api = useApi()
-    await api(`/organizations/${orgId}/pieces/${pieceId}/attachments/${attachmentId}`, {
+    await api(`/organizations/${orgSlug}/pieces/${pieceId}/attachments/${attachmentId}`, {
       method: 'DELETE'
     })
-    revokeAttachmentBlobUrl(orgId, pieceId, attachmentId)
+    revokeAttachmentBlobUrl(orgSlug, pieceId, attachmentId)
     const detail = detailById.value[pieceId]
     if (detail) {
       detailById.value = {
@@ -263,20 +263,20 @@ export const usePiecesStore = defineStore('pieces', () => {
     }
   }
 
-  function fetchAttachmentBlobUrl(orgId: number, pieceId: number, attachmentId: number): Promise<string> {
+  function fetchAttachmentBlobUrl(orgSlug: string, pieceId: number, attachmentId: number): Promise<string> {
     // Blob URLs son una API de navegador. En SSR no tenemos `URL.createObjectURL`
     // ni cookies de sesión, así que cortamos antes de hacer nada.
     if (import.meta.server) {
       return Promise.reject(new Error('blob_unavailable_on_server'))
     }
-    const key = attachmentKey(orgId, pieceId, attachmentId)
+    const key = attachmentKey(orgSlug, pieceId, attachmentId)
     const cached = attachmentBlobUrls.value[key]
     if (cached) return Promise.resolve(cached)
     const inflight = attachmentBlobInFlight.value[key]
     if (inflight) return inflight
     const promise = (async () => {
       const res = await fetch(
-        `/api/organizations/${orgId}/pieces/${pieceId}/attachments/${attachmentId}/download`
+        `/api/organizations/${orgSlug}/pieces/${pieceId}/attachments/${attachmentId}/download`
       )
       if (!res.ok) {
         throw new Error(`download_failed_${res.status}`)
@@ -294,8 +294,8 @@ export const usePiecesStore = defineStore('pieces', () => {
     return promise
   }
 
-  function revokeAttachmentBlobUrl(orgId: number, pieceId: number, attachmentId: number) {
-    const key = attachmentKey(orgId, pieceId, attachmentId)
+  function revokeAttachmentBlobUrl(orgSlug: string, pieceId: number, attachmentId: number) {
+    const key = attachmentKey(orgSlug, pieceId, attachmentId)
     const url = attachmentBlobUrls.value[key]
     if (!url) return
     if (import.meta.client) URL.revokeObjectURL(url)
@@ -305,7 +305,7 @@ export const usePiecesStore = defineStore('pieces', () => {
   }
 
   async function fetchHistory(
-    orgId: number,
+    orgSlug: string,
     pieceId: number,
     page = 0,
     size = 20
@@ -314,7 +314,7 @@ export const usePiecesStore = defineStore('pieces', () => {
     loadingHistory.value = pieceId
     try {
       const result = await api<Page<PieceHistoryItemDto>>(
-        `/organizations/${orgId}/pieces/${pieceId}/history`,
+        `/organizations/${orgSlug}/pieces/${pieceId}/history`,
         { params: { page, size } }
       )
       historyByPiece.value = { ...historyByPiece.value, [pieceId]: result }

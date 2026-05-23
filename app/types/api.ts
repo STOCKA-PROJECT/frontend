@@ -86,6 +86,12 @@ export interface OrganizationResponseDto {
   currentUserRole: OrganizationRole
 }
 
+export interface OrganizationLookupResponseDto {
+  org: OrganizationResponseDto
+  historical: boolean
+  currentSlug: string
+}
+
 export interface CreateOrganizationDto {
   name: string
   slug: string
@@ -302,6 +308,7 @@ export type AttributeType =
   | 'MULTI_SELECT'
   | 'URL'
   | 'EMAIL'
+  | 'MEMBER'
 
 export interface AttributeValidatorsDto {
   minLength?: number
@@ -318,6 +325,7 @@ export interface AttributeValidatorsDto {
   options?: string[]
   minItems?: number
   maxItems?: number
+  eligibleRoles?: OrganizationRole[]
 }
 
 export interface PieceTypeAttributeResponseDto {

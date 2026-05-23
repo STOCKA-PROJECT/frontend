@@ -32,11 +32,11 @@ export const usePieceTypesStore = defineStore('pieceTypes', () => {
     order.value = order.value.filter(x => x !== id)
   }
 
-  async function fetchAll(orgId: number) {
+  async function fetchAll(orgSlug: string) {
     const api = useApi()
     loading.value = true
     try {
-      const data = await api<PieceTypeResponseDto[]>(`/organizations/${orgId}/piece-types`)
+      const data = await api<PieceTypeResponseDto[]>(`/organizations/${orgSlug}/piece-types`)
       const nextById: Record<number, PieceTypeResponseDto> = {}
       const nextOrder: number[] = []
       for (const t of data) {
@@ -52,16 +52,16 @@ export const usePieceTypesStore = defineStore('pieceTypes', () => {
     return list.value
   }
 
-  async function fetchOne(orgId: number, id: number) {
+  async function fetchOne(orgSlug: string, id: number) {
     const api = useApi()
-    const data = await api<PieceTypeResponseDto>(`/organizations/${orgId}/piece-types/${id}`)
+    const data = await api<PieceTypeResponseDto>(`/organizations/${orgSlug}/piece-types/${id}`)
     upsert(data)
     return data
   }
 
-  async function create(orgId: number, payload: CreatePieceTypeDto) {
+  async function create(orgSlug: string, payload: CreatePieceTypeDto) {
     const api = useApi()
-    const created = await api<PieceTypeResponseDto>(`/organizations/${orgId}/piece-types`, {
+    const created = await api<PieceTypeResponseDto>(`/organizations/${orgSlug}/piece-types`, {
       method: 'POST',
       body: payload
     })
@@ -69,9 +69,9 @@ export const usePieceTypesStore = defineStore('pieceTypes', () => {
     return created
   }
 
-  async function update(orgId: number, id: number, payload: UpdatePieceTypeDto) {
+  async function update(orgSlug: string, id: number, payload: UpdatePieceTypeDto) {
     const api = useApi()
-    const updated = await api<PieceTypeResponseDto>(`/organizations/${orgId}/piece-types/${id}`, {
+    const updated = await api<PieceTypeResponseDto>(`/organizations/${orgSlug}/piece-types/${id}`, {
       method: 'PATCH',
       body: payload
     })
@@ -79,43 +79,43 @@ export const usePieceTypesStore = defineStore('pieceTypes', () => {
     return updated
   }
 
-  async function softDelete(orgId: number, id: number) {
+  async function softDelete(orgSlug: string, id: number) {
     const api = useApi()
-    await api(`/organizations/${orgId}/piece-types/${id}`, { method: 'DELETE' })
+    await api(`/organizations/${orgSlug}/piece-types/${id}`, { method: 'DELETE' })
     removeFromState(id)
   }
 
-  async function addAttribute(orgId: number, typeId: number, payload: CreatePieceTypeAttributeDto) {
+  async function addAttribute(orgSlug: string, typeId: number, payload: CreatePieceTypeAttributeDto) {
     const api = useApi()
     const created = await api<PieceTypeAttributeResponseDto>(
-      `/organizations/${orgId}/piece-types/${typeId}/attributes`,
+      `/organizations/${orgSlug}/piece-types/${typeId}/attributes`,
       { method: 'POST', body: payload }
     )
-    await fetchOne(orgId, typeId)
+    await fetchOne(orgSlug, typeId)
     return created
   }
 
   async function updateAttribute(
-    orgId: number,
+    orgSlug: string,
     typeId: number,
     attrId: number,
     payload: UpdatePieceTypeAttributeDto
   ) {
     const api = useApi()
     const updated = await api<PieceTypeAttributeResponseDto>(
-      `/organizations/${orgId}/piece-types/${typeId}/attributes/${attrId}`,
+      `/organizations/${orgSlug}/piece-types/${typeId}/attributes/${attrId}`,
       { method: 'PATCH', body: payload }
     )
-    await fetchOne(orgId, typeId)
+    await fetchOne(orgSlug, typeId)
     return updated
   }
 
-  async function removeAttribute(orgId: number, typeId: number, attrId: number) {
+  async function removeAttribute(orgSlug: string, typeId: number, attrId: number) {
     const api = useApi()
-    await api(`/organizations/${orgId}/piece-types/${typeId}/attributes/${attrId}`, {
+    await api(`/organizations/${orgSlug}/piece-types/${typeId}/attributes/${attrId}`, {
       method: 'DELETE'
     })
-    await fetchOne(orgId, typeId)
+    await fetchOne(orgSlug, typeId)
   }
 
   function reset() {

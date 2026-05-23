@@ -7,8 +7,8 @@ import type {
 } from '~/types/api'
 
 export const useTeamStore = defineStore('team', () => {
-  const membersByOrg = ref<Record<number, MemberResponseDto[]>>({})
-  const invitationsByOrg = ref<Record<number, InvitationResponseDto[]>>({})
+  const membersByOrg = ref<Record<string, MemberResponseDto[]>>({})
+  const invitationsByOrg = ref<Record<string, InvitationResponseDto[]>>({})
   const myInvitations = ref<InvitationResponseDto[]>([])
   const loadingMembers = ref(false)
   const loadingInvitations = ref(false)
@@ -19,65 +19,65 @@ export const useTeamStore = defineStore('team', () => {
     () => myInvitations.value.filter(i => i.status === 'PENDING').length
   )
 
-  async function fetchMembers(orgId: number) {
+  async function fetchMembers(orgSlug: string) {
     const api = useApi()
     loadingMembers.value = true
     try {
-      const data = await api<MemberResponseDto[]>(`/organizations/${orgId}/members`)
-      membersByOrg.value = { ...membersByOrg.value, [orgId]: data }
+      const data = await api<MemberResponseDto[]>(`/organizations/${orgSlug}/members`)
+      membersByOrg.value = { ...membersByOrg.value, [orgSlug]: data }
       return data
     } finally {
       loadingMembers.value = false
     }
   }
 
-  async function fetchInvitations(orgId: number) {
+  async function fetchInvitations(orgSlug: string) {
     const api = useApi()
     loadingInvitations.value = true
     try {
-      const data = await api<InvitationResponseDto[]>(`/organizations/${orgId}/invitations`)
-      invitationsByOrg.value = { ...invitationsByOrg.value, [orgId]: data }
+      const data = await api<InvitationResponseDto[]>(`/organizations/${orgSlug}/invitations`)
+      invitationsByOrg.value = { ...invitationsByOrg.value, [orgSlug]: data }
       return data
     } finally {
       loadingInvitations.value = false
     }
   }
 
-  async function invite(orgId: number, payload: CreateInvitationDto) {
+  async function invite(orgSlug: string, payload: CreateInvitationDto) {
     const api = useApi()
-    const created = await api<InvitationResponseDto>(`/organizations/${orgId}/invitations`, {
+    const created = await api<InvitationResponseDto>(`/organizations/${orgSlug}/invitations`, {
       method: 'POST',
       body: payload
     })
-    await fetchInvitations(orgId)
+    await fetchInvitations(orgSlug)
     return created
   }
 
-  async function updateRole(orgId: number, memberId: number, role: OrganizationRole) {
+  async function updateRole(orgSlug: string, memberId: number, role: OrganizationRole) {
     const api = useApi()
-    const updated = await api<MemberResponseDto>(`/organizations/${orgId}/members/${memberId}`, {
+    const updated = await api<MemberResponseDto>(`/organizations/${orgSlug}/members/${memberId}`, {
       method: 'PATCH',
       body: { role }
     })
-    await fetchMembers(orgId)
+    await fetchMembers(orgSlug)
     return updated
   }
 
-  async function removeMember(orgId: number, memberId: number) {
+  async function removeMember(orgSlug: string, memberId: number) {
     const api = useApi()
-    await api(`/organizations/${orgId}/members/${memberId}`, { method: 'DELETE' })
-    await fetchMembers(orgId)
+    await api(`/organizations/${orgSlug}/members/${memberId}`, { method: 'DELETE' })
+    await fetchMembers(orgSlug)
   }
 
-  async function cancelInvitation(orgId: number, invitationId: number) {
+  async function cancelInvitation(orgSlug: string, invitationId: number) {
     const api = useApi()
-    await api(`/organizations/${orgId}/invitations/${invitationId}`, { method: 'DELETE' })
-    await fetchInvitations(orgId)
+    await api(`/organizations/${orgSlug}/invitations/${invitationId}`, { method: 'DELETE' })
+    await fetchInvitations(orgSlug)
   }
 
-  async function leaveOrg(orgId: number) {
+  async function leaveOrg(orgSlug: string) {
     const api = useApi()
-    await api(`/organizations/${orgId}/members/me`, { method: 'DELETE' })
+    await api(`/organizations/${orgSlug}/members/me`, { method: 'DELETE' })
   }
 
   async function acceptInvitation(token: string) {
@@ -109,12 +109,12 @@ export const useTeamStore = defineStore('team', () => {
     }
   }
 
-  function getMembers(orgId: number): MemberResponseDto[] | undefined {
-    return membersByOrg.value[orgId]
+  function getMembers(orgSlug: string): MemberResponseDto[] | undefined {
+    return membersByOrg.value[orgSlug]
   }
 
-  function getInvitations(orgId: number): InvitationResponseDto[] | undefined {
-    return invitationsByOrg.value[orgId]
+  function getInvitations(orgSlug: string): InvitationResponseDto[] | undefined {
+    return invitationsByOrg.value[orgSlug]
   }
 
   function reset() {

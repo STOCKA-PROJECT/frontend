@@ -109,5 +109,14 @@ withDefaults(defineProps<{ name: string; size?: number }>(), { size: 16 })
       <line x1="3" y1="12" x2="21" y2="12" />
       <line x1="3" y1="18" x2="21" y2="18" />
     </template>
+    <template v-else-if="name === 'qr'">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <path d="M14 14h3v3h-3z" />
+      <path d="M20 14v3" />
+      <path d="M14 20h3" />
+      <path d="M20 20h1" />
+    </template>
   </svg>
 </template>

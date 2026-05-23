@@ -10,7 +10,7 @@ import type {
 } from '~/types/api'
 
 const props = defineProps<{
-  orgId: number
+  orgSlug: string
   canWrite: boolean
 }>()
 
@@ -24,13 +24,13 @@ const editing = ref<OrganizationPieceAttributeResponseDto | null>(null)
 const submitting = ref(false)
 const dialogError = ref<string | null>(null)
 
-const items = computed(() => store.listFor(props.orgId))
+const items = computed(() => store.listFor(props.orgSlug))
 
 watchEffect(async () => {
-  if (!props.orgId) return
-  if (!store.loadedOrgIds.has(props.orgId)) {
+  if (!props.orgSlug) return
+  if (!store.loadedOrgSlugs.has(props.orgSlug)) {
     try {
-      await store.fetchAll(props.orgId)
+      await store.fetchAll(props.orgSlug)
     } catch {
       errorMsg.value = t('dashboard.org_settings.attributes.errors.load')
     }
@@ -58,9 +58,9 @@ async function onSubmit(payload: CreatePieceTypeAttributeDto | UpdatePieceTypeAt
   dialogError.value = null
   try {
     if (dialogMode.value === 'create') {
-      await store.create(props.orgId, payload as CreateOrganizationPieceAttributeDto)
+      await store.create(props.orgSlug, payload as CreateOrganizationPieceAttributeDto)
     } else if (editing.value) {
-      await store.update(props.orgId, editing.value.id, payload as UpdateOrganizationPieceAttributeDto)
+      await store.update(props.orgSlug, editing.value.id, payload as UpdateOrganizationPieceAttributeDto)
     }
     dialogOpen.value = false
   } catch (e) {
@@ -92,7 +92,7 @@ async function confirmDelete() {
   deletingAttr.value = true
   deleteError.value = null
   try {
-    await store.softDelete(props.orgId, confirmDeleteId.value)
+    await store.softDelete(props.orgSlug, confirmDeleteId.value)
     confirmDeleteId.value = null
   } catch {
     deleteError.value = t('dashboard.org_settings.attributes.errors.delete')
@@ -139,7 +139,7 @@ function cancelDelete() {
       </p>
     </div>
 
-    <ul v-else class="flex flex-col gap-1.5">
+    <ul v-else class="grid grid-cols-1 gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
       <li v-for="attr in items" :key="attr.id">
         <DashboardPieceTypeAttributeRow
           :attr="(attr as unknown as PieceTypeAttributeResponseDto)"

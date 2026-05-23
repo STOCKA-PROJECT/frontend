@@ -3,12 +3,18 @@ import { onBeforeUnmount, onMounted, shallowRef } from 'vue'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
+const { orgPath } = useOrgPath()
+const { slug: currentOrgSlug } = useCurrentOrg()
 const auth = useAuthStore()
 const orgs = useOrganizationsStore()
 const team = useTeamStore()
 const { isOpen, close } = useMobileNav()
 
 const hasOrgs = computed(() => orgs.list.length >= 1)
+// Pages under [orgSlug] require a slug in scope. When the user is on /dashboard/mi-cuenta
+// or similar user-scoped pages, fall back to the last remembered slug so nav links stay live.
+const navOrgSlug = computed(() => currentOrgSlug.value ?? orgs.lastSlug ?? orgs.list[0]?.slug ?? null)
+const hasOrgScope = computed(() => navOrgSlug.value != null)
 
 const userInitials = computed(() => initials(auth.user?.name, auth.user?.lastName))
 const userFullName = computed(() => {
@@ -74,7 +80,7 @@ async function handleLogout() {
     </NuxtLink>
 
     <nav class="flex flex-col gap-px" :aria-label="t('common.main_nav')">
-      <NuxtLink :to="localePath('/dashboard')" exact-active-class="is-active" class="nav-item">
+      <NuxtLink :to="orgPath('', navOrgSlug)" exact-active-class="is-active" class="nav-item">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -85,18 +91,18 @@ async function handleLogout() {
         <span>{{ t('dashboard.summary') }}</span>
       </NuxtLink>
 
-      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/articulos')" active-class="is-active" class="nav-item">
+      <NuxtLink v-if="hasOrgs" :to="orgPath('/articulos', navOrgSlug)" active-class="is-active" class="nav-item">
         <DashboardIcon name="box" />
         <span>{{ t('dashboard.nav.items') }}</span>
       </NuxtLink>
 
-      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/ubicaciones')" exact-active-class="is-active"
+      <NuxtLink v-if="hasOrgs" :to="orgPath('/ubicaciones', navOrgSlug)" exact-active-class="is-active"
         class="nav-item">
         <DashboardIcon name="building" />
         <span>{{ t('dashboard.nav.locations') }}</span>
       </NuxtLink>
 
-      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/tipos-articulos')" exact-active-class="is-active"
+      <NuxtLink v-if="hasOrgs" :to="orgPath('/tipos-articulos', navOrgSlug)" exact-active-class="is-active"
         class="nav-item">
         <DashboardIcon name="list" />
         <span>{{ t('dashboard.nav.types') }}</span>
@@ -115,11 +121,11 @@ async function handleLogout() {
       <span class="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[.08em] text-ink-muted">
         {{ t('dashboard.organization_label') }}
       </span>
-      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/equipo')" exact-active-class="is-active" class="nav-item">
+      <NuxtLink v-if="hasOrgs" :to="orgPath('/equipo', navOrgSlug)" exact-active-class="is-active" class="nav-item">
         <DashboardIcon name="users" />
         <span>{{ t('dashboard.nav.team') }}</span>
       </NuxtLink>
-      <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/ajustes-organizacion')" exact-active-class="is-active"
+      <NuxtLink v-if="hasOrgs" :to="orgPath('/ajustes-organizacion', navOrgSlug)" exact-active-class="is-active"
         class="nav-item">
         <DashboardIcon name="settings" />
         <span>{{ t('dashboard.nav.settings') }}</span>
@@ -239,7 +245,7 @@ async function handleLogout() {
         </NuxtLink>
 
         <nav class="flex flex-col gap-px" :aria-label="t('common.main_nav')">
-          <NuxtLink :to="localePath('/dashboard')" exact-active-class="is-active" class="nav-item" @click="close">
+          <NuxtLink :to="orgPath('', navOrgSlug)" exact-active-class="is-active" class="nav-item" @click="close">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -250,17 +256,17 @@ async function handleLogout() {
             <span>{{ t('dashboard.summary') }}</span>
           </NuxtLink>
 
-          <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/articulos')" active-class="is-active" class="nav-item" @click="close">
+          <NuxtLink v-if="hasOrgs" :to="orgPath('/articulos', navOrgSlug)" active-class="is-active" class="nav-item" @click="close">
             <DashboardIcon name="box" />
             <span>{{ t('dashboard.nav.items') }}</span>
           </NuxtLink>
 
-          <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/ubicaciones')" exact-active-class="is-active" class="nav-item" @click="close">
+          <NuxtLink v-if="hasOrgs" :to="orgPath('/ubicaciones', navOrgSlug)" exact-active-class="is-active" class="nav-item" @click="close">
             <DashboardIcon name="building" />
             <span>{{ t('dashboard.nav.locations') }}</span>
           </NuxtLink>
 
-          <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/tipos-articulos')" exact-active-class="is-active" class="nav-item" @click="close">
+          <NuxtLink v-if="hasOrgs" :to="orgPath('/tipos-articulos', navOrgSlug)" exact-active-class="is-active" class="nav-item" @click="close">
             <DashboardIcon name="list" />
             <span>{{ t('dashboard.nav.types') }}</span>
           </NuxtLink>
@@ -270,11 +276,11 @@ async function handleLogout() {
           <span class="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[.08em] text-ink-muted">
             {{ t('dashboard.organization_label') }}
           </span>
-          <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/equipo')" exact-active-class="is-active" class="nav-item" @click="close">
+          <NuxtLink v-if="hasOrgs" :to="orgPath('/equipo', navOrgSlug)" exact-active-class="is-active" class="nav-item" @click="close">
             <DashboardIcon name="users" />
             <span>{{ t('dashboard.nav.team') }}</span>
           </NuxtLink>
-          <NuxtLink v-if="hasOrgs" :to="localePath('/dashboard/ajustes-organizacion')" exact-active-class="is-active" class="nav-item" @click="close">
+          <NuxtLink v-if="hasOrgs" :to="orgPath('/ajustes-organizacion', navOrgSlug)" exact-active-class="is-active" class="nav-item" @click="close">
             <DashboardIcon name="settings" />
             <span>{{ t('dashboard.nav.settings') }}</span>
           </NuxtLink>

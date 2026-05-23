@@ -8,12 +8,12 @@ import type {
 } from '~/types/api'
 
 const props = defineProps<{
-  orgId: number
+  orgSlug: string
   role: OrganizationRole | null
 }>()
 
 const { t } = useI18n()
-const localePath = useLocalePath()
+const { orgPath } = useOrgPath()
 
 const pieces = usePiecesStore()
 const pieceTypes = usePieceTypesStore()
@@ -47,7 +47,9 @@ function flattenTree(nodes: LocationTreeNodeDto[], parents: string[] = []): Loca
     const path = [...parents, n.name]
     out.push({
       id: n.id,
-      organizationId: props.orgId,
+      // organizationId is a legacy field in the flattened payload — the API
+      // is now slug-scoped, but downstream consumers still expect a number.
+      organizationId: 0,
       name: path.join(' / '),
       description: n.description,
       breadcrumb: []
@@ -67,7 +69,7 @@ const locationNameById = computed(() => {
 })
 const ownerNameById = computed(() => {
   const map = new Map<number, string>()
-  const members = team.getMembers(props.orgId) ?? []
+  const members = team.getMembers(props.orgSlug) ?? []
   for (const m of members) map.set(m.userId, `${m.name} ${m.lastName}`.trim())
   return map
 })
@@ -82,31 +84,31 @@ function ownerName(id?: number) {
 async function loadAll() {
   try {
     await Promise.all([
-      pieceTypes.fetchAll(props.orgId).catch(() => undefined),
-      locations.fetchTree(props.orgId).catch(() => undefined),
-      team.fetchMembers(props.orgId).catch(() => undefined),
-      pieces.fetchList(props.orgId)
+      pieceTypes.fetchAll(props.orgSlug).catch(() => undefined),
+      locations.fetchTree(props.orgSlug).catch(() => undefined),
+      team.fetchMembers(props.orgSlug).catch(() => undefined),
+      pieces.fetchList(props.orgSlug)
     ])
   } catch (e) {
     showError(extractErrorMessage(e, t('dashboard.pieces.errors.load_list')))
   }
 }
 
-onMounted(() => {
-  void loadAll()
-})
-
-watch(() => props.orgId, async (next, prev) => {
-  if (prev === undefined || next === prev) return
-  pieces.reset()
-  pieceTypes.reset()
-  locations.reset()
+// Use a single watcher with `immediate: true` so the initial load and the
+// org-switch reload share the same code path (see vue-router rule:
+// route-param changes do not retrigger lifecycle hooks).
+watch(() => props.orgSlug, async (next, prev) => {
+  if (prev !== undefined && next !== prev) {
+    pieces.reset()
+    pieceTypes.reset()
+    locations.reset()
+  }
   await loadAll()
-})
+}, { immediate: true })
 
 async function onFilterChange(patch: Record<string, unknown>) {
   try {
-    await pieces.setFilters(props.orgId, patch)
+    await pieces.setFilters(props.orgSlug, patch)
   } catch (e) {
     showError(extractErrorMessage(e, t('dashboard.pieces.errors.load_list')))
   }
@@ -114,7 +116,7 @@ async function onFilterChange(patch: Record<string, unknown>) {
 
 async function onClearFilters() {
   try {
-    await pieces.resetFilters(props.orgId)
+    await pieces.resetFilters(props.orgSlug)
   } catch (e) {
     showError(extractErrorMessage(e, t('dashboard.pieces.errors.load_list')))
   }
@@ -122,14 +124,14 @@ async function onClearFilters() {
 
 async function onPageChange(page: number) {
   try {
-    await pieces.setFilters(props.orgId, { page })
+    await pieces.setFilters(props.orgSlug, { page })
   } catch (e) {
     showError(extractErrorMessage(e, t('dashboard.pieces.errors.load_list')))
   }
 }
 async function onSizeChange(size: number) {
   try {
-    await pieces.setFilters(props.orgId, { size, page: 0 })
+    await pieces.setFilters(props.orgSlug, { size, page: 0 })
   } catch (e) {
     showError(extractErrorMessage(e, t('dashboard.pieces.errors.load_list')))
   }
@@ -137,7 +139,7 @@ async function onSizeChange(size: number) {
 
 function goToCreate() {
   if (!canWrite.value) return
-  void navigateTo(localePath('/dashboard/articulos/nuevo'))
+  void navigateTo(orgPath('/articulos/nuevo'))
 }
 
 const confirmDialog = ref<{
@@ -168,9 +170,9 @@ async function confirmDelete() {
   if (id == null) return
   confirmDialog.value.loading = true
   try {
-    await pieces.softDelete(props.orgId, id)
+    await pieces.softDelete(props.orgSlug, id)
     closeConfirm()
-    await pieces.fetchList(props.orgId)
+    await pieces.fetchList(props.orgSlug)
   } catch (e) {
     showError(extractErrorMessage(e, t('dashboard.pieces.errors.delete')))
     closeConfirm()
@@ -180,7 +182,7 @@ async function confirmDelete() {
 }
 
 function pieceLink(piece: PieceListItemDto) {
-  return localePath(`/dashboard/articulos/${piece.id}`)
+  return orgPath(`/articulos/${piece.id}`)
 }
 </script>
 
@@ -214,7 +216,7 @@ function pieceLink(piece: PieceListItemDto) {
         :filters="pieces.filters"
         :piece-types="pieceTypes.list"
         :locations="flatLocations"
-        :members="team.getMembers(orgId) ?? []"
+        :members="team.getMembers(orgSlug) ?? []"
         :loading="pieces.loadingList"
         @change="onFilterChange"
         @clear="onClearFilters"
@@ -223,7 +225,7 @@ function pieceLink(piece: PieceListItemDto) {
       <DashboardPiecesTable
         :pieces="pieces.list"
         :loading="pieces.loadingList"
-        :org-id="orgId"
+        :org-slug="orgSlug"
         :show-location="true"
         :show-owner="true"
         :can-write="canWrite"
