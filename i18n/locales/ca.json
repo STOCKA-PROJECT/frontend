@@ -728,7 +728,8 @@
         "edit": "Edita",
         "delete": "Elimina",
         "download": "Descarrega",
-        "row_menu": "Accions"
+        "row_menu": "Accions",
+        "qr": "Compartir"
       },
       "filters": {
         "search": "Cerca",
@@ -837,6 +838,18 @@
           "ACTIVE": "Actiu",
           "PENDING": "Pendent"
         }
+      },
+      "qr": {
+        "title": "Codi QR de l'article",
+        "link_label": "Enllaç per compartir",
+        "copy_link": "Copia enllaç",
+        "copy_image": "Copia imatge",
+        "download": "Descarrega PNG",
+        "link_copied": "Enllaç copiat al porta-retalls",
+        "image_copied": "Imatge copiada al porta-retalls",
+        "image_copy_unsupported": "El teu navegador no permet copiar imatges; descarrega el PNG en lloc d'això.",
+        "copy_error": "No s'ha pogut copiar l'enllaç.",
+        "aria_canvas": "Codi QR de {name}"
       },
       "confirm": {
         "delete_title": "Elimina article",

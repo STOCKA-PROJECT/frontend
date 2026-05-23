@@ -196,6 +196,7 @@ watch(
 )
 
 const previewOpen = ref(false)
+const qrOpen = ref(false)
 </script>
 
 <template>
@@ -242,6 +243,14 @@ const previewOpen = ref(false)
           </div>
         </div>
         <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="action-btn"
+            @click="qrOpen = true"
+          >
+            <DashboardIcon name="qr" :size="14" />
+            {{ t('dashboard.pieces.actions.qr') }}
+          </button>
           <button
             v-if="canWrite"
             type="button"
@@ -326,6 +335,15 @@ const previewOpen = ref(false)
         :url="coverBlobUrl"
         :name="piece.name"
       />
+
+      <DashboardPieceQrDialog
+        :open="qrOpen"
+        :piece-id="piece.id"
+        :piece-name="piece.name"
+        :serial-number="piece.serialNumber"
+        :org-slug="orgSlug"
+        @close="qrOpen = false"
+      />
     </template>
   </div>
 </template>
@@ -369,6 +387,24 @@ const previewOpen = ref(false)
   border-color: var(--c-danger);
 }
 .danger-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 9px;
+  border: 1px solid var(--c-line);
+  background: var(--c-bg-card);
+  color: var(--c-ink);
+  font-size: 13px;
+  transition: background .15s, border-color .15s;
+}
+.action-btn:hover:not(:disabled) {
+  background: var(--c-bg-soft);
+}
+.action-btn:disabled { opacity: .5; cursor: not-allowed; }
 
 .tab-bar {
   display: flex;

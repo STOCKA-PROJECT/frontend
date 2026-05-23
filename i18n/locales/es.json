@@ -728,7 +728,8 @@
         "edit": "Editar",
         "delete": "Eliminar",
         "download": "Descargar",
-        "row_menu": "Acciones"
+        "row_menu": "Acciones",
+        "qr": "Compartir"
       },
       "filters": {
         "search": "Buscar",
@@ -837,6 +838,18 @@
           "ACTIVE": "Activo",
           "PENDING": "Pendiente"
         }
+      },
+      "qr": {
+        "title": "Código QR del artículo",
+        "link_label": "Enlace para compartir",
+        "copy_link": "Copiar enlace",
+        "copy_image": "Copiar imagen",
+        "download": "Descargar PNG",
+        "link_copied": "Enlace copiado al portapapeles",
+        "image_copied": "Imagen copiada al portapapeles",
+        "image_copy_unsupported": "Tu navegador no permite copiar imágenes; descarga el PNG en su lugar.",
+        "copy_error": "No se ha podido copiar el enlace.",
+        "aria_canvas": "Código QR de {name}"
       },
       "confirm": {
         "delete_title": "Eliminar artículo",

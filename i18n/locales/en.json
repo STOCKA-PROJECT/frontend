@@ -728,7 +728,8 @@
         "edit": "Edit",
         "delete": "Delete",
         "download": "Download",
-        "row_menu": "Actions"
+        "row_menu": "Actions",
+        "qr": "Share"
       },
       "filters": {
         "search": "Search",
@@ -837,6 +838,18 @@
           "ACTIVE": "Active",
           "PENDING": "Pending"
         }
+      },
+      "qr": {
+        "title": "Item QR code",
+        "link_label": "Share link",
+        "copy_link": "Copy link",
+        "copy_image": "Copy image",
+        "download": "Download PNG",
+        "link_copied": "Link copied to clipboard",
+        "image_copied": "Image copied to clipboard",
+        "image_copy_unsupported": "Your browser does not support copying images; download the PNG instead.",
+        "copy_error": "The link could not be copied.",
+        "aria_canvas": "QR code for {name}"
       },
       "confirm": {
         "delete_title": "Delete item",
