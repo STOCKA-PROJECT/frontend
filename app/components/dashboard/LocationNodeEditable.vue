@@ -96,6 +96,7 @@ function openMenu(e: Event) {
         'is-collapsed': !isOpen,
         'no-caret': !hasChildren,
         'is-selected': isSelected,
+        'is-draggable': canEditLocations,
         'is-dragging': dragging,
         'is-drop-ok': drop.isOver.value && !drop.isInvalid.value,
         'is-drop-bad': drop.isOver.value && drop.isInvalid.value,
@@ -116,6 +117,16 @@ function openMenu(e: Event) {
       @dragleave="drop.onDragLeave"
       @drop="drop.onDrop"
     >
+      <span v-if="canEditLocations" class="grip" :aria-label="$t('dashboard.locations.drag_handle_aria')">
+        <svg width="8" height="14" viewBox="0 0 10 16" fill="currentColor" aria-hidden="true">
+          <circle cx="2" cy="3" r="1.2" />
+          <circle cx="2" cy="8" r="1.2" />
+          <circle cx="2" cy="13" r="1.2" />
+          <circle cx="8" cy="3" r="1.2" />
+          <circle cx="8" cy="8" r="1.2" />
+          <circle cx="8" cy="13" r="1.2" />
+        </svg>
+      </span>
       <button type="button" class="caret-btn" :tabindex="-1" :aria-hidden="!hasChildren" @click="onCaretClick">
         <DashboardIcon v-if="hasChildren" name="caret" :size="10" />
       </button>
@@ -194,11 +205,32 @@ function openMenu(e: Event) {
 .tree-row:focus-visible { box-shadow: 0 0 0 2px color-mix(in oklab, var(--c-accent) 35%, transparent); }
 .tree-row.is-selected { background: var(--c-accent-soft); border-color: color-mix(in oklab, var(--c-accent) 30%, transparent); }
 .tree-row.is-selected .ico { color: var(--c-accent-ink); }
+.tree-row.is-draggable { cursor: grab; }
+.tree-row.is-draggable:active { cursor: grabbing; }
 .tree-row.is-dragging { opacity: .5; }
 .tree-row.is-drop-ok { background: var(--c-accent-soft); border-color: var(--c-accent); }
 .tree-row.is-drop-bad { background: var(--c-danger-soft); border-color: var(--c-danger); cursor: not-allowed; }
 .tree-row.is-blocked { opacity: .55; }
 .tree-row.no-caret .caret-btn { pointer-events: none; }
+
+.grip {
+  display: inline-flex;
+  align-items: center;
+  color: var(--c-ink-muted);
+  flex-shrink: 0;
+  padding: 0 1px;
+  opacity: .4;
+  transition: opacity .12s;
+}
+.tree-row:hover .grip,
+.tree-row.is-selected .grip,
+.tree-row.is-dragging .grip { opacity: 1; }
+
+/* Drag is desktop-only — hide affordances on touch devices. */
+@media (hover: none) and (pointer: coarse) {
+  .grip { display: none; }
+  .tree-row.is-draggable { cursor: default; }
+}
 
 .caret-btn {
   width: 18px;
