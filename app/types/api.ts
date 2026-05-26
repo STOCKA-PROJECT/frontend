@@ -26,6 +26,43 @@ export interface User {
   role: Role
 }
 
+export type SecurityEventType =
+  | 'LOGIN_SUCCESS'
+  | 'LOGIN_FAILED'
+  | 'LOGOUT'
+  | 'PASSWORD_CHANGED'
+  | 'PASSWORD_RESET_REQUESTED'
+  | 'PASSWORD_RESET_COMPLETED'
+  | 'EMAIL_VERIFIED'
+  | 'TWO_FACTOR_ENABLED'
+  | 'TWO_FACTOR_DISABLED'
+  | 'TWO_FACTOR_CHALLENGE_FAILED'
+  | 'OAUTH_LINKED'
+  | 'OAUTH_UNLINKED'
+  | 'REFRESH_REUSE_DETECTED'
+  | 'NEW_DEVICE_LOGIN'
+  | 'SESSION_REVOKED'
+
+export interface SecurityActivityEntry {
+  id: number
+  eventType: SecurityEventType
+  success: boolean
+  ipAddress: string | null
+  userAgent: string | null
+  metadata: string | null
+  createdAt: string
+}
+
+export interface PagedResponse<T> {
+  content: T[]
+  totalElements: number
+  totalPages: number
+  number: number
+  size: number
+  first: boolean
+  last: boolean
+}
+
 export interface LoginUserDto {
   email: string
   password: string

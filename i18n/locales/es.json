@@ -590,6 +590,36 @@
           "load": "No se han podido cargar las preferencias.",
           "save": "No se han podido guardar las preferencias."
         }
+      },
+      "security": {
+        "section_title": "Actividad de seguridad",
+        "subtitle": "Histórico de inicios de sesión, cambios de contraseña y otros eventos de seguridad de tu cuenta.",
+        "loading": "Cargando actividad…",
+        "empty": "Aún no hay actividad registrada.",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "page_of": "Página {current} de {total}",
+        "pagination_label": "Paginación del histórico de seguridad",
+        "errors": {
+          "load_failed": "No se ha podido cargar el histórico. Inténtalo de nuevo."
+        },
+        "event": {
+          "LOGIN_SUCCESS": "Inicio de sesión",
+          "LOGIN_FAILED": "Intento de acceso fallido",
+          "LOGOUT": "Cierre de sesión",
+          "PASSWORD_CHANGED": "Cambio de contraseña",
+          "PASSWORD_RESET_REQUESTED": "Restablecimiento solicitado",
+          "PASSWORD_RESET_COMPLETED": "Contraseña restablecida",
+          "EMAIL_VERIFIED": "Email verificado",
+          "TWO_FACTOR_ENABLED": "Verificación en dos pasos activada",
+          "TWO_FACTOR_DISABLED": "Verificación en dos pasos desactivada",
+          "TWO_FACTOR_CHALLENGE_FAILED": "Código 2FA inválido",
+          "OAUTH_LINKED": "Cuenta externa vinculada",
+          "OAUTH_UNLINKED": "Cuenta externa desvinculada",
+          "REFRESH_REUSE_DETECTED": "Sesión revocada por seguridad",
+          "NEW_DEVICE_LOGIN": "Acceso desde un dispositivo nuevo",
+          "SESSION_REVOKED": "Sesión revocada"
+        }
       }
     },
     "org_settings": {

@@ -590,6 +590,36 @@
           "load": "Couldn't load the preferences.",
           "save": "Couldn't save the preferences."
         }
+      },
+      "security": {
+        "section_title": "Security activity",
+        "subtitle": "History of sign-ins, password changes and other security events on your account.",
+        "loading": "Loading activity…",
+        "empty": "No activity recorded yet.",
+        "previous": "Previous",
+        "next": "Next",
+        "page_of": "Page {current} of {total}",
+        "pagination_label": "Security history pagination",
+        "errors": {
+          "load_failed": "Couldn't load the history. Please try again."
+        },
+        "event": {
+          "LOGIN_SUCCESS": "Sign-in",
+          "LOGIN_FAILED": "Failed sign-in attempt",
+          "LOGOUT": "Sign-out",
+          "PASSWORD_CHANGED": "Password changed",
+          "PASSWORD_RESET_REQUESTED": "Password reset requested",
+          "PASSWORD_RESET_COMPLETED": "Password reset completed",
+          "EMAIL_VERIFIED": "Email verified",
+          "TWO_FACTOR_ENABLED": "Two-step verification enabled",
+          "TWO_FACTOR_DISABLED": "Two-step verification disabled",
+          "TWO_FACTOR_CHALLENGE_FAILED": "Invalid 2FA code",
+          "OAUTH_LINKED": "External account linked",
+          "OAUTH_UNLINKED": "External account unlinked",
+          "REFRESH_REUSE_DETECTED": "Session revoked for security",
+          "NEW_DEVICE_LOGIN": "Sign-in from a new device",
+          "SESSION_REVOKED": "Session revoked"
+        }
       }
     },
     "org_settings": {

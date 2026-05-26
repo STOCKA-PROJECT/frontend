@@ -590,6 +590,36 @@
           "load": "No s'han pogut carregar les preferències.",
           "save": "No s'han pogut desar les preferències."
         }
+      },
+      "security": {
+        "section_title": "Activitat de seguretat",
+        "subtitle": "Historial d'inicis de sessió, canvis de contrasenya i altres esdeveniments de seguretat del teu compte.",
+        "loading": "Carregant activitat…",
+        "empty": "Encara no hi ha activitat registrada.",
+        "previous": "Anterior",
+        "next": "Següent",
+        "page_of": "Pàgina {current} de {total}",
+        "pagination_label": "Paginació de l'historial de seguretat",
+        "errors": {
+          "load_failed": "No s'ha pogut carregar l'historial. Torna-ho a provar."
+        },
+        "event": {
+          "LOGIN_SUCCESS": "Inici de sessió",
+          "LOGIN_FAILED": "Intent d'accés fallit",
+          "LOGOUT": "Tancament de sessió",
+          "PASSWORD_CHANGED": "Canvi de contrasenya",
+          "PASSWORD_RESET_REQUESTED": "Restabliment sol·licitat",
+          "PASSWORD_RESET_COMPLETED": "Contrasenya restablerta",
+          "EMAIL_VERIFIED": "Correu verificat",
+          "TWO_FACTOR_ENABLED": "Verificació en dos passos activada",
+          "TWO_FACTOR_DISABLED": "Verificació en dos passos desactivada",
+          "TWO_FACTOR_CHALLENGE_FAILED": "Codi 2FA invàlid",
+          "OAUTH_LINKED": "Compte extern vinculat",
+          "OAUTH_UNLINKED": "Compte extern desvinculat",
+          "REFRESH_REUSE_DETECTED": "Sessió revocada per seguretat",
+          "NEW_DEVICE_LOGIN": "Accés des d'un dispositiu nou",
+          "SESSION_REVOKED": "Sessió revocada"
+        }
       }
     },
     "org_settings": {

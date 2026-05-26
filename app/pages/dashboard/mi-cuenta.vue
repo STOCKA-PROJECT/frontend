@@ -276,5 +276,8 @@ async function submitPassword() {
 
     <!-- Notifications (full width) -->
     <AccountNotificationsSection v-if="auth.user" />
+
+    <!-- Security activity (full width) -->
+    <AccountSecurityActivitySection v-if="auth.user" />
   </div>
 </template>
