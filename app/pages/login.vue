@@ -15,6 +15,7 @@ const apiError = useApiError()
 
 const email = ref('')
 const password = ref('')
+const rememberMe = ref(false)
 const loading = ref(false)
 const errorMsg = ref<string | null>(null)
 const errorCode = ref<string | null>(null)
@@ -57,12 +58,17 @@ async function submit() {
   errorCode.value = null
   verificationResent.value = false
   try {
+    const payload = {
+      email: email.value.trim(),
+      password: password.value,
+      rememberMe: rememberMe.value
+    }
     const next = safeNextPath()
     if (next) {
-      await auth.loginNoRedirect({ email: email.value.trim(), password: password.value })
+      await auth.loginNoRedirect(payload)
       await navigateTo(next)
     } else {
-      await auth.login({ email: email.value.trim(), password: password.value })
+      await auth.login(payload)
     }
   } catch (e) {
     console.error('[login] error:', e)
@@ -124,6 +130,10 @@ async function resendVerification() {
           </NuxtLink>
         </template>
       </AuthPasswordField>
+
+      <AuthCheckbox id="remember-me" v-model="rememberMe">
+        {{ t('auth.login.remember_me') }}
+      </AuthCheckbox>
 
       <AuthSubmitButton :loading="loading" :disabled="!canSubmit">
         {{ t('auth.login.submit') }}

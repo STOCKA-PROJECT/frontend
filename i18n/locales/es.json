@@ -167,6 +167,7 @@
       "password": "Contraseña",
       "password_placeholder": "Tu contraseña",
       "forgot": "¿La olvidaste?",
+      "remember_me": "Recuérdame en este dispositivo durante 30 días",
       "submit": "Iniciar sesión",
       "no_account": "¿Aún no tienes cuenta?",
       "create_free": "Crea una gratis",

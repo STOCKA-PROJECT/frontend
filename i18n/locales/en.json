@@ -167,6 +167,7 @@
       "password": "Password",
       "password_placeholder": "Your password",
       "forgot": "Forgot it?",
+      "remember_me": "Remember me on this device for 30 days",
       "submit": "Sign in",
       "no_account": "Don't have an account yet?",
       "create_free": "Create one for free",

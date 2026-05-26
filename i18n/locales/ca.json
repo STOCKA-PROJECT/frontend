@@ -167,6 +167,7 @@
       "password": "Contrasenya",
       "password_placeholder": "La teva contrasenya",
       "forgot": "L'has oblidada?",
+      "remember_me": "Recorda'm en aquest dispositiu durant 30 dies",
       "submit": "Inicia sessió",
       "no_account": "Encara no tens compte?",
       "create_free": "Crea'n un de gratis",
