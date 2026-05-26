@@ -108,6 +108,13 @@ async function submit() {
     :title="t('auth.signup.title')"
     :subtitle="t('auth.signup.subtitle')"
   >
+    <AuthGoogleSignInButton :label="t('auth.oauth.signup_with_google')" />
+    <div class="my-3 flex items-center gap-3">
+      <hr class="flex-1 border-line">
+      <span class="text-[11.5px] uppercase tracking-wider text-ink-muted">{{ t('auth.oauth.or_separator') }}</span>
+      <hr class="flex-1 border-line">
+    </div>
+
     <form class="flex flex-col gap-3.5" novalidate @submit.prevent="submit">
       <div
         v-if="errorMsg"

@@ -152,6 +152,37 @@
     "footer_short": "© {year} Stocka",
     "show_password": "Mostrar contraseña",
     "hide_password": "Ocultar contraseña",
+    "oauth": {
+      "or_separator": "o",
+      "continue_with_google": "Continuar con Google",
+      "signup_with_google": "Registrarse con Google",
+      "errors": {
+        "start_failed": "No se ha podido iniciar el acceso con Google."
+      },
+      "callback": {
+        "page_title": "Completando acceso…",
+        "title": "Completando el acceso",
+        "subtitle": "Estamos terminando de iniciar tu sesión con Google.",
+        "loading": "Verificando credenciales…",
+        "back_to_login": "Volver al inicio de sesión",
+        "errors": {
+          "invalid_redirect": "La redirección desde Google no es válida. Vuelve a intentarlo."
+        }
+      },
+      "link": {
+        "section_title": "Acceso con Google",
+        "subtitle": "Vincula tu cuenta de Google para acceder con un solo clic.",
+        "status_linked": "Vinculada",
+        "status_not_linked": "No vinculada",
+        "link": "Vincular Google",
+        "unlink": "Desvincular",
+        "linked": "Cuenta vinculada.",
+        "unlinked": "Cuenta desvinculada.",
+        "errors": {
+          "unlink_failed": "No se ha podido desvincular la cuenta."
+        }
+      }
+    },
     "strength": {
       "label": "Seguridad",
       "weak": "Débil",

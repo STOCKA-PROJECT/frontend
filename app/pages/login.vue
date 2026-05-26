@@ -161,6 +161,13 @@ async function resendVerification() {
         {{ successMsg }}
       </div>
 
+      <AuthGoogleSignInButton />
+      <div class="flex items-center gap-3">
+        <hr class="flex-1 border-line">
+        <span class="text-[11.5px] uppercase tracking-wider text-ink-muted">{{ t('auth.oauth.or_separator') }}</span>
+        <hr class="flex-1 border-line">
+      </div>
+
       <div v-if="errorMsg" role="alert"
         class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger">
         <p>{{ errorMsg }}</p>

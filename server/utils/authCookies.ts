@@ -45,14 +45,14 @@ function parseSetCookie(headerValue: string, name: string): { value: string, max
 }
 
 /**
- * Extracts the refresh-token value (and its Max-Age, if any) from a backend
+ * Extracts a cookie value (and its Max-Age, if any) by name from a backend
  * response's {@code Set-Cookie} headers.
  *
  * Tries {@code Headers.getSetCookie()} (Node 22+) first, falling back to
  * iterating raw headers — needed because some runtimes return only the first
  * Set-Cookie when using {@code headers.get('set-cookie')}.
  */
-export function extractRefreshFromBackend(headers: Headers): { value: string, maxAge?: number } | null {
+export function extractCookieFromBackend(headers: Headers, name: string): { value: string, maxAge?: number } | null {
   const headersWithList = headers as Headers & { getSetCookie?: () => string[] }
   const allCookies: string[] = headersWithList.getSetCookie
     ? headersWithList.getSetCookie()
@@ -62,10 +62,15 @@ export function extractRefreshFromBackend(headers: Headers): { value: string, ma
     if (single) allCookies.push(single)
   }
   for (const cookie of allCookies) {
-    const parsed = parseSetCookie(cookie, REFRESH_COOKIE)
+    const parsed = parseSetCookie(cookie, name)
     if (parsed) return parsed
   }
   return null
+}
+
+/** Convenience wrapper for the {@code stocka_refresh} cookie. */
+export function extractRefreshFromBackend(headers: Headers): { value: string, maxAge?: number } | null {
+  return extractCookieFromBackend(headers, REFRESH_COOKIE)
 }
 
 /**

@@ -152,6 +152,37 @@
     "footer_short": "© {year} Stocka",
     "show_password": "Show password",
     "hide_password": "Hide password",
+    "oauth": {
+      "or_separator": "or",
+      "continue_with_google": "Continue with Google",
+      "signup_with_google": "Sign up with Google",
+      "errors": {
+        "start_failed": "Couldn't start the Google sign-in."
+      },
+      "callback": {
+        "page_title": "Finishing sign-in…",
+        "title": "Finishing sign-in",
+        "subtitle": "We're completing your Google sign-in.",
+        "loading": "Verifying credentials…",
+        "back_to_login": "Back to sign in",
+        "errors": {
+          "invalid_redirect": "The redirect from Google is not valid. Please try again."
+        }
+      },
+      "link": {
+        "section_title": "Sign in with Google",
+        "subtitle": "Link your Google account to sign in with one click.",
+        "status_linked": "Linked",
+        "status_not_linked": "Not linked",
+        "link": "Link Google",
+        "unlink": "Unlink",
+        "linked": "Account linked.",
+        "unlinked": "Account unlinked.",
+        "errors": {
+          "unlink_failed": "Couldn't unlink the account."
+        }
+      }
+    },
     "strength": {
       "label": "Strength",
       "weak": "Weak",
