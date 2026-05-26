@@ -168,6 +168,11 @@
       "password_placeholder": "La teva contrasenya",
       "forgot": "L'has oblidada?",
       "remember_me": "Recorda'm en aquest dispositiu durant 30 dies",
+      "totp_prompt": "Introdueix el codi de la teva aplicació d'autenticació (o un dels codis de recuperació).",
+      "totp_label": "Codi de verificació",
+      "totp_placeholder": "123456",
+      "totp_submit": "Verificar",
+      "totp_back": "Tornar a l'inici de sessió",
       "submit": "Inicia sessió",
       "no_account": "Encara no tens compte?",
       "create_free": "Crea'n un de gratis",
@@ -590,6 +595,35 @@
         "errors": {
           "load": "No s'han pogut carregar les preferències.",
           "save": "No s'han pogut desar les preferències."
+        }
+      },
+      "two_factor": {
+        "section_title": "Verificació en dos passos",
+        "subtitle": "Afegeix un segon factor amb una aplicació d'autenticació (Google Authenticator, Authy, 1Password…).",
+        "status_on": "Activada",
+        "status_off": "Desactivada",
+        "activate": "Activar verificació en dos passos",
+        "scan_instructions": "Escaneja el codi QR amb la teva app d'autenticació i introdueix el codi que mostra per confirmar.",
+        "qr_alt": "Codi QR per configurar 2FA",
+        "manual_entry_label": "O introdueix aquesta clau manualment:",
+        "code_label": "Codi de verificació",
+        "code_placeholder": "123456",
+        "confirm": "Confirmar i activar",
+        "cancel": "Cancel·lar",
+        "codes_warning": "Desa aquests codis de recuperació en un lloc segur. Et serviran per accedir si perds l'app d'autenticació. No te'ls tornarem a mostrar.",
+        "copy": "Copiar",
+        "download": "Descarregar",
+        "done": "Fet",
+        "codes_copied": "Codis copiats al porta-retalls.",
+        "enabled": "Verificació en dos passos activada.",
+        "disabled": "Verificació en dos passos desactivada.",
+        "regenerate_codes": "Regenerar codis de recuperació",
+        "disable": "Desactivar",
+        "disable_instructions": "Introdueix la teva contrasenya actual i un codi vàlid per desactivar la verificació en dos passos.",
+        "current_password": "Contrasenya actual",
+        "confirm_disable": "Desactivar 2FA",
+        "errors": {
+          "code_too_short": "El codi ha de tenir com a mínim 6 dígits."
         }
       },
       "sessions": {

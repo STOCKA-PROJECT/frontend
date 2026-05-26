@@ -168,6 +168,11 @@
       "password_placeholder": "Your password",
       "forgot": "Forgot it?",
       "remember_me": "Remember me on this device for 30 days",
+      "totp_prompt": "Enter the code from your authenticator app (or one of your recovery codes).",
+      "totp_label": "Verification code",
+      "totp_placeholder": "123456",
+      "totp_submit": "Verify",
+      "totp_back": "Back to sign in",
       "submit": "Sign in",
       "no_account": "Don't have an account yet?",
       "create_free": "Create one for free",
@@ -590,6 +595,35 @@
         "errors": {
           "load": "Couldn't load the preferences.",
           "save": "Couldn't save the preferences."
+        }
+      },
+      "two_factor": {
+        "section_title": "Two-step verification",
+        "subtitle": "Add a second factor with an authenticator app (Google Authenticator, Authy, 1Password…).",
+        "status_on": "On",
+        "status_off": "Off",
+        "activate": "Turn on two-step verification",
+        "scan_instructions": "Scan the QR code with your authenticator app and enter the code it shows to confirm.",
+        "qr_alt": "QR code to set up 2FA",
+        "manual_entry_label": "Or enter this key manually:",
+        "code_label": "Verification code",
+        "code_placeholder": "123456",
+        "confirm": "Confirm and activate",
+        "cancel": "Cancel",
+        "codes_warning": "Save these recovery codes somewhere safe. They let you sign in if you lose access to your authenticator app. We won't show them again.",
+        "copy": "Copy",
+        "download": "Download",
+        "done": "Done",
+        "codes_copied": "Codes copied to clipboard.",
+        "enabled": "Two-step verification is on.",
+        "disabled": "Two-step verification is off.",
+        "regenerate_codes": "Regenerate recovery codes",
+        "disable": "Turn off",
+        "disable_instructions": "Enter your current password and a valid code to turn off two-step verification.",
+        "current_password": "Current password",
+        "confirm_disable": "Turn off 2FA",
+        "errors": {
+          "code_too_short": "The code must be at least 6 digits."
         }
       },
       "sessions": {

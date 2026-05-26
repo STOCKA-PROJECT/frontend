@@ -274,6 +274,9 @@ async function submitPassword() {
 
     </div>
 
+    <!-- Two-factor (full width) -->
+    <AccountTwoFactorSection v-if="auth.user" />
+
     <!-- Notifications (full width) -->
     <AccountNotificationsSection v-if="auth.user" />
 

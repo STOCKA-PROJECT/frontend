@@ -24,6 +24,7 @@ export interface User {
   enabled: boolean
   language: Language
   role: Role
+  twoFactorEnabled?: boolean
 }
 
 export type SecurityEventType =
@@ -71,6 +72,16 @@ export interface UserSession {
   firstSeenAt: string
   lastSeenAt: string
   current: boolean
+}
+
+export interface TwoFactorSetupResponse {
+  setupToken: string
+  secret: string
+  otpAuthUri: string
+}
+
+export interface TwoFactorRecoveryCodesResponse {
+  recoveryCodes: string[]
 }
 
 export interface LoginUserDto {

@@ -168,6 +168,11 @@
       "password_placeholder": "Tu contraseña",
       "forgot": "¿La olvidaste?",
       "remember_me": "Recuérdame en este dispositivo durante 30 días",
+      "totp_prompt": "Introduce el código de tu aplicación de autenticación (o uno de tus códigos de recuperación).",
+      "totp_label": "Código de verificación",
+      "totp_placeholder": "123456",
+      "totp_submit": "Verificar",
+      "totp_back": "Volver al inicio de sesión",
       "submit": "Iniciar sesión",
       "no_account": "¿Aún no tienes cuenta?",
       "create_free": "Crea una gratis",
@@ -590,6 +595,35 @@
         "errors": {
           "load": "No se han podido cargar las preferencias.",
           "save": "No se han podido guardar las preferencias."
+        }
+      },
+      "two_factor": {
+        "section_title": "Verificación en dos pasos",
+        "subtitle": "Añade un segundo factor con una aplicación de autenticación (Google Authenticator, Authy, 1Password…).",
+        "status_on": "Activada",
+        "status_off": "Desactivada",
+        "activate": "Activar verificación en dos pasos",
+        "scan_instructions": "Escanea el código QR con tu app de autenticación e introduce el código que muestra para confirmar.",
+        "qr_alt": "Código QR para configurar 2FA",
+        "manual_entry_label": "O introduce esta clave manualmente:",
+        "code_label": "Código de verificación",
+        "code_placeholder": "123456",
+        "confirm": "Confirmar y activar",
+        "cancel": "Cancelar",
+        "codes_warning": "Guarda estos códigos de recuperación en un lugar seguro. Te servirán para acceder si pierdes el acceso a tu app de autenticación. No volveremos a mostrártelos.",
+        "copy": "Copiar",
+        "download": "Descargar",
+        "done": "Hecho",
+        "codes_copied": "Códigos copiados al portapapeles.",
+        "enabled": "Verificación en dos pasos activada.",
+        "disabled": "Verificación en dos pasos desactivada.",
+        "regenerate_codes": "Regenerar códigos de recuperación",
+        "disable": "Desactivar",
+        "disable_instructions": "Introduce tu contraseña actual y un código válido para desactivar la verificación en dos pasos.",
+        "current_password": "Contraseña actual",
+        "confirm_disable": "Desactivar 2FA",
+        "errors": {
+          "code_too_short": "El código debe tener al menos 6 dígitos."
         }
       },
       "sessions": {
