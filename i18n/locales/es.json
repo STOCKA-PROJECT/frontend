@@ -592,6 +592,28 @@
           "save": "No se han podido guardar las preferencias."
         }
       },
+      "sessions": {
+        "section_title": "Dispositivos conectados",
+        "subtitle": "Lista de sesiones activas. Si no reconoces alguna, revócala.",
+        "loading": "Cargando sesiones…",
+        "empty": "No hay sesiones activas.",
+        "current": "Este dispositivo",
+        "rename": "Renombrar",
+        "revoke": "Cerrar sesión",
+        "revoke_all_others": "Cerrar todas las demás",
+        "confirm": "Confirmar",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "confirm_revoke_all": "Vas a cerrar la sesión en todos los demás dispositivos. ¿Continuar?",
+        "renamed": "Nombre actualizado.",
+        "revoked": "Sesión cerrada.",
+        "revoked_all": "Sesiones cerradas.",
+        "errors": {
+          "load_failed": "No se han podido cargar las sesiones.",
+          "rename_failed": "No se ha podido renombrar la sesión.",
+          "revoke_failed": "No se ha podido cerrar la sesión."
+        }
+      },
       "security": {
         "section_title": "Actividad de seguridad",
         "subtitle": "Histórico de inicios de sesión, cambios de contraseña y otros eventos de seguridad de tu cuenta.",

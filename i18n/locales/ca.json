@@ -592,6 +592,28 @@
           "save": "No s'han pogut desar les preferències."
         }
       },
+      "sessions": {
+        "section_title": "Dispositius connectats",
+        "subtitle": "Llista de sessions actives. Si no en reconeixes alguna, revoca-la.",
+        "loading": "Carregant sessions…",
+        "empty": "No hi ha sessions actives.",
+        "current": "Aquest dispositiu",
+        "rename": "Reanomenar",
+        "revoke": "Tancar sessió",
+        "revoke_all_others": "Tancar totes les altres",
+        "confirm": "Confirmar",
+        "cancel": "Cancel·lar",
+        "save": "Desar",
+        "confirm_revoke_all": "Tancaràs la sessió a tots els altres dispositius. Continuar?",
+        "renamed": "Nom actualitzat.",
+        "revoked": "Sessió tancada.",
+        "revoked_all": "Sessions tancades.",
+        "errors": {
+          "load_failed": "No s'han pogut carregar les sessions.",
+          "rename_failed": "No s'ha pogut reanomenar la sessió.",
+          "revoke_failed": "No s'ha pogut tancar la sessió."
+        }
+      },
       "security": {
         "section_title": "Activitat de seguretat",
         "subtitle": "Historial d'inicis de sessió, canvis de contrasenya i altres esdeveniments de seguretat del teu compte.",

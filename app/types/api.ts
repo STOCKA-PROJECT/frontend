@@ -63,6 +63,16 @@ export interface PagedResponse<T> {
   last: boolean
 }
 
+export interface UserSession {
+  id: number
+  displayName: string
+  userAgent: string | null
+  lastIp: string | null
+  firstSeenAt: string
+  lastSeenAt: string
+  current: boolean
+}
+
 export interface LoginUserDto {
   email: string
   password: string

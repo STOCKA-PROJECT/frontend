@@ -592,6 +592,28 @@
           "save": "Couldn't save the preferences."
         }
       },
+      "sessions": {
+        "section_title": "Connected devices",
+        "subtitle": "List of active sessions. Revoke any you don't recognize.",
+        "loading": "Loading sessions…",
+        "empty": "No active sessions.",
+        "current": "This device",
+        "rename": "Rename",
+        "revoke": "Sign out",
+        "revoke_all_others": "Sign out everywhere else",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "save": "Save",
+        "confirm_revoke_all": "You'll be signed out from every other device. Continue?",
+        "renamed": "Name updated.",
+        "revoked": "Session ended.",
+        "revoked_all": "Sessions ended.",
+        "errors": {
+          "load_failed": "Couldn't load the sessions.",
+          "rename_failed": "Couldn't rename the session.",
+          "revoke_failed": "Couldn't end the session."
+        }
+      },
       "security": {
         "section_title": "Security activity",
         "subtitle": "History of sign-ins, password changes and other security events on your account.",
