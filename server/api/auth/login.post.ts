@@ -1,10 +1,11 @@
 interface LoginBody {
   email: string
   password: string
+  rememberMe?: boolean
 }
 
 interface BackendLoginResponse {
-  token: string
+  accessToken: string
   expiresIn: number
   user: unknown
 }
@@ -13,9 +14,9 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<LoginBody>(event)
   const base = getBackendBaseUrl()
 
-  let data: BackendLoginResponse
+  let response: Awaited<ReturnType<typeof $fetch.raw<BackendLoginResponse>>>
   try {
-    data = await $fetch<BackendLoginResponse>(`${base}/auth/login`, {
+    response = await $fetch.raw<BackendLoginResponse>(`${base}/auth/login`, {
       method: 'POST',
       body,
       headers: {
@@ -26,13 +27,15 @@ export default defineEventHandler(async (event) => {
     return forwardBackendError(event, err)
   }
 
-  setCookie(event, 'stocka_token', data.token, {
-    httpOnly: true,
-    secure: !import.meta.dev,
-    sameSite: 'strict',
-    maxAge: data.expiresIn,
-    path: '/'
-  })
+  const data = response._data
+  if (!data) {
+    return forwardBackendError(event, new Error('empty backend response'))
+  }
+  const refresh = extractRefreshFromBackend(response.headers)
+  if (!refresh) {
+    return forwardBackendError(event, new Error('refresh cookie missing in backend response'))
+  }
 
+  setAuthCookies(event, data.accessToken, data.expiresIn, refresh.value, refresh.maxAge)
   return { user: data.user, expiresIn: data.expiresIn }
 })

@@ -29,10 +29,11 @@ export interface User {
 export interface LoginUserDto {
   email: string
   password: string
+  rememberMe?: boolean
 }
 
 export interface LoginResponseDto {
-  token: string
+  accessToken: string
   expiresIn: number
   user: User
 }

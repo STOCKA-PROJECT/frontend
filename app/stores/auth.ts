@@ -12,6 +12,12 @@ import type {
   VerifyEmailRequestDto
 } from '~/types/api'
 
+/**
+ * Shape returned by every BFF endpoint that establishes or refreshes a
+ * session ({@code /api/auth/login}, {@code /api/auth/refresh}). The access
+ * token never reaches the browser — it stays in the {@code stocka_token}
+ * httpOnly cookie set by the server route.
+ */
 interface LoginSessionResponse {
   user: User
   expiresIn: number
