@@ -2,6 +2,7 @@
 definePageMeta({ layout: 'dashboard' })
 
 const { t } = useI18n()
+const route = useRoute()
 
 // `resolve-org-slug.global.ts` already guarantees the org exists in the store and
 // the user is a member (otherwise it shows 404 / redirects). No need to repeat
@@ -14,6 +15,14 @@ useSeoMeta({
 })
 
 const role = computed(() => org.value?.currentUserRole ?? null)
+
+const initialFocusId = computed(() => {
+  const raw = route.query.location
+  const value = Array.isArray(raw) ? raw[0] : raw
+  if (typeof value !== 'string') return null
+  const n = Number(value)
+  return Number.isInteger(n) && n > 0 ? n : null
+})
 </script>
 
 <template>
@@ -28,7 +37,12 @@ const role = computed(() => org.value?.currentUserRole ?? null)
     </div>
 
     <div class="board-host">
-      <DashboardLocationsBoard v-if="orgSlug" :org-slug="orgSlug" :role="role" />
+      <DashboardLocationsBoard
+        v-if="orgSlug"
+        :org-slug="orgSlug"
+        :role="role"
+        :initial-focus-id="initialFocusId"
+      />
     </div>
   </div>
 </template>

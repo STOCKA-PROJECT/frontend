@@ -32,7 +32,9 @@ const isDraggingLocation = computed(() => currentDrag.value?.kind === 'location'
 const blockedIds = computed(() => {
   const drag = currentDrag.value
   if (!drag || drag.kind !== 'location') return new Set<number>()
-  return descendantIds(props.nodes, drag.id)
+  const ids = descendantIds(props.nodes, drag.id)
+  ids.delete(drag.id)
+  return ids
 })
 
 function toggle(id: number) {
@@ -94,18 +96,6 @@ const unassignedDrop = useDropTarget({
       </button>
     </header>
 
-    <div v-if="isDraggingLocation && canEditLocations"
-      class="root-drop"
-      :class="{ 'is-drop-ok': rootDrop.isOver.value && !rootDrop.isInvalid.value, 'is-drop-bad': rootDrop.isOver.value && rootDrop.isInvalid.value }"
-      @dragenter="rootDrop.onDragEnter"
-      @dragover="rootDrop.onDragOver"
-      @dragleave="rootDrop.onDragLeave"
-      @drop="rootDrop.onDrop"
-    >
-      <DashboardIcon name="upload" :size="13" />
-      <span>{{ t('dashboard.locations.drop_to_root') }}</span>
-    </div>
-
     <div class="flex-1 overflow-y-auto px-2 py-2" role="tree">
       <div v-if="loading" class="flex flex-col gap-1.5 px-1">
         <div v-for="i in 5" :key="`s-${i}`" class="h-7 animate-pulse rounded bg-bg-soft" />
@@ -120,38 +110,35 @@ const unassignedDrop = useDropTarget({
       </div>
 
       <div v-else>
-        <DashboardLocationNodeEditable
-          v-for="node in nodes"
-          :key="node.id"
-          :node="node"
-          :selected-id="selectedId"
-          :expanded="expanded"
-          :blocked-ids="blockedIds"
-          :can-edit-locations="canEditLocations"
-          :can-move-pieces="canMovePieces"
-          @toggle="toggle"
-          @select="(id) => emit('select', id)"
+        <DashboardLocationNodeEditable v-for="node in nodes" :key="node.id" :node="node" :selected-id="selectedId"
+          :expanded="expanded" :blocked-ids="blockedIds" :can-edit-locations="canEditLocations"
+          :can-move-pieces="canMovePieces" @toggle="toggle" @select="(id) => emit('select', id)"
           @drop-location="(p) => emit('drop-location', { sourceId: p.sourceId, targetId: p.targetId })"
           @drop-piece="(p) => emit('drop-piece', { pieceId: p.pieceId, targetLocationId: p.targetLocationId })"
-          @create-child="(id) => emit('create-child', id)"
-          @rename="(id) => emit('rename', id)"
-          @delete="(id) => emit('delete', id)"
-        />
+          @create-child="(id) => emit('create-child', id)" @rename="(id) => emit('rename', id)"
+          @delete="(id) => emit('delete', id)" />
       </div>
     </div>
 
-    <button type="button"
-      class="unassigned-row"
-      :class="{
-        'is-selected': isUnassignedFocus,
-        'is-drop-ok': unassignedDrop.isOver.value && !unassignedDrop.isInvalid.value
-      }"
-      @click="emit('select-unassigned')"
-      @dragenter="unassignedDrop.onDragEnter"
-      @dragover="unassignedDrop.onDragOver"
-      @dragleave="unassignedDrop.onDragLeave"
-      @drop="unassignedDrop.onDrop"
-    >
+    <!-- Footer-mounted root drop zone: only present while a location is being
+         dragged. Inserting an element here only shrinks the scrollable tree
+         area from the bottom — rows at the top of the tree (where the drag
+         source lives) keep their on-screen position, so Chromium doesn't
+         cancel the drag. -->
+    <div v-if="isDraggingLocation && canEditLocations" class="root-drop" :class="{
+      'is-drop-ok': rootDrop.isOver.value && !rootDrop.isInvalid.value,
+      'is-drop-bad': rootDrop.isOver.value && rootDrop.isInvalid.value
+    }" aria-hidden="true" @dragenter="rootDrop.onDragEnter" @dragover="rootDrop.onDragOver"
+      @dragleave="rootDrop.onDragLeave" @drop="rootDrop.onDrop">
+      <DashboardIcon name="upload" :size="13" />
+      <span>{{ t('dashboard.locations.drop_to_root') }}</span>
+    </div>
+
+    <button type="button" class="unassigned-row" :class="{
+      'is-selected': isUnassignedFocus,
+      'is-drop-ok': unassignedDrop.isOver.value && !unassignedDrop.isInvalid.value
+    }" @click="emit('select-unassigned')" @dragenter="unassignedDrop.onDragEnter"
+      @dragover="unassignedDrop.onDragOver" @dragleave="unassignedDrop.onDragLeave" @drop="unassignedDrop.onDrop">
       <DashboardIcon name="folder" :size="14" />
       <span>{{ t('dashboard.locations.unassigned') }}</span>
     </button>
@@ -173,15 +160,20 @@ const unassignedDrop = useDropTarget({
   color: var(--c-ink);
   transition: background .12s, border-color .12s;
 }
-.hdr-btn:hover { background: var(--c-bg-soft); border-color: var(--c-line-strong); }
+
+.hdr-btn:hover {
+  background: var(--c-bg-soft);
+  border-color: var(--c-line-strong);
+}
 
 .root-drop {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin: 8px;
-  padding: 10px;
+  margin: 0 8px 8px;
+  padding: 8px 12px;
   border-radius: 9px;
   border: 1px dashed var(--c-line-strong);
   background: var(--c-bg-soft);
@@ -189,8 +181,18 @@ const unassignedDrop = useDropTarget({
   color: var(--c-ink-muted);
   transition: background .12s, border-color .12s, color .12s;
 }
-.root-drop.is-drop-ok { background: var(--c-accent-soft); border-color: var(--c-accent); color: var(--c-accent-ink); }
-.root-drop.is-drop-bad { background: var(--c-danger-soft); border-color: var(--c-danger); color: var(--c-danger); }
+
+.root-drop.is-drop-ok {
+  background: var(--c-accent-soft);
+  border-color: var(--c-accent);
+  color: var(--c-accent-ink);
+}
+
+.root-drop.is-drop-bad {
+  background: var(--c-danger-soft);
+  border-color: var(--c-danger);
+  color: var(--c-danger);
+}
 
 .unassigned-row {
   display: flex;
@@ -201,13 +203,24 @@ const unassignedDrop = useDropTarget({
   font-size: 13px;
   color: var(--c-ink-soft);
   background: transparent;
-  border-left: 0; border-right: 0; border-bottom: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
   cursor: pointer;
   transition: background .12s, color .12s;
   text-align: left;
 }
-.unassigned-row:hover { background: var(--c-bg-soft); color: var(--c-ink); }
-.unassigned-row.is-selected { background: var(--c-accent-soft); color: var(--c-accent-ink); }
+
+.unassigned-row:hover {
+  background: var(--c-bg-soft);
+  color: var(--c-ink);
+}
+
+.unassigned-row.is-selected {
+  background: var(--c-accent-soft);
+  color: var(--c-accent-ink);
+}
+
 .unassigned-row.is-drop-ok {
   background: var(--c-accent-soft);
   box-shadow: inset 0 0 0 1px var(--c-accent);
