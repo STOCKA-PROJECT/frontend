@@ -28,7 +28,13 @@ const isBlocked = computed(() => props.blockedIds.has(props.node.id))
 
 const { onDragStart, onDragEnd, dragging } = useDragSource(
   () => ({ kind: 'location', id: props.node.id }),
-  { disabled: () => !props.canEditLocations }
+  {
+    disabled: () => !props.canEditLocations,
+    dragImage: (e) => {
+      const handle = e.currentTarget as HTMLElement | null
+      return handle?.closest<HTMLElement>('.tree-row') ?? null
+    }
+  }
 )
 
 const drop = useDropTarget({
@@ -90,35 +96,21 @@ function openMenu(e: Event) {
 
 <template>
   <div>
-    <div
-      class="tree-row"
-      :class="{
-        'is-collapsed': !isOpen,
-        'no-caret': !hasChildren,
-        'is-selected': isSelected,
-        'is-draggable': canEditLocations,
-        'is-dragging': dragging,
-        'is-drop-ok': drop.isOver.value && !drop.isInvalid.value,
-        'is-drop-bad': drop.isOver.value && drop.isInvalid.value,
-        'is-blocked': isBlocked
-      }"
-      :draggable="canEditLocations ? true : false"
-      role="treeitem"
-      :aria-selected="isSelected"
-      :aria-expanded="hasChildren ? isOpen : undefined"
-      tabindex="0"
-      @click="onRowClick"
-      @keydown.enter.prevent="onRowClick"
-      @keydown.space.prevent="onRowClick"
-      @dragstart="onDragStart"
-      @dragend="onDragEnd"
-      @dragenter="drop.onDragEnter"
-      @dragover="drop.onDragOver"
-      @dragleave="drop.onDragLeave"
-      @drop="drop.onDrop"
-    >
-      <span v-if="canEditLocations" class="grip" :aria-label="$t('dashboard.locations.drag_handle_aria')">
-        <svg width="8" height="14" viewBox="0 0 10 16" fill="currentColor" aria-hidden="true">
+    <div class="tree-row" :class="{
+      'is-collapsed': !isOpen,
+      'no-caret': !hasChildren,
+      'is-selected': isSelected,
+      'is-dragging': dragging,
+      'is-drop-ok': drop.isOver.value && !drop.isInvalid.value,
+      'is-drop-bad': drop.isOver.value && drop.isInvalid.value,
+      'is-blocked': isBlocked
+    }" role="treeitem" :aria-selected="isSelected" :aria-expanded="hasChildren ? isOpen : undefined" tabindex="0"
+      @click="onRowClick" @keydown.enter.prevent="onRowClick" @keydown.space.prevent="onRowClick"
+      @dragenter="drop.onDragEnter" @dragover="drop.onDragOver" @dragleave="drop.onDragLeave" @drop="drop.onDrop">
+      <span v-if="canEditLocations" class="grip" :draggable="true"
+        :aria-label="$t('dashboard.locations.drag_handle_aria')" @click.stop @dragstart="onDragStart"
+        @dragend="onDragEnd">
+        <svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor" aria-hidden="true">
           <circle cx="2" cy="3" r="1.2" />
           <circle cx="2" cy="8" r="1.2" />
           <circle cx="2" cy="13" r="1.2" />
@@ -130,14 +122,16 @@ function openMenu(e: Event) {
       <button type="button" class="caret-btn" :tabindex="-1" :aria-hidden="!hasChildren" @click="onCaretClick">
         <DashboardIcon v-if="hasChildren" name="caret" :size="10" />
       </button>
-      <span class="ico"><DashboardIcon :name="hasChildren ? 'building' : 'cabinet'" :size="14" /></span>
+      <span class="ico">
+        <DashboardIcon :name="hasChildren ? 'building' : 'cabinet'" :size="14" />
+      </span>
       <span class="lbl">{{ node.name }}</span>
 
       <div v-if="canEditLocations" ref="menuRef" class="menu-wrap" @click.stop>
         <button type="button" class="menu-btn" :aria-expanded="menuOpen" :aria-haspopup="true"
           :title="$t('dashboard.locations.actions')" @click="openMenu">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="5" cy="12" r="1" />
             <circle cx="12" cy="12" r="1" />
             <circle cx="19" cy="12" r="1" />
@@ -149,8 +143,7 @@ function openMenu(e: Event) {
             <DashboardIcon name="plus" :size="12" />
             {{ $t('dashboard.locations.new_child') }}
           </button>
-          <button type="button" role="menuitem" class="menu-item"
-            @click="menuOpen = false; emit('rename', node.id)">
+          <button type="button" role="menuitem" class="menu-item" @click="menuOpen = false; emit('rename', node.id)">
             {{ $t('dashboard.locations.rename') }}
           </button>
           <button type="button" role="menuitem" class="menu-item menu-item-danger"
@@ -162,23 +155,12 @@ function openMenu(e: Event) {
     </div>
 
     <div v-if="isOpen && hasChildren" class="ml-3.5 border-l border-line pl-4">
-      <DashboardLocationNodeEditable
-        v-for="child in node.children"
-        :key="child.id"
-        :node="child"
-        :selected-id="selectedId"
-        :expanded="expanded"
-        :blocked-ids="blockedIds"
-        :can-edit-locations="canEditLocations"
-        :can-move-pieces="canMovePieces"
-        @toggle="emit('toggle', $event)"
-        @select="emit('select', $event)"
-        @drop-location="emit('drop-location', $event)"
-        @drop-piece="emit('drop-piece', $event)"
-        @create-child="emit('create-child', $event)"
-        @rename="emit('rename', $event)"
-        @delete="emit('delete', $event)"
-      />
+      <DashboardLocationNodeEditable v-for="child in node.children" :key="child.id" :node="child"
+        :selected-id="selectedId" :expanded="expanded" :blocked-ids="blockedIds" :can-edit-locations="canEditLocations"
+        :can-move-pieces="canMovePieces" @toggle="emit('toggle', $event)" @select="emit('select', $event)"
+        @drop-location="emit('drop-location', $event)" @drop-piece="emit('drop-piece', $event)"
+        @create-child="emit('create-child', $event)" @rename="emit('rename', $event)"
+        @delete="emit('delete', $event)" />
     </div>
   </div>
 </template>
@@ -194,42 +176,102 @@ function openMenu(e: Event) {
   font-size: 13.5px;
   cursor: pointer;
   color: var(--c-ink);
-  transition: background .12s, border-color .12s, box-shadow .12s, opacity .12s;
+  transition: background .12s, border-color .12s, box-shadow .12s;
   user-select: none;
   background: transparent;
   border: 1px solid transparent;
   text-align: left;
   outline: none;
 }
-.tree-row:hover { background: var(--c-bg-soft); }
-.tree-row:focus-visible { box-shadow: 0 0 0 2px color-mix(in oklab, var(--c-accent) 35%, transparent); }
-.tree-row.is-selected { background: var(--c-accent-soft); border-color: color-mix(in oklab, var(--c-accent) 30%, transparent); }
-.tree-row.is-selected .ico { color: var(--c-accent-ink); }
-.tree-row.is-draggable { cursor: grab; }
-.tree-row.is-draggable:active { cursor: grabbing; }
-.tree-row.is-dragging { opacity: .5; }
-.tree-row.is-drop-ok { background: var(--c-accent-soft); border-color: var(--c-accent); }
-.tree-row.is-drop-bad { background: var(--c-danger-soft); border-color: var(--c-danger); cursor: not-allowed; }
-.tree-row.is-blocked { opacity: .55; }
-.tree-row.no-caret .caret-btn { pointer-events: none; }
+
+.tree-row:hover {
+  background: var(--c-bg-soft);
+}
+
+.tree-row:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--c-accent) 35%, transparent);
+}
+
+.tree-row.is-selected {
+  background: var(--c-accent-soft);
+  border-color: color-mix(in oklab, var(--c-accent) 30%, transparent);
+}
+
+.tree-row.is-selected .ico {
+  color: var(--c-accent-ink);
+}
+
+/* Do NOT change opacity (or any other animatable CSS) on the row that hosts the
+   drag source. Chromium cancels the drag if the ancestor of the draggable
+   element mutates synchronously after dragstart. The browser-generated ghost
+   already shows what is being dragged, so we don't need extra feedback on the
+   source row. */
+.tree-row.is-dragging .lbl,
+.tree-row.is-dragging .ico {
+  color: var(--c-ink-muted);
+}
+
+.tree-row.is-drop-ok {
+  background: var(--c-accent-soft);
+  border-color: var(--c-accent);
+}
+
+.tree-row.is-drop-bad {
+  background: var(--c-danger-soft);
+  border-color: var(--c-danger);
+  cursor: not-allowed;
+}
+
+.tree-row.is-blocked {
+  opacity: .55;
+}
+
+.tree-row.no-caret .caret-btn {
+  display: none;
+}
 
 .grip {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 22px;
   color: var(--c-ink-muted);
   flex-shrink: 0;
-  padding: 0 1px;
-  opacity: .4;
-  transition: opacity .12s;
+  border-radius: 4px;
+  opacity: .55;
+  cursor: grab;
+  transition: opacity .12s, background .12s;
+  /* Critical: -webkit-user-drag must be auto/element so the span itself is the
+     drag source. Some user-agent stylesheets set it to "none" for spans. */
+  -webkit-user-drag: element;
+  user-drag: element;
 }
+
+.grip:hover {
+  background: var(--c-bg-soft);
+  opacity: 1;
+}
+
+.grip:active {
+  cursor: grabbing;
+}
+
+.grip>svg {
+  pointer-events: none;
+}
+
 .tree-row:hover .grip,
 .tree-row.is-selected .grip,
-.tree-row.is-dragging .grip { opacity: 1; }
+.tree-row.is-dragging .grip {
+  opacity: 1;
+}
 
 /* Drag is desktop-only — hide affordances on touch devices. */
-@media (hover: none) and (pointer: coarse) {
-  .grip { display: none; }
-  .tree-row.is-draggable { cursor: default; }
+@media (any-hover: none) and (any-pointer: coarse) {
+  .grip {
+    display: none;
+  }
 }
 
 .caret-btn {
@@ -245,10 +287,20 @@ function openMenu(e: Event) {
   flex-shrink: 0;
   transition: transform .15s, background .12s;
 }
-.caret-btn:hover { background: var(--c-bg-soft); }
-.tree-row.is-collapsed .caret-btn { transform: rotate(-90deg); }
 
-.ico { color: var(--c-ink-soft); flex-shrink: 0; }
+.caret-btn:hover {
+  background: var(--c-bg-soft);
+}
+
+.tree-row.is-collapsed .caret-btn {
+  transform: rotate(-90deg);
+}
+
+.ico {
+  color: var(--c-ink-soft);
+  flex-shrink: 0;
+}
+
 .lbl {
   flex: 1;
   min-width: 0;
@@ -257,7 +309,11 @@ function openMenu(e: Event) {
   text-overflow: ellipsis;
 }
 
-.menu-wrap { position: relative; flex-shrink: 0; }
+.menu-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .menu-btn {
   width: 22px;
   height: 22px;
@@ -271,10 +327,17 @@ function openMenu(e: Event) {
   opacity: 0;
   transition: opacity .12s, background .12s, color .12s;
 }
+
 .tree-row:hover .menu-btn,
 .tree-row.is-selected .menu-btn,
-.menu-btn[aria-expanded="true"] { opacity: 1; }
-.menu-btn:hover { background: var(--c-bg-soft); color: var(--c-ink); }
+.menu-btn[aria-expanded="true"] {
+  opacity: 1;
+}
+
+.menu-btn:hover {
+  background: var(--c-bg-soft);
+  color: var(--c-ink);
+}
 
 .menu {
   position: absolute;
@@ -287,9 +350,10 @@ function openMenu(e: Event) {
   border: 1px solid var(--c-line);
   background: var(--c-bg-card);
   border-radius: 9px;
-  box-shadow: var(--shadow-md, 0 6px 20px rgba(0,0,0,.08));
+  box-shadow: var(--shadow-md, 0 6px 20px rgba(0, 0, 0, .08));
   padding: 4px;
 }
+
 .menu-item {
   display: flex;
   align-items: center;
@@ -304,7 +368,16 @@ function openMenu(e: Event) {
   text-align: left;
   cursor: pointer;
 }
-.menu-item:hover { background: var(--c-bg-soft); }
-.menu-item-danger { color: var(--c-danger); }
-.menu-item-danger:hover { background: var(--c-danger-soft); }
+
+.menu-item:hover {
+  background: var(--c-bg-soft);
+}
+
+.menu-item-danger {
+  color: var(--c-danger);
+}
+
+.menu-item-danger:hover {
+  background: var(--c-danger-soft);
+}
 </style>
