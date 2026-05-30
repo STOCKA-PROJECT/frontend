@@ -444,6 +444,7 @@
       "empty_pieces": "This location has no items.",
       "detail_empty": "Pick a location from the tree to see its items and sub-locations, or create a new one.",
       "drop_to_root": "Drop here to move to root",
+      "drag_handle_aria": "Drag to move the location",
       "unassigned": "Unassigned",
       "unassigned_subtitle": "Items that are not yet in any location. Drag them onto the tree to place them.",
       "children_title": "Sub-locations",

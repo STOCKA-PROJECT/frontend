@@ -444,6 +444,7 @@
       "empty_pieces": "Aquesta ubicació no té articles.",
       "detail_empty": "Selecciona una ubicació de l'arbre per veure els seus articles i sub-ubicacions, o crea'n una de nova.",
       "drop_to_root": "Deixa anar aquí per moure a l'arrel",
+      "drag_handle_aria": "Arrossega per moure la ubicació",
       "unassigned": "Sense ubicació",
       "unassigned_subtitle": "Articles que encara no són a cap ubicació. Arrossega'ls a l'arbre per col·locar-los.",
       "children_title": "Sub-ubicacions",

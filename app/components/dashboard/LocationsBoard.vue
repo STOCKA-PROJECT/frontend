@@ -4,6 +4,7 @@ import type { LocationTreeNodeDto, OrganizationRole } from '~/types/api'
 const props = defineProps<{
   orgSlug: string
   role: OrganizationRole | null
+  initialFocusId?: number | null
 }>()
 
 const { t } = useI18n()
@@ -56,6 +57,15 @@ function findInTree(nodes: LocationTreeNodeDto[], id: number): LocationTreeNodeD
   return null
 }
 
+function findParentId(nodes: LocationTreeNodeDto[], childId: number): number | null {
+  for (const n of nodes) {
+    if (n.children?.some(c => c.id === childId)) return n.id
+    const found = findParentId(n.children ?? [], childId)
+    if (found != null) return found
+  }
+  return null
+}
+
 async function loadTree() {
   try {
     await locations.fetchTree(props.orgSlug)
@@ -84,11 +94,29 @@ async function loadDetail(id: number) {
   }
 }
 
+function applyInitialFocus(resetIfNone: boolean) {
+  const id = props.initialFocusId
+  if (id == null) {
+    if (resetIfNone) focus.value = { kind: 'none' }
+    return
+  }
+  const node = findInTree(locations.tree, id)
+  if (node) {
+    focus.value = { kind: 'location', id }
+  } else if (resetIfNone) {
+    focus.value = { kind: 'none' }
+  }
+}
+
 watch(() => props.orgSlug, async () => {
-  focus.value = { kind: 'none' }
   pieces.invalidateAll()
   await loadTree()
+  applyInitialFocus(true)
 }, { immediate: true })
+
+watch(() => props.initialFocusId, () => {
+  applyInitialFocus(false)
+})
 
 watch(focus, async (next) => {
   if (next.kind === 'location') {
@@ -110,6 +138,8 @@ function onSelectUnassigned() {
 async function handleDropLocation(payload: { sourceId: number; targetId: number | null }) {
   if (props.role !== 'OWNER' && props.role !== 'MANAGER') return
   if (payload.sourceId === payload.targetId) return
+  const currentParentId = findParentId(locations.tree, payload.sourceId)
+  if (currentParentId === payload.targetId) return
   try {
     if (payload.targetId == null) {
       await locations.update(props.orgSlug, payload.sourceId, { moveToRoot: true })

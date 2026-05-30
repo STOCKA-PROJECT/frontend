@@ -444,6 +444,7 @@
       "empty_pieces": "Esta ubicación no tiene artículos.",
       "detail_empty": "Selecciona una ubicación del árbol para ver sus artículos y sub-ubicaciones, o crea una nueva.",
       "drop_to_root": "Soltar aquí para mover a raíz",
+      "drag_handle_aria": "Arrastra para mover la ubicación",
       "unassigned": "Sin ubicación",
       "unassigned_subtitle": "Artículos que aún no están en ninguna ubicación. Arrástralos al árbol para colocarlos.",
       "children_title": "Sub-ubicaciones",
