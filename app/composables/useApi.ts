@@ -1,7 +1,11 @@
 import type { FetchOptions } from 'ofetch'
 
 const PUBLIC_SEGMENTS = ['/login', '/registro', '/recuperar-password', '/restablecer-password']
-const AUTH_ENDPOINTS = ['/auth/login', '/auth/signup']
+const AUTH_ENDPOINTS = ['/auth/login', '/auth/signup', '/auth/refresh']
+const REFRESHABLE_ERROR_CODES = new Set([
+  'auth.token_expired',
+  'auth.unauthenticated'
+])
 
 function stripLocalePrefix(path: string): string {
   const m = path.match(/^\/(en|ca)(\/|$)/)
@@ -23,6 +27,15 @@ function isAuthEndpoint(url: string): boolean {
 
 type I18nLike = { locale: { value: string } | string }
 type LocalePathFn = (path: string) => string
+type ApiErrorBody = { code?: string }
+type ApiFetchError = { response?: { status?: number, _data?: ApiErrorBody } }
+
+/**
+ * Module-level mutex for refresh-token rotation. Multiple concurrent requests
+ * that hit a 401 only trigger a single /api/auth/refresh round-trip; everyone
+ * else awaits the same in-flight promise and then retries.
+ */
+let refreshInFlight: Promise<boolean> | null = null
 
 export function useApi() {
   const auth = useAuthStore()
@@ -41,7 +54,7 @@ export function useApi() {
     return fn ? fn(path) : path
   }
 
-  const options: FetchOptions = {
+  const buildOptions = (): FetchOptions => ({
     baseURL: '/api',
     onRequest({ options, request }) {
       const headers = new Headers(options.headers as HeadersInit | undefined)
@@ -58,29 +71,70 @@ export function useApi() {
 
       options.headers = headers
       void request
-    },
-    onResponseError({ response, request }) {
-      if (response?.status !== 401) return
+    }
+  })
 
-      const url = requestUrl(request)
-      if (isAuthEndpoint(url)) return
+  const baseFetch = $fetch.create(buildOptions())
 
-      const code = (response._data as { code?: string } | undefined)?.code
-      const isTokenInvalid = !code || code === 'auth.unauthenticated' || code.startsWith('auth.token_')
-      if (!isTokenInvalid) return
-
-      auth.clearLocalSession()
-
-      if (import.meta.client) {
-        const raw = useRoute().path
-        const path = stripLocalePrefix(raw)
-        const isPublic = PUBLIC_SEGMENTS.some(p => path.startsWith(p)) || path === '/'
-        if (!isPublic) {
-          navigateTo(resolveLocalePath('/login'))
+  async function tryRefresh(): Promise<boolean> {
+    // SSR can't refresh: the rotated cookies would land on the inner fetch's
+    // response, not the outer document response, so the browser never sees
+    // them. The error bubbles up; the next client-side interaction will
+    // refresh correctly.
+    if (import.meta.server) return false
+    if (!refreshInFlight) {
+      refreshInFlight = (async () => {
+        try {
+          const data = await baseFetch<{ user: unknown, expiresIn: number }>(
+            '/auth/refresh',
+            { method: 'POST' }
+          )
+          auth.setSession(data as { user: import('~/types/api').User, expiresIn: number })
+          return true
+        } catch {
+          return false
+        } finally {
+          refreshInFlight = null
         }
+      })()
+    }
+    return refreshInFlight
+  }
+
+  function handleRefreshFailure(): void {
+    auth.clearLocalSession()
+    if (import.meta.client) {
+      const raw = useRoute().path
+      const path = stripLocalePrefix(raw)
+      const isPublic = PUBLIC_SEGMENTS.some(p => path.startsWith(p)) || path === '/'
+      if (!isPublic) {
+        navigateTo(resolveLocalePath('/login'))
       }
     }
   }
 
-  return $fetch.create(options)
+  return async <T> (
+    url: Parameters<typeof baseFetch>[0],
+    opts?: Parameters<typeof baseFetch>[1]
+  ): Promise<T> => {
+    try {
+      return await baseFetch<T>(url, opts)
+    } catch (err) {
+      const error = err as ApiFetchError
+      if (error.response?.status !== 401) throw err
+
+      const apiUrl = requestUrl(url)
+      if (isAuthEndpoint(apiUrl)) throw err
+
+      const code = error.response._data?.code
+      if (code && !REFRESHABLE_ERROR_CODES.has(code)) throw err
+
+      const refreshed = await tryRefresh()
+      if (!refreshed) {
+        handleRefreshFailure()
+        throw err
+      }
+      return await baseFetch<T>(url, opts)
+    }
+  }
 }

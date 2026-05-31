@@ -1,18 +1,22 @@
 export default defineEventHandler(async (event) => {
-  const token = getCookie(event, 'stocka_token')
+  const accessToken = getAccessCookie(event)
+  const refreshToken = getRefreshCookie(event)
   const base = getBackendBaseUrl()
 
-  if (token) {
+  if (accessToken) {
     try {
       await $fetch(`${base}/auth/logout`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          ...(refreshToken ? { cookie: `stocka_refresh=${refreshToken}` } : {})
+        }
       })
     } catch {
-      // logout is fire-and-forget; clear cookie regardless
+      // logout is fire-and-forget; clear cookies regardless
     }
   }
 
-  deleteCookie(event, 'stocka_token', { path: '/' })
+  clearAuthCookies(event)
   return { success: true }
 })

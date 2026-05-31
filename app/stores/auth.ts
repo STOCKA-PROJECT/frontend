@@ -12,9 +12,26 @@ import type {
   VerifyEmailRequestDto
 } from '~/types/api'
 
+/**
+ * Shape returned by every BFF endpoint that establishes or refreshes a
+ * session ({@code /api/auth/login}, {@code /api/auth/refresh}). The access
+ * token never reaches the browser — it stays in the {@code stocka_token}
+ * httpOnly cookie set by the server route.
+ */
 interface LoginSessionResponse {
   user: User
   expiresIn: number
+}
+
+interface LoginChallengeResponse {
+  requires2fa: true
+  mfaToken: string
+}
+
+type LoginResponse = LoginSessionResponse | LoginChallengeResponse
+
+function isChallengeResponse(r: LoginResponse): r is LoginChallengeResponse {
+  return (r as LoginChallengeResponse).requires2fa === true
 }
 
 type LocalePathFn = (path: string) => string
@@ -53,25 +70,50 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function login(payload: LoginUserDto) {
+  async function login(payload: LoginUserDto): Promise<LoginChallengeResponse | null> {
     const api = useApi()
-    const data = await api<LoginSessionResponse>('/auth/login', {
+    const data = await api<LoginResponse>('/auth/login', {
       method: 'POST',
       body: payload
     })
+    if (isChallengeResponse(data)) {
+      return data
+    }
     setSession(data)
     await routeAfterAuth()
+    return null
   }
 
-  async function loginNoRedirect(payload: LoginUserDto) {
+  async function loginNoRedirect(payload: LoginUserDto): Promise<LoginChallengeResponse | null> {
     const api = useApi()
-    const data = await api<LoginSessionResponse>('/auth/login', {
+    const data = await api<LoginResponse>('/auth/login', {
       method: 'POST',
       body: payload
     })
+    if (isChallengeResponse(data)) {
+      return data
+    }
     setSession(data)
     const orgs = useOrganizationsStore()
     await orgs.fetchList()
+    return null
+  }
+
+  /**
+   * Submits the second step of the 2FA login. On success the session is set
+   * and the caller drives the redirect.
+   *
+   * @param mfaToken the {@code mfaToken} returned by {@link login}
+   * @param code TOTP code or recovery code
+   * @param rememberMe whether the resulting session should be persistent
+   */
+  async function submit2faChallenge(mfaToken: string, code: string, rememberMe: boolean) {
+    const api = useApi()
+    const data = await api<LoginSessionResponse>('/auth/login/2fa', {
+      method: 'POST',
+      body: { mfaToken, code, rememberMe }
+    })
+    setSession(data)
   }
 
   async function signup(payload: RegisterUserDto) {
@@ -181,6 +223,7 @@ export const useAuthStore = defineStore('auth', () => {
     setSession,
     login,
     loginNoRedirect,
+    submit2faChallenge,
     signup,
     logout,
     forgotPassword,
@@ -191,6 +234,7 @@ export const useAuthStore = defineStore('auth', () => {
     updateProfile,
     changePassword,
     checkUsername,
-    clearLocalSession
+    clearLocalSession,
+    routeAfterAuth
   }
 })
