@@ -1,24 +1,27 @@
-interface LoginBody {
-  email: string
-  password: string
+interface LoginTwoFactorBody {
+  mfaToken: string
+  code: string
   rememberMe?: boolean
 }
 
 interface BackendLoginResponse {
-  accessToken?: string
-  expiresIn?: number
-  user?: unknown
-  requires2fa?: boolean
-  mfaToken?: string
+  accessToken: string
+  expiresIn: number
+  user: unknown
 }
 
+/**
+ * BFF wrapper for the 2FA challenge step. Same shape as the
+ * {@code /api/auth/login} success path — sets both cookies and returns
+ * {@code { user, expiresIn }}.
+ */
 export default defineEventHandler(async (event) => {
-  const body = await readBody<LoginBody>(event)
+  const body = await readBody<LoginTwoFactorBody>(event)
   const base = getBackendBaseUrl()
 
   let response: Awaited<ReturnType<typeof $fetch.raw<BackendLoginResponse>>>
   try {
-    response = await $fetch.raw<BackendLoginResponse>(`${base}/auth/login`, {
+    response = await $fetch.raw<BackendLoginResponse>(`${base}/auth/login/2fa`, {
       method: 'POST',
       body,
       headers: {
@@ -32,16 +35,6 @@ export default defineEventHandler(async (event) => {
   const data = response._data
   if (!data) {
     return forwardBackendError(event, new Error('empty backend response'))
-  }
-
-  // 2FA-enabled accounts get the challenge step instead of a full session.
-  // No cookies are set — the frontend redirects to the 2FA challenge form.
-  if (data.requires2fa) {
-    return { requires2fa: true, mfaToken: data.mfaToken }
-  }
-
-  if (!data.accessToken || data.expiresIn == null) {
-    return forwardBackendError(event, new Error('malformed backend response'))
   }
   const refresh = extractRefreshFromBackend(response.headers)
   if (!refresh) {

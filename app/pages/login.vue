@@ -15,11 +15,18 @@ const apiError = useApiError()
 
 const email = ref('')
 const password = ref('')
+const rememberMe = ref(false)
 const loading = ref(false)
 const errorMsg = ref<string | null>(null)
 const errorCode = ref<string | null>(null)
 const resendingVerification = ref(false)
 const verificationResent = ref(false)
+
+// 2FA challenge state
+const mfaToken = ref<string | null>(null)
+const totpCode = ref('')
+const totpError = ref<string | null>(null)
+const verifyingTotp = ref(false)
 
 const successMsg = computed(() => {
   if (route.query.verified === 'ok') return t('auth.login.verified_ok')
@@ -36,6 +43,7 @@ const showResendVerification = computed(() =>
 )
 
 const canSubmit = computed(() => email.value.trim() && password.value && !loading.value)
+const canSubmitTotp = computed(() => totpCode.value.replace(/\s+/g, '').length >= 6 && !verifyingTotp.value)
 
 function safeNextPath(): string | null {
   const raw = route.query.next
@@ -57,12 +65,19 @@ async function submit() {
   errorCode.value = null
   verificationResent.value = false
   try {
+    const payload = {
+      email: email.value.trim(),
+      password: password.value,
+      rememberMe: rememberMe.value
+    }
     const next = safeNextPath()
-    if (next) {
-      await auth.loginNoRedirect({ email: email.value.trim(), password: password.value })
+    const challenge = next
+      ? await auth.loginNoRedirect(payload)
+      : await auth.login(payload)
+    if (challenge) {
+      mfaToken.value = challenge.mfaToken
+    } else if (next) {
       await navigateTo(next)
-    } else {
-      await auth.login({ email: email.value.trim(), password: password.value })
     }
   } catch (e) {
     console.error('[login] error:', e)
@@ -72,6 +87,36 @@ async function submit() {
   } finally {
     loading.value = false
   }
+}
+
+async function submitTotp() {
+  if (!canSubmitTotp.value || !mfaToken.value) return
+  verifyingTotp.value = true
+  totpError.value = null
+  try {
+    await auth.submit2faChallenge(mfaToken.value, totpCode.value.trim(), rememberMe.value)
+    const next = safeNextPath()
+    if (next) {
+      await navigateTo(next)
+    } else {
+      await auth.routeAfterAuth()
+    }
+  } catch (e) {
+    const view = apiError(e)
+    totpError.value = view.description
+    if (view.code === 'auth.2fa_mfa_token_expired') {
+      mfaToken.value = null
+      errorMsg.value = view.description
+    }
+  } finally {
+    verifyingTotp.value = false
+  }
+}
+
+function cancelTotp() {
+  mfaToken.value = null
+  totpCode.value = ''
+  totpError.value = null
 }
 
 async function resendVerification() {
@@ -90,10 +135,37 @@ async function resendVerification() {
 
 <template>
   <AuthFormCard :title="t('auth.login.title')" :subtitle="t('auth.login.subtitle')">
-    <form class="flex flex-col gap-3.5" novalidate @submit.prevent="submit">
+    <!-- Step 2: 2FA challenge -->
+    <form v-if="mfaToken" class="flex flex-col gap-3.5" novalidate @submit.prevent="submitTotp">
+      <div v-if="totpError" role="alert"
+        class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger">
+        {{ totpError }}
+      </div>
+      <p class="text-[13px] text-ink-soft">{{ t('auth.login.totp_prompt') }}</p>
+      <AuthTextField id="totp" v-model="totpCode" :label="t('auth.login.totp_label')"
+        :placeholder="t('auth.login.totp_placeholder')" autocomplete="one-time-code"
+        :maxlength="10" required />
+      <AuthSubmitButton :loading="verifyingTotp" :disabled="!canSubmitTotp">
+        {{ t('auth.login.totp_submit') }}
+      </AuthSubmitButton>
+      <button type="button" class="self-center text-[12.5px] text-ink-muted underline-offset-2 hover:underline"
+        @click="cancelTotp">
+        {{ t('auth.login.totp_back') }}
+      </button>
+    </form>
+
+    <!-- Step 1: email + password -->
+    <form v-else class="flex flex-col gap-3.5" novalidate @submit.prevent="submit">
       <div v-if="successMsg" role="status"
         class="rounded-lg border border-accent/30 bg-accent-soft px-3 py-2 text-[13px] text-accent-ink">
         {{ successMsg }}
+      </div>
+
+      <AuthGoogleSignInButton />
+      <div class="flex items-center gap-3">
+        <hr class="flex-1 border-line">
+        <span class="text-[11.5px] uppercase tracking-wider text-ink-muted">{{ t('auth.oauth.or_separator') }}</span>
+        <hr class="flex-1 border-line">
       </div>
 
       <div v-if="errorMsg" role="alert"
@@ -124,6 +196,10 @@ async function resendVerification() {
           </NuxtLink>
         </template>
       </AuthPasswordField>
+
+      <AuthCheckbox id="remember-me" v-model="rememberMe">
+        {{ t('auth.login.remember_me') }}
+      </AuthCheckbox>
 
       <AuthSubmitButton :loading="loading" :disabled="!canSubmit">
         {{ t('auth.login.submit') }}

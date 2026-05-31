@@ -152,6 +152,37 @@
     "footer_short": "© {year} Stocka",
     "show_password": "Show password",
     "hide_password": "Hide password",
+    "oauth": {
+      "or_separator": "or",
+      "continue_with_google": "Continue with Google",
+      "signup_with_google": "Sign up with Google",
+      "errors": {
+        "start_failed": "Couldn't start the Google sign-in."
+      },
+      "callback": {
+        "page_title": "Finishing sign-in…",
+        "title": "Finishing sign-in",
+        "subtitle": "We're completing your Google sign-in.",
+        "loading": "Verifying credentials…",
+        "back_to_login": "Back to sign in",
+        "errors": {
+          "invalid_redirect": "The redirect from Google is not valid. Please try again."
+        }
+      },
+      "link": {
+        "section_title": "Sign in with Google",
+        "subtitle": "Link your Google account to sign in with one click.",
+        "status_linked": "Linked",
+        "status_not_linked": "Not linked",
+        "link": "Link Google",
+        "unlink": "Unlink",
+        "linked": "Account linked.",
+        "unlinked": "Account unlinked.",
+        "errors": {
+          "unlink_failed": "Couldn't unlink the account."
+        }
+      }
+    },
     "strength": {
       "label": "Strength",
       "weak": "Weak",
@@ -167,6 +198,12 @@
       "password": "Password",
       "password_placeholder": "Your password",
       "forgot": "Forgot it?",
+      "remember_me": "Remember me on this device for 30 days",
+      "totp_prompt": "Enter the code from your authenticator app (or one of your recovery codes).",
+      "totp_label": "Verification code",
+      "totp_placeholder": "123456",
+      "totp_submit": "Verify",
+      "totp_back": "Back to sign in",
       "submit": "Sign in",
       "no_account": "Don't have an account yet?",
       "create_free": "Create one for free",
@@ -590,6 +627,87 @@
         "errors": {
           "load": "Couldn't load the preferences.",
           "save": "Couldn't save the preferences."
+        }
+      },
+      "two_factor": {
+        "section_title": "Two-step verification",
+        "subtitle": "Add a second factor with an authenticator app (Google Authenticator, Authy, 1Password…).",
+        "status_on": "On",
+        "status_off": "Off",
+        "activate": "Turn on two-step verification",
+        "scan_instructions": "Scan the QR code with your authenticator app and enter the code it shows to confirm.",
+        "qr_alt": "QR code to set up 2FA",
+        "manual_entry_label": "Or enter this key manually:",
+        "code_label": "Verification code",
+        "code_placeholder": "123456",
+        "confirm": "Confirm and activate",
+        "cancel": "Cancel",
+        "codes_warning": "Save these recovery codes somewhere safe. They let you sign in if you lose access to your authenticator app. We won't show them again.",
+        "copy": "Copy",
+        "download": "Download",
+        "done": "Done",
+        "codes_copied": "Codes copied to clipboard.",
+        "enabled": "Two-step verification is on.",
+        "disabled": "Two-step verification is off.",
+        "regenerate_codes": "Regenerate recovery codes",
+        "disable": "Turn off",
+        "disable_instructions": "Enter your current password and a valid code to turn off two-step verification.",
+        "current_password": "Current password",
+        "confirm_disable": "Turn off 2FA",
+        "errors": {
+          "code_too_short": "The code must be at least 6 digits."
+        }
+      },
+      "sessions": {
+        "section_title": "Connected devices",
+        "subtitle": "List of active sessions. Revoke any you don't recognize.",
+        "loading": "Loading sessions…",
+        "empty": "No active sessions.",
+        "current": "This device",
+        "rename": "Rename",
+        "revoke": "Sign out",
+        "revoke_all_others": "Sign out everywhere else",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "save": "Save",
+        "confirm_revoke_all": "You'll be signed out from every other device. Continue?",
+        "renamed": "Name updated.",
+        "revoked": "Session ended.",
+        "revoked_all": "Sessions ended.",
+        "errors": {
+          "load_failed": "Couldn't load the sessions.",
+          "rename_failed": "Couldn't rename the session.",
+          "revoke_failed": "Couldn't end the session."
+        }
+      },
+      "security": {
+        "section_title": "Security activity",
+        "subtitle": "History of sign-ins, password changes and other security events on your account.",
+        "loading": "Loading activity…",
+        "empty": "No activity recorded yet.",
+        "previous": "Previous",
+        "next": "Next",
+        "page_of": "Page {current} of {total}",
+        "pagination_label": "Security history pagination",
+        "errors": {
+          "load_failed": "Couldn't load the history. Please try again."
+        },
+        "event": {
+          "LOGIN_SUCCESS": "Sign-in",
+          "LOGIN_FAILED": "Failed sign-in attempt",
+          "LOGOUT": "Sign-out",
+          "PASSWORD_CHANGED": "Password changed",
+          "PASSWORD_RESET_REQUESTED": "Password reset requested",
+          "PASSWORD_RESET_COMPLETED": "Password reset completed",
+          "EMAIL_VERIFIED": "Email verified",
+          "TWO_FACTOR_ENABLED": "Two-step verification enabled",
+          "TWO_FACTOR_DISABLED": "Two-step verification disabled",
+          "TWO_FACTOR_CHALLENGE_FAILED": "Invalid 2FA code",
+          "OAUTH_LINKED": "External account linked",
+          "OAUTH_UNLINKED": "External account unlinked",
+          "REFRESH_REUSE_DETECTED": "Session revoked for security",
+          "NEW_DEVICE_LOGIN": "Sign-in from a new device",
+          "SESSION_REVOKED": "Session revoked"
         }
       }
     },
