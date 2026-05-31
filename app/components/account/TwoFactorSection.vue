@@ -129,7 +129,7 @@ function downloadCodes() {
 
     <!-- Stage: idle, 2FA off -->
     <div v-if="stage === 'idle' && !enabled" class="mt-4">
-      <button type="button" class="rounded-md bg-accent px-4 py-2 text-[13.5px] font-medium text-accent-ink hover:bg-accent/90 disabled:opacity-50"
+      <button type="button" class="rounded-md bg-ink px-4 py-2 text-[13.5px] font-medium text-bg-card hover:bg-ink/90 disabled:opacity-50"
         :disabled="tfa.loading" @click="startEnrollment">
         {{ t('dashboard.account.two_factor.activate') }}
       </button>
@@ -166,7 +166,7 @@ function downloadCodes() {
           autocomplete="one-time-code" :maxlength="10" required />
         <div class="flex items-center gap-2">
           <button type="submit"
-            class="rounded-md bg-accent px-4 py-2 text-[13.5px] font-medium text-accent-ink hover:bg-accent/90 disabled:opacity-50"
+            class="rounded-md bg-ink px-4 py-2 text-[13.5px] font-medium text-bg-card hover:bg-ink/90 disabled:opacity-50"
             :disabled="tfa.loading">
             {{ t('dashboard.account.two_factor.confirm') }}
           </button>
@@ -199,7 +199,7 @@ function downloadCodes() {
           {{ t('dashboard.account.two_factor.download') }}
         </button>
         <button type="button"
-          class="rounded-md bg-accent px-3 py-1.5 text-[12.5px] font-medium text-accent-ink hover:bg-accent/90"
+          class="rounded-md bg-ink px-3 py-1.5 text-[12.5px] font-medium text-bg-card hover:bg-ink/90"
           @click="finishEnrollment">
           {{ t('dashboard.account.two_factor.done') }}
         </button>
