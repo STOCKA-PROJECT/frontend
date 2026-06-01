@@ -13,6 +13,7 @@ useSeoMeta({
 })
 
 const role = computed(() => org.value?.currentUserRole ?? null)
+const actionsEnabled = computed(() => org.value?.pieceTypeActionsEnabled === true)
 </script>
 
 <template>
@@ -27,7 +28,7 @@ const role = computed(() => org.value?.currentUserRole ?? null)
     </div>
 
     <div class="board-host">
-      <DashboardPieceTypesBoard v-if="orgSlug" :org-slug="orgSlug" :role="role" />
+      <DashboardPieceTypesBoard v-if="orgSlug" :org-slug="orgSlug" :role="role" :actions-enabled="actionsEnabled" />
     </div>
   </div>
 </template>
