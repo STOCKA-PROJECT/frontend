@@ -1,16 +1,22 @@
 <script setup lang="ts">
 import { FetchError } from 'ofetch'
 import type {
+  CreatePieceTypeActionDto,
   CreatePieceTypeAttributeDto,
   OrganizationRole,
+  PieceTypeActionResponseDto,
   PieceTypeAttributeResponseDto,
+  UpdatePieceTypeActionDto,
   UpdatePieceTypeAttributeDto
 } from '~/types/api'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   orgSlug: string
   role: OrganizationRole | null
-}>()
+  actionsEnabled?: boolean
+}>(), {
+  actionsEnabled: false
+})
 
 const { t } = useI18n()
 const pieceTypes = usePieceTypesStore()
@@ -18,6 +24,11 @@ const pieceTypes = usePieceTypesStore()
 const selectedId = ref<number | null>(null)
 
 const canWrite = computed(() => props.role === 'OWNER' || props.role === 'MANAGER')
+const canViewActions = computed(() => props.actionsEnabled === true)
+const canManageActions = computed(() => canViewActions.value && canWrite.value)
+
+const selectedActions = computed<PieceTypeActionResponseDto[]>(() =>
+  selectedId.value != null ? pieceTypes.actionsByTypeId[selectedId.value] ?? [] : [])
 
 const selected = computed(() => selectedId.value != null
   ? pieceTypes.byId[selectedId.value] ?? null
@@ -65,6 +76,13 @@ watch(selectedId, async (id) => {
       await pieceTypes.fetchOne(props.orgSlug, id)
     } catch {
       showError(t('dashboard.pieceTypes.errors.load_detail'))
+    }
+  }
+  if (canViewActions.value && !pieceTypes.actionsByTypeId[id]) {
+    try {
+      await pieceTypes.fetchActions(props.orgSlug, id)
+    } catch {
+      showError(t('dashboard.pieceTypes.errors.load_actions'))
     }
   }
 })
@@ -198,11 +216,87 @@ async function submitAttrDialog(payload: CreatePieceTypeAttributeDto | UpdatePie
   }
 }
 
+const actionFormDialog = ref<{
+  open: boolean
+  mode: 'create' | 'edit'
+  typeId: number | null
+  initial: PieceTypeActionResponseDto | null
+  loading: boolean
+  error: string | null
+}>({
+  open: false,
+  mode: 'create',
+  typeId: null,
+  initial: null,
+  loading: false,
+  error: null
+})
+
+function openCreateAction() {
+  if (!selected.value) return
+  actionFormDialog.value = {
+    open: true,
+    mode: 'create',
+    typeId: selected.value.id,
+    initial: null,
+    loading: false,
+    error: null
+  }
+}
+
+function openEditAction(actionId: number) {
+  if (selectedId.value == null) return
+  const action = selectedActions.value.find(a => a.id === actionId)
+  if (!action) return
+  actionFormDialog.value = {
+    open: true,
+    mode: 'edit',
+    typeId: selectedId.value,
+    initial: action,
+    loading: false,
+    error: null
+  }
+}
+
+function closeActionDialog() {
+  actionFormDialog.value = { ...actionFormDialog.value, open: false, error: null, loading: false }
+}
+
+async function submitActionDialog(payload: CreatePieceTypeActionDto | UpdatePieceTypeActionDto) {
+  if (actionFormDialog.value.typeId == null) return
+  actionFormDialog.value.loading = true
+  actionFormDialog.value.error = null
+  try {
+    const typeId = actionFormDialog.value.typeId
+    if (actionFormDialog.value.mode === 'create') {
+      await pieceTypes.addAction(props.orgSlug, typeId, payload as CreatePieceTypeActionDto)
+    } else if (actionFormDialog.value.initial) {
+      await pieceTypes.updateAction(
+        props.orgSlug,
+        typeId,
+        actionFormDialog.value.initial.id,
+        payload as UpdatePieceTypeActionDto
+      )
+    }
+    closeActionDialog()
+  } catch (e) {
+    actionFormDialog.value.error = extractErrorMessage(e, t('dashboard.pieceTypes.errors.save_action'))
+  } finally {
+    actionFormDialog.value.loading = false
+  }
+}
+
+const actionDialogTypeName = computed(() => {
+  if (actionFormDialog.value.typeId == null) return ''
+  return pieceTypes.byId[actionFormDialog.value.typeId]?.name ?? ''
+})
+
 const confirmDialog = ref<{
   open: boolean
-  kind: 'type' | 'attribute' | null
+  kind: 'type' | 'attribute' | 'action' | null
   typeId: number | null
   attrId: number | null
+  actionId: number | null
   targetName: string
   loading: boolean
 }>({
@@ -210,6 +304,7 @@ const confirmDialog = ref<{
   kind: null,
   typeId: null,
   attrId: null,
+  actionId: null,
   targetName: '',
   loading: false
 })
@@ -221,6 +316,7 @@ function openDeleteType(id: number) {
     kind: 'type',
     typeId: id,
     attrId: null,
+    actionId: null,
     targetName: t_?.name ?? '',
     loading: false
   }
@@ -235,7 +331,23 @@ function openDeleteAttribute(attrId: number) {
     kind: 'attribute',
     typeId: selected.value.id,
     attrId,
+    actionId: null,
     targetName: attr.displayName,
+    loading: false
+  }
+}
+
+function openDeleteAction(actionId: number) {
+  if (selectedId.value == null) return
+  const action = selectedActions.value.find(a => a.id === actionId)
+  if (!action) return
+  confirmDialog.value = {
+    open: true,
+    kind: 'action',
+    typeId: selectedId.value,
+    attrId: null,
+    actionId,
+    targetName: action.displayName,
     loading: false
   }
 }
@@ -244,36 +356,51 @@ function closeConfirm() {
   confirmDialog.value = { ...confirmDialog.value, open: false }
 }
 
+const DELETE_ERROR_KEYS: Record<'type' | 'attribute' | 'action', string> = {
+  type: 'dashboard.pieceTypes.errors.delete_type',
+  attribute: 'dashboard.pieceTypes.errors.delete_attribute',
+  action: 'dashboard.pieceTypes.errors.delete_action'
+}
+
 async function confirmDelete() {
   const c = confirmDialog.value
-  if (!c.kind) return
+  const kind = c.kind
+  if (!kind) return
   c.loading = true
   try {
-    if (c.kind === 'type' && c.typeId != null) {
+    if (kind === 'type' && c.typeId != null) {
       await pieceTypes.softDelete(props.orgSlug, c.typeId)
       if (selectedId.value === c.typeId) selectedId.value = null
-    } else if (c.kind === 'attribute' && c.typeId != null && c.attrId != null) {
+    } else if (kind === 'attribute' && c.typeId != null && c.attrId != null) {
       await pieceTypes.removeAttribute(props.orgSlug, c.typeId, c.attrId)
+    } else if (kind === 'action' && c.typeId != null && c.actionId != null) {
+      await pieceTypes.removeAction(props.orgSlug, c.typeId, c.actionId)
     }
     closeConfirm()
   } catch (e) {
-    const fallback = c.kind === 'type'
-      ? t('dashboard.pieceTypes.errors.delete_type')
-      : t('dashboard.pieceTypes.errors.delete_attribute')
-    showError(extractErrorMessage(e, fallback))
+    showError(extractErrorMessage(e, t(DELETE_ERROR_KEYS[kind])))
     closeConfirm()
   } finally {
     confirmDialog.value.loading = false
   }
 }
 
-const confirmTitle = computed(() => confirmDialog.value.kind === 'attribute'
-  ? t('dashboard.pieceTypes.delete.attribute_confirm_title')
-  : t('dashboard.pieceTypes.delete.confirm_title'))
+const confirmTitle = computed(() => {
+  switch (confirmDialog.value.kind) {
+    case 'attribute': return t('dashboard.pieceTypes.delete.attribute_confirm_title')
+    case 'action': return t('dashboard.pieceTypes.actions.delete_confirm_title')
+    default: return t('dashboard.pieceTypes.delete.confirm_title')
+  }
+})
 
-const confirmMessage = computed(() => confirmDialog.value.kind === 'attribute'
-  ? t('dashboard.pieceTypes.delete.attribute_confirm_message', { name: confirmDialog.value.targetName })
-  : t('dashboard.pieceTypes.delete.confirm_message', { name: confirmDialog.value.targetName }))
+const confirmMessage = computed(() => {
+  const name = confirmDialog.value.targetName
+  switch (confirmDialog.value.kind) {
+    case 'attribute': return t('dashboard.pieceTypes.delete.attribute_confirm_message', { name })
+    case 'action': return t('dashboard.pieceTypes.actions.delete_confirm_message', { name })
+    default: return t('dashboard.pieceTypes.delete.confirm_message', { name })
+  }
+})
 
 const attrDialogTypeName = computed(() => {
   if (!attrFormDialog.value.typeId) return ''
@@ -303,11 +430,17 @@ const attrDialogTypeName = computed(() => {
       <DashboardPieceTypeDetailPanel
         :detail="selected"
         :can-write="canWrite"
+        :actions="selectedActions"
+        :can-view-actions="canViewActions"
+        :can-manage-actions="canManageActions"
         @rename="selectedId != null && openRenameType(selectedId)"
         @delete="selectedId != null && openDeleteType(selectedId)"
         @add-attribute="openCreateAttribute"
         @edit-attribute="openEditAttribute"
         @delete-attribute="openDeleteAttribute"
+        @add-action="openCreateAction"
+        @edit-action="openEditAction"
+        @delete-action="openDeleteAction"
       />
     </div>
 
@@ -330,6 +463,17 @@ const attrDialogTypeName = computed(() => {
       :error-msg="attrFormDialog.error"
       @close="closeAttrDialog"
       @submit="submitAttrDialog"
+    />
+
+    <DashboardPieceTypeActionFormDialog
+      :open="actionFormDialog.open"
+      :mode="actionFormDialog.mode"
+      :type-name="actionDialogTypeName"
+      :initial="actionFormDialog.initial"
+      :loading="actionFormDialog.loading"
+      :error-msg="actionFormDialog.error"
+      @close="closeActionDialog"
+      @submit="submitActionDialog"
     />
 
     <DashboardConfirmDialog

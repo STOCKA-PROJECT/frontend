@@ -143,6 +143,12 @@ export interface OrganizationResponseDto {
   name: string
   slug: string
   currentUserRole: OrganizationRole
+  /**
+   * Whether the private "piece-type actions" feature is available to the current user for this
+   * organization (only enabled when the organization's owner is a global admin). Optional so older
+   * payloads without the flag are treated as disabled.
+   */
+  pieceTypeActionsEnabled?: boolean
 }
 
 export interface OrganizationLookupResponseDto {
@@ -431,6 +437,44 @@ export interface UpdatePieceTypeAttributeDto {
   required?: boolean
   position?: number
   validators?: AttributeValidatorsDto
+}
+
+/**
+ * A single typed parameter of a piece-type action (e.g. `tiempo` of type `INTEGER`). Reuses the
+ * attribute {@link AttributeType} and {@link AttributeValidatorsDto} typing system.
+ */
+export interface ActionParameterDto {
+  name: string
+  displayName: string
+  type: AttributeType
+  required: boolean
+  position?: number
+  validators?: AttributeValidatorsDto
+}
+
+export interface PieceTypeActionResponseDto {
+  id: number
+  name: string
+  displayName: string
+  description?: string | null
+  position: number
+  parameters: ActionParameterDto[]
+}
+
+export interface CreatePieceTypeActionDto {
+  name: string
+  displayName: string
+  description?: string
+  position?: number
+  parameters: ActionParameterDto[]
+}
+
+export interface UpdatePieceTypeActionDto {
+  name?: string
+  displayName?: string
+  description?: string
+  position?: number
+  parameters?: ActionParameterDto[]
 }
 
 export interface OrganizationPieceAttributeResponseDto {
