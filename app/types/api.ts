@@ -149,6 +149,12 @@ export interface OrganizationResponseDto {
    * payloads without the flag are treated as disabled.
    */
   pieceTypeActionsEnabled?: boolean
+  /**
+   * Whether the private "ports" feature is available to the current user for this organization
+   * (only enabled when the organization's owner is a global admin). Optional so older payloads
+   * without the flag are treated as disabled.
+   */
+  portsEnabled?: boolean
 }
 
 export interface OrganizationLookupResponseDto {
@@ -474,6 +480,37 @@ export interface UpdatePieceTypeActionDto {
   displayName?: string
   description?: string
   position?: number
+  parameters?: ActionParameterDto[]
+}
+
+/**
+ * A port (Raspberry Pi GPIO output) declared by an organization, e.g. "Salida tira led 1" wired to
+ * pin 21 and related to an existing piece type via {@link pieceTypeId} ({@link pieceTypeName} is its
+ * resolved display name, {@code null} if the type was deleted), with a list of typed
+ * {@link parameters} (reusing the same {@link ActionParameterDto} machinery as piece-type actions).
+ * Private, organization-gated feature — see {@link OrganizationResponseDto.portsEnabled}.
+ */
+export interface PortResponseDto {
+  id: number
+  name: string
+  pieceTypeId: number
+  pieceTypeName: string | null
+  pin: number | null
+  position: number
+  parameters: ActionParameterDto[]
+}
+
+export interface CreatePortDto {
+  name: string
+  pieceTypeId: number
+  pin: number
+  parameters: ActionParameterDto[]
+}
+
+export interface UpdatePortDto {
+  name?: string
+  pieceTypeId?: number
+  pin?: number
   parameters?: ActionParameterDto[]
 }
 

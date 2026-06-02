@@ -356,6 +356,7 @@
       "items": "Articles",
       "locations": "Ubicacions",
       "types": "Tipus d'article",
+      "ports": "Ports",
       "team": "Equip",
       "settings": "Configuració"
     },
@@ -595,6 +596,46 @@
         "options_required": "Afegeix almenys una opció.",
         "type_required": "Selecciona un tipus de dada.",
         "eligibleRoles_required": "Selecciona almenys un rol elegible."
+      }
+    },
+    "ports": {
+      "page_title": "Ports",
+      "page_subtitle": "Defineix els ports de la teva Raspberry Pi: cadascun té un nom, un tipus, un pin (GPIO) i paràmetres tipats.",
+      "list": {
+        "count": "{n} ports | {n} port | {n} ports",
+        "new": "Nou port",
+        "empty": "Encara no has creat cap port.",
+        "loading": "Carregant ports…",
+        "no_parameters": "Sense paràmetres",
+        "unknown_type": "Tipus eliminat",
+        "edit": "Edita",
+        "delete": "Elimina"
+      },
+      "form": {
+        "new_title": "Nou port",
+        "edit_title": "Edita el port «{name}»",
+        "field_name": "Nom",
+        "field_name_placeholder": "Sortida tira led 1",
+        "field_type": "Tipus d'article",
+        "field_type_placeholder": "Selecciona un tipus d'article",
+        "field_type_empty": "Crea primer un tipus d'article per poder assignar-lo a un port.",
+        "field_pin": "Pin (GPIO)",
+        "field_pin_placeholder": "21",
+        "field_pin_help": "Número de pin GPIO de la Raspberry Pi.",
+        "parameters_title": "Paràmetres ({n})",
+        "add_parameter": "Afegeix un paràmetre",
+        "no_parameters": "Aquest port no té paràmetres. Afegeix-ne un si cal.",
+        "create": "Crea",
+        "save": "Desa els canvis"
+      },
+      "delete": {
+        "confirm_title": "Eliminar port",
+        "confirm_message": "Segur que vols eliminar el port «{name}»? Aquesta acció no es pot desfer.",
+        "confirm_label": "Elimina"
+      },
+      "not_available": {
+        "title": "Funció no disponible",
+        "body": "Els ports només estan disponibles per a organitzacions habilitades. Contacta amb un administrador si creus que hi hauries de tenir accés."
       }
     },
     "account": {

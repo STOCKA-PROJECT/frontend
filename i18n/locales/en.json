@@ -356,6 +356,7 @@
       "items": "Items",
       "locations": "Locations",
       "types": "Item types",
+      "ports": "Ports",
       "team": "Team",
       "settings": "Settings"
     },
@@ -595,6 +596,46 @@
         "options_required": "Add at least one option.",
         "type_required": "Pick a data type.",
         "eligibleRoles_required": "Pick at least one eligible role."
+      }
+    },
+    "ports": {
+      "page_title": "Ports",
+      "page_subtitle": "Define your Raspberry Pi ports: each one has a name, a type, a pin (GPIO) and typed parameters.",
+      "list": {
+        "count": "{n} ports | {n} port | {n} ports",
+        "new": "New port",
+        "empty": "You haven't created any ports yet.",
+        "loading": "Loading ports…",
+        "no_parameters": "No parameters",
+        "unknown_type": "Deleted type",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "form": {
+        "new_title": "New port",
+        "edit_title": "Edit port “{name}”",
+        "field_name": "Name",
+        "field_name_placeholder": "LED strip output 1",
+        "field_type": "Item type",
+        "field_type_placeholder": "Select an item type",
+        "field_type_empty": "Create an item type first so you can assign it to a port.",
+        "field_pin": "Pin (GPIO)",
+        "field_pin_placeholder": "21",
+        "field_pin_help": "Raspberry Pi GPIO pin number.",
+        "parameters_title": "Parameters ({n})",
+        "add_parameter": "Add parameter",
+        "no_parameters": "This port has no parameters. Add one if you need it.",
+        "create": "Create",
+        "save": "Save changes"
+      },
+      "delete": {
+        "confirm_title": "Delete port",
+        "confirm_message": "Are you sure you want to delete the port “{name}”? This action cannot be undone.",
+        "confirm_label": "Delete"
+      },
+      "not_available": {
+        "title": "Feature not available",
+        "body": "Ports are only available for enabled organizations. Contact an administrator if you think you should have access."
       }
     },
     "account": {

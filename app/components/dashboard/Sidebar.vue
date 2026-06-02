@@ -16,6 +16,13 @@ const hasOrgs = computed(() => orgs.list.length >= 1)
 const navOrgSlug = computed(() => currentOrgSlug.value ?? orgs.lastSlug ?? orgs.list[0]?.slug ?? null)
 const hasOrgScope = computed(() => navOrgSlug.value != null)
 
+// The "Puertos" section is a private, org-gated feature: only show its nav link when the
+// organization in scope has it enabled (its owner is a global admin).
+const navOrg = computed(() => navOrgSlug.value
+  ? (orgs.list.find(o => o.slug === navOrgSlug.value) ?? null)
+  : null)
+const portsEnabled = computed(() => navOrg.value?.portsEnabled === true)
+
 const userInitials = computed(() => initials(auth.user?.name, auth.user?.lastName))
 const userFullName = computed(() => {
   const u = auth.user
@@ -106,6 +113,12 @@ async function handleLogout() {
         class="nav-item">
         <DashboardIcon name="list" />
         <span>{{ t('dashboard.nav.types') }}</span>
+      </NuxtLink>
+
+      <NuxtLink v-if="hasOrgs && portsEnabled" :to="orgPath('/puertos', navOrgSlug)" exact-active-class="is-active"
+        class="nav-item">
+        <DashboardIcon name="cpu" />
+        <span>{{ t('dashboard.nav.ports') }}</span>
       </NuxtLink>
 
       <button v-for="item in inactiveItems" :key="item.label" type="button" class="nav-item is-disabled"
@@ -269,6 +282,11 @@ async function handleLogout() {
           <NuxtLink v-if="hasOrgs" :to="orgPath('/tipos-articulos', navOrgSlug)" exact-active-class="is-active" class="nav-item" @click="close">
             <DashboardIcon name="list" />
             <span>{{ t('dashboard.nav.types') }}</span>
+          </NuxtLink>
+
+          <NuxtLink v-if="hasOrgs && portsEnabled" :to="orgPath('/puertos', navOrgSlug)" exact-active-class="is-active" class="nav-item" @click="close">
+            <DashboardIcon name="cpu" />
+            <span>{{ t('dashboard.nav.ports') }}</span>
           </NuxtLink>
         </nav>
 
