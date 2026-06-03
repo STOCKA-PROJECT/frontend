@@ -13,6 +13,7 @@ import {
   pieceSchema,
   pieceTypeAttributeSchema,
   pieceTypeSchema,
+  syncStateSchema,
   type AttachmentDoc,
   type LocationDoc,
   type OrgAttributeDoc,
@@ -20,6 +21,7 @@ import {
   type PieceDoc,
   type PieceTypeAttributeDoc,
   type PieceTypeDoc,
+  type SyncStateDoc,
 } from "./schemas";
 
 /** The typed collection map of the Stocka offline database. */
@@ -31,6 +33,7 @@ export type StockaCollections = {
   pieces: RxCollection<PieceDoc>;
   attachments: RxCollection<AttachmentDoc>;
   outbox: RxCollection<OutboxDoc>;
+  syncState: RxCollection<SyncStateDoc>;
 };
 
 export type StockaDatabase = RxDatabase<StockaCollections>;
@@ -64,6 +67,7 @@ export async function createStockaDatabase(
     pieces: { schema: pieceSchema },
     attachments: { schema: attachmentSchema },
     outbox: { schema: outboxSchema },
+    syncState: { schema: syncStateSchema },
   });
 
   return db;

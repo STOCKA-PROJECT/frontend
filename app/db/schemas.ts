@@ -177,6 +177,23 @@ export const outboxSchema: RxJsonSchema<OutboxDoc> = {
   indexes: ["createdAt"],
 };
 
+/** Local-only sync bookkeeping (the per-collection pull checkpoint). */
+export interface SyncStateDoc {
+  id: string;
+  checkpoint: Record<string, number>;
+}
+
+export const syncStateSchema: RxJsonSchema<SyncStateDoc> = {
+  version: 0,
+  primaryKey: "id",
+  type: "object",
+  properties: {
+    id: { type: "string", maxLength: 40 },
+    checkpoint: { type: "object" },
+  },
+  required: ["id"],
+};
+
 export const attachmentSchema: RxJsonSchema<AttachmentDoc> = {
   version: 0,
   primaryKey: "syncId",
