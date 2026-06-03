@@ -10,6 +10,7 @@
     "dev:desktop": "STOCKA_TARGET=desktop nuxt dev --envName desktop",
     "tauri": "tauri",
     "preview": "nuxt preview",
+    "test": "vitest run",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "nuxt": "^4.4.2",
     "pinia": "^3.0.4",
     "qrcode": "^1.5.4",
+    "rxdb": "^17.3.0",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"
   },
@@ -33,6 +35,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.11.2",
-    "@types/qrcode": "^1.5.6"
+    "@types/qrcode": "^1.5.6",
+    "vitest": "^4.1.8"
   }
 }
