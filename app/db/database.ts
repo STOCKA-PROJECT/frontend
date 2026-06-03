@@ -9,12 +9,14 @@ import {
   attachmentSchema,
   locationSchema,
   orgAttributeSchema,
+  outboxSchema,
   pieceSchema,
   pieceTypeAttributeSchema,
   pieceTypeSchema,
   type AttachmentDoc,
   type LocationDoc,
   type OrgAttributeDoc,
+  type OutboxDoc,
   type PieceDoc,
   type PieceTypeAttributeDoc,
   type PieceTypeDoc,
@@ -28,6 +30,7 @@ export type StockaCollections = {
   orgAttributes: RxCollection<OrgAttributeDoc>;
   pieces: RxCollection<PieceDoc>;
   attachments: RxCollection<AttachmentDoc>;
+  outbox: RxCollection<OutboxDoc>;
 };
 
 export type StockaDatabase = RxDatabase<StockaCollections>;
@@ -60,6 +63,7 @@ export async function createStockaDatabase(
     orgAttributes: { schema: orgAttributeSchema },
     pieces: { schema: pieceSchema },
     attachments: { schema: attachmentSchema },
+    outbox: { schema: outboxSchema },
   });
 
   return db;

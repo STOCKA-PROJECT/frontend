@@ -114,6 +114,36 @@ export interface SyncChangesResponse {
   minClientVersion: number;
 }
 
+/** A single mutation pushed to the server (mirrors backend `SyncMutationRequest.Item`). */
+export interface SyncMutationItem {
+  mutationId: string;
+  collection: SyncCollection;
+  op: "upsert" | "delete";
+  syncId: string;
+  baseRev: number | null;
+  doc: Record<string, unknown> | null;
+}
+
+/** Batch of mutations (mirrors backend `SyncMutationRequest`). */
+export interface SyncMutationRequest {
+  mutations: SyncMutationItem[];
+}
+
+/** Outcome of a single mutation (mirrors backend `SyncMutationsResponse.Result`). */
+export interface SyncMutationResult {
+  mutationId: string;
+  status: "applied" | "duplicate" | "conflict" | "rejected";
+  syncId: string;
+  serverDoc: unknown | null;
+  errorCode: string | null;
+}
+
+/** Response of `POST /organizations/{slug}/sync/v1/mutations`. */
+export interface SyncMutationsResponse {
+  results: SyncMutationResult[];
+  minClientVersion: number;
+}
+
 /** The collection names, in the dependency order clients must apply them. */
 export const SYNC_COLLECTIONS = [
   "pieceTypes",

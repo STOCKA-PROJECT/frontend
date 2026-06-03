@@ -139,6 +139,44 @@ export const orgAttributeSchema: RxJsonSchema<OrgAttributeDoc> = {
   required: ["syncId", "rev", "name"],
 };
 
+/**
+ * A queued local mutation awaiting push. Local-only (never synced). `status` is {@code pending}
+ * until acknowledged; rejected mutations become {@code failed} (a dead-letter the UI surfaces,
+ * DECISIONS-AND-RISKS R8).
+ */
+export interface OutboxDoc {
+  mutationId: string;
+  targetCollection: string;
+  op: "upsert" | "delete";
+  syncId: string;
+  baseRev: number | null;
+  doc: Record<string, unknown> | null;
+  createdAt: string;
+  attempts: number;
+  status: "pending" | "failed";
+  errorCode: string | null;
+}
+
+export const outboxSchema: RxJsonSchema<OutboxDoc> = {
+  version: 0,
+  primaryKey: "mutationId",
+  type: "object",
+  properties: {
+    mutationId: SYNC_ID,
+    targetCollection: { type: "string" },
+    op: { type: "string" },
+    syncId: { type: "string", maxLength: 36 },
+    baseRev: { type: ["number", "null"] },
+    doc: { type: ["object", "null"] },
+    createdAt: { type: "string", maxLength: 30 },
+    attempts: { type: "number" },
+    status: { type: "string", maxLength: 10 },
+    errorCode: { type: ["string", "null"] },
+  },
+  required: ["mutationId", "targetCollection", "op", "syncId", "createdAt", "status"],
+  indexes: ["createdAt"],
+};
+
 export const attachmentSchema: RxJsonSchema<AttachmentDoc> = {
   version: 0,
   primaryKey: "syncId",
