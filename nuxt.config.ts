@@ -25,6 +25,24 @@ const SECURITY_HEADERS = {
 };
 
 export default defineNuxtConfig({
+  // Desktop (Tauri) target: built with `nuxt generate --envName desktop`.
+  // Overrides the web defaults to produce a static, client-only SPA that talks
+  // directly to the backend (no Nitro BFF). The web build is unaffected when the
+  // `desktop` environment is not selected. See docs/offline-sync/DESIGN.md.
+  $env: {
+    desktop: {
+      ssr: false,
+      runtimeConfig: {
+        public: {
+          // In desktop there is no Nitro server: the SPA calls the backend
+          // directly, so the base URL must be exposed to the client.
+          desktop: true,
+          apiBaseUrl: API_BASE_URL,
+        },
+      },
+    },
+  },
+
   compatibilityDate: "2025-07-15",
   devtools: { enabled: false },
   future: { compatibilityVersion: 4 },

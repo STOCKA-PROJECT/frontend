@@ -6,6 +6,9 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "generate:desktop": "STOCKA_TARGET=desktop nuxt generate --envName desktop",
+    "dev:desktop": "STOCKA_TARGET=desktop nuxt dev --envName desktop",
+    "tauri": "tauri",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
@@ -29,6 +32,7 @@
     }
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.11.2",
     "@types/qrcode": "^1.5.6"
   }
 }
