@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+
+import type { DesktopSession } from '~/auth/desktopSession'
 import type {
   AvailabilityResponse,
   ChangePasswordDto,
@@ -60,6 +62,23 @@ export const useAuthStore = defineStore('auth', () => {
     userCookie.value = payload.user
   }
 
+  /** Whether this is the desktop (Tauri) build, which authenticates via DesktopSession (D4). */
+  const isDesktop = (): boolean => !!useRuntimeConfig().public.desktop
+
+  const desktopSession = (): DesktopSession | undefined =>
+    (useNuxtApp().$stockaSync as { session?: DesktopSession } | undefined)?.session
+
+  /** Opens the per-account offline database after a desktop login (best-effort). */
+  async function bootstrapDesktop(user: User): Promise<void> {
+    try {
+      // Dynamic import keeps RxDB out of the web bundle (desktop-only).
+      const { getStockaDb } = await import('~/composables/useStockaDb')
+      await getStockaDb(String(user.id))
+    } catch {
+      // The DB opens regardless of connectivity; ignore transient errors.
+    }
+  }
+
   async function routeAfterAuth() {
     const orgs = useOrganizationsStore()
     await orgs.fetchList()
@@ -71,6 +90,12 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function login(payload: LoginUserDto): Promise<LoginChallengeResponse | null> {
+    if (isDesktop()) {
+      const challenge = await desktopLogin(payload)
+      if (challenge) return challenge
+      await routeAfterAuth()
+      return null
+    }
     const api = useApi()
     const data = await api<LoginResponse>('/auth/login', {
       method: 'POST',
@@ -85,6 +110,12 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function loginNoRedirect(payload: LoginUserDto): Promise<LoginChallengeResponse | null> {
+    if (isDesktop()) {
+      const challenge = await desktopLogin(payload)
+      if (challenge) return challenge
+      await useOrganizationsStore().fetchList()
+      return null
+    }
     const api = useApi()
     const data = await api<LoginResponse>('/auth/login', {
       method: 'POST',
@@ -100,6 +131,23 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
+   * Desktop login via {@link DesktopSession} (Bearer + keychain, no cookies). Returns the 2FA
+   * challenge when required; otherwise sets the session and opens the offline database.
+   */
+  async function desktopLogin(payload: LoginUserDto): Promise<LoginChallengeResponse | null> {
+    const session = desktopSession()
+    if (!session) throw new Error('desktop session unavailable')
+    const result = await session.login(payload.email, payload.password, payload.rememberMe ?? false)
+    if (result.kind === 'twoFactor') {
+      return { requires2fa: true, mfaToken: result.mfaToken }
+    }
+    const user = result.user as User
+    setSession({ user, expiresIn: 0 })
+    await bootstrapDesktop(user)
+    return null
+  }
+
+  /**
    * Submits the second step of the 2FA login. On success the session is set
    * and the caller drives the redirect.
    *
@@ -108,6 +156,14 @@ export const useAuthStore = defineStore('auth', () => {
    * @param rememberMe whether the resulting session should be persistent
    */
   async function submit2faChallenge(mfaToken: string, code: string, rememberMe: boolean) {
+    if (isDesktop()) {
+      const session = desktopSession()
+      if (!session) throw new Error('desktop session unavailable')
+      const user = (await session.completeTwoFactor(mfaToken, code, rememberMe)) as User
+      setSession({ user, expiresIn: 0 })
+      await bootstrapDesktop(user)
+      return
+    }
     const api = useApi()
     const data = await api<LoginSessionResponse>('/auth/login/2fa', {
       method: 'POST',
@@ -212,6 +268,15 @@ export const useAuthStore = defineStore('auth', () => {
       await api('/auth/logout', { method: 'POST' })
     } catch {
       // logout is fire-and-forget; clear local session regardless
+    }
+    if (isDesktop()) {
+      try {
+        await desktopSession()?.logout()
+      } catch {
+        // ignore
+      }
+      const { resetStockaDb } = await import('~/composables/useStockaDb')
+      await resetStockaDb()
     }
     clearLocalSession()
     await navigateTo(resolveLocalePath('/login'))

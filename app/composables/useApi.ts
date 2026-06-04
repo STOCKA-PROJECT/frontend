@@ -1,5 +1,7 @@
 import type { FetchOptions } from 'ofetch'
 
+import type { DesktopSession } from '~/auth/desktopSession'
+
 const PUBLIC_SEGMENTS = ['/login', '/registro', '/recuperar-password', '/restablecer-password']
 const AUTH_ENDPOINTS = ['/auth/login', '/auth/signup', '/auth/refresh']
 const REFRESHABLE_ERROR_CODES = new Set([
@@ -37,7 +39,67 @@ type ApiFetchError = { response?: { status?: number, _data?: ApiErrorBody } }
  */
 let refreshInFlight: Promise<boolean> | null = null
 
+/**
+ * Desktop transport: the Tauri SPA has no Nitro BFF, so it calls the backend directly with a Bearer
+ * access token from the {@link DesktopSession} (no cookies). On 401 it rotates the refresh token via
+ * the session and retries once. The web variant below is unchanged. See DECISIONS-AND-RISKS D4.
+ */
+function useDesktopApi() {
+  const auth = useAuthStore()
+  const nuxtApp = useNuxtApp()
+  const config = useRuntimeConfig()
+  const apiBaseUrl = String(config.public.apiBaseUrl ?? '')
+  const session = (nuxtApp.$stockaSync as { session?: DesktopSession } | undefined)?.session
+
+  const readLocale = (): string => {
+    const i18n = nuxtApp.$i18n as I18nLike | undefined
+    if (!i18n) return 'es'
+    const loc = i18n.locale
+    return typeof loc === 'string' ? loc : loc.value
+  }
+
+  const desktopFetch = $fetch.create({
+    baseURL: apiBaseUrl,
+    async onRequest({ options }) {
+      const headers = new Headers(options.headers as HeadersInit | undefined)
+      if (!headers.has('Accept-Language')) headers.set('Accept-Language', readLocale())
+      if (!headers.has('Accept')) headers.set('Accept', 'application/problem+json, application/json')
+      headers.set('X-Stocka-Client', 'desktop')
+      const token = session ? await session.getValidAccessToken() : null
+      if (token) headers.set('Authorization', `Bearer ${token}`)
+      options.headers = headers
+    }
+  })
+
+  return async <T> (
+    url: Parameters<typeof desktopFetch>[0],
+    opts?: Parameters<typeof desktopFetch>[1]
+  ): Promise<T> => {
+    try {
+      return await desktopFetch<T>(url, opts)
+    } catch (err) {
+      const error = err as ApiFetchError
+      if (error.response?.status !== 401 || isAuthEndpoint(requestUrl(url)) || !session) throw err
+      try {
+        await session.refresh()
+      } catch {
+        auth.clearLocalSession()
+        if (import.meta.client) {
+          const fn = nuxtApp.$localePath as LocalePathFn | undefined
+          navigateTo(fn ? fn('/login') : '/login')
+        }
+        throw err
+      }
+      return await desktopFetch<T>(url, opts)
+    }
+  }
+}
+
 export function useApi() {
+  if (useRuntimeConfig().public.desktop) {
+    return useDesktopApi()
+  }
+
   const auth = useAuthStore()
   const nuxtApp = useNuxtApp()
   const ssrCookie = import.meta.server ? useRequestHeaders(['cookie']).cookie : undefined

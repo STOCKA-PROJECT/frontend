@@ -134,6 +134,11 @@ export default defineNuxtConfig({
       "/_nuxt/**": {
         headers: { "cache-control": "public, max-age=31536000, immutable" },
       },
+      // The offline page uses RxDB/IndexedDB (browser-only); never prerender it server-side
+      // (covers the i18n-localized variants too).
+      "/offline": { ssr: false },
+      "/en/offline": { ssr: false },
+      "/ca/offline": { ssr: false },
     },
   },
 
