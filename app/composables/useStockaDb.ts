@@ -12,13 +12,21 @@ import type { StockaDatabase } from "../db/database";
 let handle: { accountKey: string; db: Promise<StockaDatabase> } | null = null;
 
 /**
- * Returns the shared desktop database for {@code accountKey}, opening it on first use.
+ * Returns the shared desktop database for {@code accountKey}, opening it on first use. Each
+ * (account, organization) gets its own database so organizations never mix locally (R28). When
+ * called with no key, returns the currently-open database, or opens an offline-only {@code "local"}
+ * one if none is open yet.
  *
- * @param accountKey stable per-account key (user id/email); defaults to {@code "local"} for an
- *                   offline-only session before login
+ * @param accountKey stable per-(account,org) key; omit to reuse the currently-open database
  * @returns the ready database
  */
-export function getStockaDb(accountKey = "local"): Promise<StockaDatabase> {
+export function getStockaDb(accountKey?: string): Promise<StockaDatabase> {
+  if (accountKey === undefined) {
+    if (handle) {
+      return handle.db;
+    }
+    accountKey = "local";
+  }
   if (!handle || handle.accountKey !== accountKey) {
     handle = { accountKey, db: createDesktopDatabase(accountKey) };
   }

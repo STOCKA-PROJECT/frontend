@@ -31,11 +31,43 @@ export const useOrganizationsStore = defineStore('organizations', () => {
     return list.value.find(o => o.slug === slug)
   }
 
+  const isDesktop = (): boolean => !!useRuntimeConfig().public.desktop
+
+  /** Per-account localStorage key caching the org list for offline org resolution (desktop). */
+  function orgsCacheKey(): string {
+    const userId = useAuthStore().user?.id ?? 'anon'
+    return `stocka_orgs_${userId}`
+  }
+
   function rememberSlug(slug: string | null) {
     lastSlugCookie.value = slug
   }
 
   async function fetchList() {
+    if (isDesktop()) {
+      // Desktop: fetch online and cache locally; fall back to the cache when offline so org
+      // resolution (and thus the dashboard shell) keeps working without connectivity.
+      try {
+        const data = await useApi()<OrganizationResponseDto[]>('/organizations')
+        list.value = data
+        if (import.meta.client) {
+          try { localStorage.setItem(orgsCacheKey(), JSON.stringify(data)) } catch { /* quota */ }
+        }
+        if (lastSlugCookie.value && !data.some(o => o.slug === lastSlugCookie.value)) {
+          lastSlugCookie.value = null
+        }
+        return data
+      } catch (err) {
+        if (import.meta.client) {
+          const raw = localStorage.getItem(orgsCacheKey())
+          if (raw) {
+            try { list.value = JSON.parse(raw) as OrganizationResponseDto[] } catch { /* corrupt */ }
+          }
+        }
+        if (list.value.length === 0) throw err
+        return list.value
+      }
+    }
     const api = useApi()
     const data = await api<OrganizationResponseDto[]>('/organizations')
     list.value = data
