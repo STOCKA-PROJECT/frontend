@@ -621,6 +621,39 @@ export const usePiecesStore = defineStore('pieces', () => {
     file: File,
     kind: PieceAttachmentKind
   ) {
+    if (isDesktop()) {
+      const database = await openDb(orgSlug)
+      const pieceSyncId = idToSync.get(pieceId)
+      if (!pieceSyncId) return undefined
+      const { arrayBufferToBase64, queueAttachmentUpload } = await import('~/sync/attachments')
+      const contentBase64 = arrayBufferToBase64(await file.arrayBuffer())
+      const meta = await queueAttachmentUpload(database, {
+        pieceSyncId,
+        kind,
+        originalFilename: file.name,
+        mimeType: file.type || 'application/octet-stream',
+        contentBase64,
+        sizeBytes: file.size
+      })
+      const created: PieceAttachmentResponseDto = {
+        id: hashId(meta.syncId),
+        kind: meta.kind as PieceAttachmentKind,
+        originalFilename: meta.originalFilename,
+        mimeType: meta.mimeType,
+        sizeBytes: meta.sizeBytes,
+        createdAt: meta.createdAt ?? ''
+      }
+      idToSync.set(created.id, meta.syncId)
+      const detail = detailById.value[pieceId]
+      if (detail) {
+        detailById.value = {
+          ...detailById.value,
+          [pieceId]: { ...detail, attachments: [...detail.attachments, created] }
+        }
+      }
+      void syncQuietly(orgSlug, database)
+      return created
+    }
     const api = useApi()
     const form = new FormData()
     form.append('file', file)
@@ -643,6 +676,27 @@ export const usePiecesStore = defineStore('pieces', () => {
   }
 
   async function deleteAttachment(orgSlug: string, pieceId: number, attachmentId: number) {
+    if (isDesktop()) {
+      const database = await openDb(orgSlug)
+      const attachmentSyncId = idToSync.get(attachmentId)
+      if (attachmentSyncId) {
+        const { queueAttachmentDelete } = await import('~/sync/attachments')
+        await queueAttachmentDelete(database, attachmentSyncId)
+      }
+      revokeAttachmentBlobUrl(orgSlug, pieceId, attachmentId)
+      const detail = detailById.value[pieceId]
+      if (detail) {
+        detailById.value = {
+          ...detailById.value,
+          [pieceId]: {
+            ...detail,
+            attachments: detail.attachments.filter(a => a.id !== attachmentId)
+          }
+        }
+      }
+      void syncQuietly(orgSlug, database)
+      return
+    }
     const api = useApi()
     await api(`/organizations/${orgSlug}/pieces/${pieceId}/attachments/${attachmentId}`, {
       method: 'DELETE'

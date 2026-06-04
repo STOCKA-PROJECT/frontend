@@ -40,6 +40,7 @@ export function createSyncRunner(config: SyncRunnerConfig): SyncRunner {
       return runSync(config.db, {
         pull: transport.pull,
         push: transport.push,
+        attachments: transport.attachments,
         checkpoints,
       });
     },

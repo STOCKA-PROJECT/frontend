@@ -177,6 +177,50 @@ export const outboxSchema: RxJsonSchema<OutboxDoc> = {
   indexes: ["createdAt"],
 };
 
+/**
+ * A queued attachment binary operation awaiting push. Local-only. Binaries ride a queue separate
+ * from the data outbox so a large upload never blocks data convergence (DECISIONS-AND-RISKS
+ * R15–R17). `contentBase64` holds the bytes for an {@code upload} (absent for a {@code delete}).
+ */
+export interface AttachmentQueueDoc {
+  queueId: string;
+  op: "upload" | "delete";
+  attachmentSyncId: string;
+  pieceSyncId: string;
+  kind: string;
+  originalFilename: string;
+  mimeType: string;
+  sizeBytes: number;
+  contentBase64: string | null;
+  createdAt: string;
+  attempts: number;
+  status: "pending" | "failed";
+  errorCode: string | null;
+}
+
+export const attachmentQueueSchema: RxJsonSchema<AttachmentQueueDoc> = {
+  version: 0,
+  primaryKey: "queueId",
+  type: "object",
+  properties: {
+    queueId: SYNC_ID,
+    op: { type: "string" },
+    attachmentSyncId: { type: "string", maxLength: 36 },
+    pieceSyncId: { type: "string", maxLength: 36 },
+    kind: { type: "string" },
+    originalFilename: { type: "string" },
+    mimeType: { type: "string" },
+    sizeBytes: { type: "number" },
+    contentBase64: { type: ["string", "null"] },
+    createdAt: { type: "string", maxLength: 30 },
+    attempts: { type: "number" },
+    status: { type: "string", maxLength: 10 },
+    errorCode: { type: ["string", "null"] },
+  },
+  required: ["queueId", "op", "attachmentSyncId", "pieceSyncId", "createdAt", "status"],
+  indexes: ["createdAt"],
+};
+
 /** Local-only sync bookkeeping (the per-collection pull checkpoint). */
 export interface SyncStateDoc {
   id: string;

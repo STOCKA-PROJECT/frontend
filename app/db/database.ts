@@ -6,6 +6,7 @@ import {
 } from "rxdb";
 
 import {
+  attachmentQueueSchema,
   attachmentSchema,
   locationSchema,
   orgAttributeSchema,
@@ -15,6 +16,7 @@ import {
   pieceTypeSchema,
   syncStateSchema,
   type AttachmentDoc,
+  type AttachmentQueueDoc,
   type LocationDoc,
   type OrgAttributeDoc,
   type OutboxDoc,
@@ -32,6 +34,7 @@ export type StockaCollections = {
   orgAttributes: RxCollection<OrgAttributeDoc>;
   pieces: RxCollection<PieceDoc>;
   attachments: RxCollection<AttachmentDoc>;
+  attachmentQueue: RxCollection<AttachmentQueueDoc>;
   outbox: RxCollection<OutboxDoc>;
   syncState: RxCollection<SyncStateDoc>;
 };
@@ -66,6 +69,7 @@ export async function createStockaDatabase(
     orgAttributes: { schema: orgAttributeSchema },
     pieces: { schema: pieceSchema },
     attachments: { schema: attachmentSchema },
+    attachmentQueue: { schema: attachmentQueueSchema },
     outbox: { schema: outboxSchema },
     syncState: { schema: syncStateSchema },
   });

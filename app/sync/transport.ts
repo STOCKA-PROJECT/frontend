@@ -1,6 +1,7 @@
+import { base64ToBlob, type AttachmentTransport } from "./attachments";
 import type { PullFetch } from "./pull";
 import type { PushFetch } from "./push";
-import type { SyncChangesResponse, SyncMutationsResponse } from "./types";
+import type { AttachmentSync, SyncChangesResponse, SyncMutationsResponse } from "./types";
 
 /** Error thrown when a sync HTTP call returns a non-2xx status. */
 export class SyncHttpError extends Error {
@@ -36,6 +37,7 @@ export interface SyncTransportConfig {
 export function createSyncTransport(config: SyncTransportConfig): {
   pull: PullFetch;
   push: PushFetch;
+  attachments: AttachmentTransport;
 } {
   const doFetch = config.fetchImpl ?? globalThis.fetch;
   const base = `${config.apiBaseUrl.replace(/\/+$/, "")}/organizations/${encodeURIComponent(
@@ -71,5 +73,33 @@ export function createSyncTransport(config: SyncTransportConfig): {
     return (await response.json()) as SyncMutationsResponse;
   };
 
-  return { pull, push };
+  const attachments: AttachmentTransport = {
+    async upload(input) {
+      const form = new FormData();
+      form.append("pieceSyncId", input.pieceSyncId);
+      form.append("attachmentSyncId", input.attachmentSyncId);
+      form.append("kind", input.kind);
+      form.append("file", base64ToBlob(input.contentBase64, input.mimeType), input.originalFilename);
+      const response = await doFetch(`${base}/attachments`, {
+        method: "POST",
+        headers: await authHeaders(),
+        body: form,
+      });
+      if (!response.ok) {
+        throw new SyncHttpError(response.status, "push");
+      }
+      return (await response.json()) as AttachmentSync;
+    },
+    async remove(attachmentSyncId) {
+      const response = await doFetch(`${base}/attachments/${encodeURIComponent(attachmentSyncId)}`, {
+        method: "DELETE",
+        headers: await authHeaders(),
+      });
+      if (!response.ok && response.status !== 404) {
+        throw new SyncHttpError(response.status, "push");
+      }
+    },
+  };
+
+  return { pull, push, attachments };
 }

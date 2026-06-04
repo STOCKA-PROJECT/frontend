@@ -1,4 +1,5 @@
 import type { StockaDatabase } from "../db/database";
+import { type AttachmentPushOutcome, type AttachmentTransport, pushAttachments } from "./attachments";
 import { type CheckpointStore, type PullFetch, runPull } from "./pull";
 import { type PushFetch, type PushOutcome, pushOutbox } from "./push";
 
@@ -7,12 +8,15 @@ export interface SyncEngineDeps {
   pull: PullFetch;
   push: PushFetch;
   checkpoints: CheckpointStore;
+  /** Optional binary transport; when present, the attachment queue is drained best-effort. */
+  attachments?: AttachmentTransport;
 }
 
 /** Summary of one sync run. */
 export interface SyncRunResult {
   push: PushOutcome;
   checkpoint: Record<string, number>;
+  attachments?: AttachmentPushOutcome;
 }
 
 /**
@@ -29,6 +33,12 @@ export interface SyncRunResult {
  */
 export async function runSync(db: StockaDatabase, deps: SyncEngineDeps): Promise<SyncRunResult> {
   const push = await pushOutbox(db, deps.push);
+  // Drain attachment binaries on their own queue (R17): never let a large/failing upload abort the
+  // data sync, so this is best-effort and runs between the data push and the pull.
+  let attachments: AttachmentPushOutcome | undefined;
+  if (deps.attachments) {
+    attachments = await pushAttachments(db, deps.attachments);
+  }
   const checkpoint = await runPull(db, deps.pull, deps.checkpoints);
-  return { push, checkpoint };
+  return { push, checkpoint, attachments };
 }
