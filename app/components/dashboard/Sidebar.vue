@@ -62,16 +62,6 @@ async function handleLogout() {
   <!-- Desktop sidebar (lg+): fixed, always visible -->
   <aside
     class="dashboard-side sticky top-0 hidden h-screen flex-col gap-[18px] border-r border-line bg-bg-card px-3.5 py-4.5 lg:flex">
-    <NuxtLink :to="localePath('/')"
-      class="flex items-center gap-2.5 px-2 py-1.5 text-[15px] font-semibold tracking-[-0.015em] text-ink">
-      <svg width="22" height="22" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-        <rect x="2" y="2" width="36" height="36" rx="6" stroke="currentColor" stroke-width="1.5" opacity="0.25" />
-        <rect x="8" y="8" width="24" height="24" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.55" />
-        <rect x="14" y="14" width="12" height="12" rx="2.5" fill="currentColor" />
-      </svg>
-      <span>Stocka</span>
-    </NuxtLink>
-
     <DashboardOrgSwitcher v-if="hasOrgs" />
     <NuxtLink v-else :to="localePath('/dashboard/crear-organizacion')"
       class="flex items-center gap-2.5 rounded-[10px] border border-dashed border-line-strong bg-bg-soft px-3 py-2.5 text-left text-[13px] font-medium text-ink-soft transition-[border-color,color,background] duration-150 hover:border-accent hover:bg-accent-soft hover:text-accent-ink">
@@ -217,19 +207,7 @@ async function handleLogout() {
         aria-modal="true"
         :aria-label="t('common.main_nav')"
       >
-        <div class="flex items-center justify-between">
-          <NuxtLink
-            :to="localePath('/')"
-            class="flex items-center gap-2.5 px-2 py-1.5 text-[15px] font-semibold tracking-[-0.015em] text-ink"
-            @click="close"
-          >
-            <svg width="22" height="22" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-              <rect x="2" y="2" width="36" height="36" rx="6" stroke="currentColor" stroke-width="1.5" opacity="0.25" />
-              <rect x="8" y="8" width="24" height="24" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.55" />
-              <rect x="14" y="14" width="12" height="12" rx="2.5" fill="currentColor" />
-            </svg>
-            <span>Stocka</span>
-          </NuxtLink>
+        <div class="flex items-center justify-end">
           <button
             type="button"
             class="flex h-10 w-10 items-center justify-center rounded-[10px] border border-line bg-bg-card text-ink-soft transition-colors hover:bg-bg-soft"
