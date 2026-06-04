@@ -1,0 +1,89 @@
+name: Desktop release
+
+# Builds, signs and publishes the Tauri desktop app for macOS and Windows, and emits the
+# Tauri updater artifacts (signed `.sig` + `latest.json`) consumed by the in-app updater.
+#
+# This milestone (M-Dist) is independent of F0–F4: until the signing secrets below are
+# configured the workflow still builds, but produces unsigned artifacts. Required repository
+# secrets (Settings → Secrets and variables → Actions):
+#
+#   TAURI_SIGNING_PRIVATE_KEY           # `tauri signer generate` private key (updater signing)
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  # its password
+#   # macOS notarization / code signing:
+#   APPLE_CERTIFICATE                   # base64 of the Developer ID Application .p12
+#   APPLE_CERTIFICATE_PASSWORD
+#   APPLE_SIGNING_IDENTITY              # e.g. "Developer ID Application: Stocka (TEAMID)"
+#   APPLE_ID
+#   APPLE_PASSWORD                      # app-specific password
+#   APPLE_TEAM_ID
+#   # Windows code signing is configured via the bundle config / Azure Trusted Signing.
+#
+# Also paste the public key from `tauri signer generate` into
+# `src-tauri/tauri.conf.json` → plugins.updater.pubkey.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: "--target universal-apple-darwin"
+          - platform: windows-latest
+            args: ""
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build, sign and publish the desktop app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || format('v{0}', github.run_number) }}
+          releaseName: "Stocka Desktop ${{ github.ref_type == 'tag' && github.ref_name || github.run_number }}"
+          releaseBody: "See the assets to download and install this version."
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

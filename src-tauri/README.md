@@ -39,22 +39,42 @@ El binario nativo usa el **WebView del sistema operativo**:
 > ejecutarse en macOS/Windows o en un runner Linux con esas librerías. El scaffold Rust es el
 > estándar generado por `@tauri-apps/cli` y compila en esos entornos.
 
-## Firma de código (hito posterior — `M-Dist`)
+## Almacenamiento seguro (keychain) y cifrado en reposo
 
-`pnpm tauri build` genera instaladores **sin firmar**, que funcionan para desarrollo y uso
-interno. Para distribución pública:
+- **Tokens de sesión**: se guardan en el llavero del SO (macOS Keychain / Windows Credential
+  Manager / Secret Service en Linux) mediante los comandos Rust `keychain_save/load/clear`
+  (crate `keyring`). El frontend los usa vía `TauriKeychainTokenStore` (`app/auth/tokenStore.ts`);
+  fuera de Tauri degrada a memoria.
+- **Base de datos local (RxDB/Dexie)**: los campos sensibles (nombres, nº de serie,
+  descripciones, validadores, nombres de fichero y **bytes de los adjuntos en cola**, payloads del
+  outbox) se cifran en reposo con una clave por máquina guardada en el llavero (entrada `db_key`,
+  generada al primer arranque). Ver `app/db/encryptionKey.ts` y `app/db/database.ts` (R29).
 
-- **macOS**: Apple Developer ID + `codesign` + notarización (`notarytool`) + staple.
-- **Windows**: certificado de code-signing (CA / Azure Trusted Signing) + `signtool`.
-- **Auto-update**: `pnpm tauri signer generate` (clave privada como secreto de CI, pública en
-  `tauri.conf.json`).
+## Firma de código y auto-update (`M-Dist`)
 
-Hasta entonces, en macOS el usuario abre con clic derecho → *Abrir* (Gatekeeper) y en Windows
-acepta el aviso de SmartScreen.
+La infraestructura está lista: `tauri.conf.json` activa `bundle.createUpdaterArtifacts` y
+`plugins.updater`, el plugin `tauri-plugin-updater` está registrado, y el workflow
+`.github/workflows/desktop-release.yml` construye, firma, notariza y publica releases para macOS
+(universal) y Windows en cada tag `v*`.
 
-## Pendiente para offline real (F1+)
+Pasos para activarla (requiere cuentas/certificados externos):
 
-- **Fuentes**: la UI carga Inter desde Google Fonts (CDN). Para funcionar 100% offline hay que
-  **auto-alojar la fuente** en el target de escritorio (se abordará en F1).
-- Capa de datos local (RxDB), motor de sync y almacenamiento seguro de tokens (keychain) se
-  añaden en F1–F3 según el plan.
+1. `pnpm tauri signer generate` → pega la **clave pública** en
+   `tauri.conf.json` → `plugins.updater.pubkey` y guarda la **privada** + password como secretos
+   `TAURI_SIGNING_PRIVATE_KEY` / `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
+2. **macOS**: Apple Developer ID + notarización vía los secretos `APPLE_*` (los consume
+   `tauri-action`: `codesign` + `notarytool` + staple).
+3. **Windows**: certificado de code-signing (CA / Azure Trusted Signing) + `signtool`.
+4. Sirve los artefactos del updater (`latest.json` + binarios firmados) en el endpoint configurado
+   (`https://releases.stocka.es/desktop/...`).
+
+Sin esos secretos el workflow sigue construyendo, pero genera artefactos **sin firmar**: en macOS
+el usuario abre con clic derecho → *Abrir* (Gatekeeper) y en Windows acepta el aviso de SmartScreen.
+
+> Falta solo el disparador de "buscar actualizaciones" en la UI, que necesita el paquete JS
+> `@tauri-apps/plugin-updater`; el resto del canal de actualización ya está cableado.
+
+## Pendiente para offline real
+
+- **Fuentes**: la UI carga Inter desde Google Fonts (CDN). Para funcionar 100% offline conviene
+  **auto-alojar la fuente** en el target de escritorio.
