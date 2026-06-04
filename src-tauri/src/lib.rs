@@ -1,35 +1,37 @@
 use keyring::Entry;
 
-/// Keychain service name under which the session tokens are stored. Pairs with a fixed account
-/// label so there is a single secure entry per machine user (the app namespaces accounts itself).
+/// Keychain service name under which secrets are stored. Each secret uses a distinct account label
+/// (e.g. "session" for the auth tokens, "db_key" for the local database encryption key), so the app
+/// keeps several independent secure entries per machine user.
 const KEYCHAIN_SERVICE: &str = "es.stocka.desktop";
-const KEYCHAIN_ACCOUNT: &str = "session";
+const DEFAULT_ACCOUNT: &str = "session";
 
-fn entry() -> Result<Entry, String> {
-    Entry::new(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT).map_err(|e| e.to_string())
+fn entry(account: Option<String>) -> Result<Entry, String> {
+    let account = account.unwrap_or_else(|| DEFAULT_ACCOUNT.to_string());
+    Entry::new(KEYCHAIN_SERVICE, &account).map_err(|e| e.to_string())
 }
 
-/// Persists the serialized session tokens in the OS keychain (macOS Keychain / Windows Credential
-/// Manager / Secret Service on Linux), so they survive restarts and never touch disk in clear text.
+/// Persists a secret in the OS keychain (macOS Keychain / Windows Credential Manager / Secret
+/// Service on Linux), so it survives restarts and never touches disk in clear text.
 #[tauri::command]
-fn keychain_save(value: String) -> Result<(), String> {
-    entry()?.set_password(&value).map_err(|e| e.to_string())
+fn keychain_save(value: String, account: Option<String>) -> Result<(), String> {
+    entry(account)?.set_password(&value).map_err(|e| e.to_string())
 }
 
-/// Loads the serialized session tokens, or `None` when no entry exists yet.
+/// Loads a stored secret, or `None` when no entry exists yet.
 #[tauri::command]
-fn keychain_load() -> Result<Option<String>, String> {
-    match entry()?.get_password() {
+fn keychain_load(account: Option<String>) -> Result<Option<String>, String> {
+    match entry(account)?.get_password() {
         Ok(value) => Ok(Some(value)),
         Err(keyring::Error::NoEntry) => Ok(None),
         Err(e) => Err(e.to_string()),
     }
 }
 
-/// Clears the stored tokens (logout); a missing entry is treated as success.
+/// Clears a stored secret; a missing entry is treated as success.
 #[tauri::command]
-fn keychain_clear() -> Result<(), String> {
-    match entry()?.delete_credential() {
+fn keychain_clear(account: Option<String>) -> Result<(), String> {
+    match entry(account)?.delete_credential() {
         Ok(()) => Ok(()),
         Err(keyring::Error::NoEntry) => Ok(()),
         Err(e) => Err(e.to_string()),

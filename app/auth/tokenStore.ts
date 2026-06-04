@@ -41,9 +41,10 @@ export class MemoryTokenStore implements TokenStore {
 }
 
 /** Minimal shape of the Tauri global bridge we rely on (exposed via `withGlobalTauri`). */
-type TauriInvoke = <T>(cmd: string, args?: Record<string, unknown>) => Promise<T>;
+export type TauriInvoke = <T>(cmd: string, args?: Record<string, unknown>) => Promise<T>;
 
-function tauriInvoke(): TauriInvoke | null {
+/** Resolves the Tauri `invoke` function from the global bridge, or {@code null} off-Tauri. */
+export function tauriInvoke(): TauriInvoke | null {
   const g = globalThis as unknown as {
     __TAURI__?: { core?: { invoke?: TauriInvoke } };
     __TAURI_INTERNALS__?: { invoke?: TauriInvoke };
