@@ -1,5 +1,5 @@
 import { DesktopSession } from "../auth/desktopSession";
-import { MemoryTokenStore, type TokenStore } from "../auth/tokenStore";
+import { createTokenStore, type TokenStore } from "../auth/tokenStore";
 import { createDesktopDatabase } from "../db/desktopDatabase";
 import type { StockaDatabase } from "../db/database";
 import { createSyncRunner, type SyncRunner } from "../sync/runner";
@@ -13,10 +13,11 @@ import { createSyncRunner, type SyncRunner } from "../sync/runner";
  * {@link SyncRunner}. The session, database and runner are created lazily because the account
  * (database namespace, R28) and organization are only known post-login.
  *
- * <p><strong>Token storage:</strong> defaults to a non-persistent in-memory store. Production
- * must inject a keychain-backed {@link TokenStore} (macOS Keychain / Windows Credential Manager via
- * a Tauri plugin) by replacing {@code tokenStore} below, so the session survives app restarts and
- * tokens never touch disk in clear text.
+ * <p><strong>Token storage:</strong> uses the OS keychain inside Tauri (macOS Keychain / Windows
+ * Credential Manager / Linux Secret Service via the {@code keychain_*} Rust commands), so the
+ * session survives app restarts and tokens never touch disk in clear text; it degrades to a
+ * non-persistent in-memory store on web/dev or when the bridge is unavailable (see
+ * {@code createTokenStore}).
  */
 export interface StockaSyncApi {
   session: DesktopSession;
@@ -32,9 +33,9 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const apiBaseUrl = String(config.public.apiBaseUrl ?? "");
 
-  // TODO(M-Dist): swap for a keychain-backed TokenStore (Tauri plugin) so the session persists
-  // securely across restarts.
-  const tokenStore: TokenStore = new MemoryTokenStore();
+  // OS keychain (Tauri `keychain_*` commands) so the session persists securely across restarts;
+  // degrades to an in-memory store on web/dev or when the bridge is missing.
+  const tokenStore: TokenStore = createTokenStore();
   const session = new DesktopSession({ apiBaseUrl, tokenStore });
 
   const api: StockaSyncApi = {

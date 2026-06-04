@@ -1062,6 +1062,15 @@
         "not_found": "Artículo no encontrado."
       },
       "new_breadcrumb": "Nuevo"
+    },
+    "sync": {
+      "idle": "Sincronizado",
+      "syncing": "Sincronizando…",
+      "offline": "Sin conexión",
+      "pending": "{count} pendiente(s)",
+      "failed": "{count} con conflicto",
+      "sync_now": "Sincronizar ahora",
+      "title": "Estado de sincronización"
     }
   },
   "invitations": {

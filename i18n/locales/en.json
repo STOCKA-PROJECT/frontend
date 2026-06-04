@@ -1062,6 +1062,15 @@
         "not_found": "Item not found."
       },
       "new_breadcrumb": "New"
+    },
+    "sync": {
+      "idle": "Synced",
+      "syncing": "Syncing…",
+      "offline": "Offline",
+      "pending": "{count} pending",
+      "failed": "{count} with conflict",
+      "sync_now": "Sync now",
+      "title": "Sync status"
     }
   },
   "invitations": {

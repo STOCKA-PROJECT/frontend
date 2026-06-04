@@ -78,6 +78,8 @@ const showOrg = computed(() => lastSegment.value !== 'crear-organizacion')
       <kbd class="rounded-md border border-line bg-bg-soft px-1.5 py-px text-[11px] text-ink-muted">⌘K</kbd>
     </div>
 
+    <DashboardSyncStatusBadge />
+
     <LanguageSwitcher variant="ghost" />
 
     <button

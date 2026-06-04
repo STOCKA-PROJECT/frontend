@@ -1062,6 +1062,15 @@
         "not_found": "Article no trobat."
       },
       "new_breadcrumb": "Nou"
+    },
+    "sync": {
+      "idle": "Sincronitzat",
+      "syncing": "Sincronitzant…",
+      "offline": "Sense connexió",
+      "pending": "{count} pendent(s)",
+      "failed": "{count} amb conflicte",
+      "sync_now": "Sincronitza ara",
+      "title": "Estat de sincronització"
     }
   },
   "invitations": {
