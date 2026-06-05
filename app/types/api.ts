@@ -514,6 +514,26 @@ export interface UpdatePortDto {
   parameters?: ActionParameterDto[]
 }
 
+/**
+ * A timeline (línea de tiempo) belonging to an organization. Identified by a {@link name} that is
+ * unique within its organization; {@link createdAt}/{@link updatedAt} are managed automatically.
+ */
+export interface TimelineResponseDto {
+  id: number
+  organizationId: number
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateTimelineDto {
+  name: string
+}
+
+export interface UpdateTimelineDto {
+  name?: string
+}
+
 export interface OrganizationPieceAttributeResponseDto {
   id: number
   name: string

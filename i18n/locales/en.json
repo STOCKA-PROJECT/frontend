@@ -356,9 +356,46 @@
       "items": "Items",
       "locations": "Locations",
       "types": "Item types",
+      "timelines": "Timelines",
       "ports": "Ports",
       "team": "Team",
       "settings": "Settings"
+    },
+    "timelines": {
+      "page_title": "Timelines",
+      "page_subtitle": "Manage your organization's timelines: create, view and delete.",
+      "count": "{n} timeline | {n} timelines",
+      "empty": "No timelines yet.",
+      "columns": {
+        "name": "Name",
+        "created": "Created",
+        "updated": "Updated",
+        "actions": "Actions"
+      },
+      "actions": {
+        "new": "New timeline",
+        "modify": "Modify",
+        "rename": "Rename",
+        "delete": "Delete"
+      },
+      "dialog": {
+        "title": "New timeline",
+        "edit_title": "Rename",
+        "name_label": "Name",
+        "name_placeholder": "e.g. Launch 2026",
+        "name_required": "Name is required.",
+        "submit": "Create",
+        "save": "Save"
+      },
+      "confirm": {
+        "delete_title": "Delete timeline",
+        "delete_body": "Are you sure you want to delete “{name}”? This action cannot be undone."
+      },
+      "errors": {
+        "load_list": "Could not load timelines.",
+        "save": "Could not save the timeline.",
+        "delete": "Could not delete the timeline."
+      }
     },
     "header": {
       "greeting_named": "Hi, {name} 👋",

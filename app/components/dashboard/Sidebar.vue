@@ -115,6 +115,12 @@ async function handleLogout() {
         <span>{{ t('dashboard.nav.types') }}</span>
       </NuxtLink>
 
+      <NuxtLink v-if="hasOrgs" :to="orgPath('/timelines', navOrgSlug)" exact-active-class="is-active"
+        class="nav-item">
+        <DashboardIcon name="clock" />
+        <span>{{ t('dashboard.nav.timelines') }}</span>
+      </NuxtLink>
+
       <NuxtLink v-if="hasOrgs && portsEnabled" :to="orgPath('/puertos', navOrgSlug)" exact-active-class="is-active"
         class="nav-item">
         <DashboardIcon name="cpu" />
@@ -282,6 +288,11 @@ async function handleLogout() {
           <NuxtLink v-if="hasOrgs" :to="orgPath('/tipos-articulos', navOrgSlug)" exact-active-class="is-active" class="nav-item" @click="close">
             <DashboardIcon name="list" />
             <span>{{ t('dashboard.nav.types') }}</span>
+          </NuxtLink>
+
+          <NuxtLink v-if="hasOrgs" :to="orgPath('/timelines', navOrgSlug)" exact-active-class="is-active" class="nav-item" @click="close">
+            <DashboardIcon name="clock" />
+            <span>{{ t('dashboard.nav.timelines') }}</span>
           </NuxtLink>
 
           <NuxtLink v-if="hasOrgs && portsEnabled" :to="orgPath('/puertos', navOrgSlug)" exact-active-class="is-active" class="nav-item" @click="close">

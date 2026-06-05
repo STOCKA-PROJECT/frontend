@@ -356,9 +356,46 @@
       "items": "Artículos",
       "locations": "Ubicaciones",
       "types": "Tipos de artículo",
+      "timelines": "Timelines",
       "ports": "Puertos",
       "team": "Equipo",
       "settings": "Ajustes"
+    },
+    "timelines": {
+      "page_title": "Timelines",
+      "page_subtitle": "Gestiona las líneas de tiempo de tu organización: crea, consulta y elimina.",
+      "count": "{n} línea de tiempo | {n} líneas de tiempo",
+      "empty": "Todavía no hay líneas de tiempo.",
+      "columns": {
+        "name": "Nombre",
+        "created": "Creado",
+        "updated": "Editado",
+        "actions": "Acciones"
+      },
+      "actions": {
+        "new": "Nueva timeline",
+        "modify": "Modificar",
+        "rename": "Renombrar",
+        "delete": "Eliminar"
+      },
+      "dialog": {
+        "title": "Nueva timeline",
+        "edit_title": "Cambiar nombre",
+        "name_label": "Nombre",
+        "name_placeholder": "Ej. Lanzamiento 2026",
+        "name_required": "El nombre es obligatorio.",
+        "submit": "Crear",
+        "save": "Guardar"
+      },
+      "confirm": {
+        "delete_title": "Eliminar timeline",
+        "delete_body": "¿Seguro que quieres eliminar «{name}»? Esta acción no se puede deshacer."
+      },
+      "errors": {
+        "load_list": "No se han podido cargar las líneas de tiempo.",
+        "save": "No se ha podido guardar la línea de tiempo.",
+        "delete": "No se ha podido eliminar la línea de tiempo."
+      }
     },
     "header": {
       "greeting_named": "Hola, {name} 👋",

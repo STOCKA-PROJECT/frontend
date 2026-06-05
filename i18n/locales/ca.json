@@ -356,9 +356,46 @@
       "items": "Articles",
       "locations": "Ubicacions",
       "types": "Tipus d'article",
+      "timelines": "Timelines",
       "ports": "Ports",
       "team": "Equip",
       "settings": "Configuració"
+    },
+    "timelines": {
+      "page_title": "Timelines",
+      "page_subtitle": "Gestiona les línies de temps de la teva organització: crea, consulta i elimina.",
+      "count": "{n} línia de temps | {n} línies de temps",
+      "empty": "Encara no hi ha línies de temps.",
+      "columns": {
+        "name": "Nom",
+        "created": "Creat",
+        "updated": "Editat",
+        "actions": "Accions"
+      },
+      "actions": {
+        "new": "Nova timeline",
+        "modify": "Modificar",
+        "rename": "Reanomenar",
+        "delete": "Eliminar"
+      },
+      "dialog": {
+        "title": "Nova timeline",
+        "edit_title": "Canviar el nom",
+        "name_label": "Nom",
+        "name_placeholder": "Ex. Llançament 2026",
+        "name_required": "El nom és obligatori.",
+        "submit": "Crear",
+        "save": "Desar"
+      },
+      "confirm": {
+        "delete_title": "Eliminar timeline",
+        "delete_body": "Segur que vols eliminar «{name}»? Aquesta acció no es pot desfer."
+      },
+      "errors": {
+        "load_list": "No s'han pogut carregar les línies de temps.",
+        "save": "No s'ha pogut desar la línia de temps.",
+        "delete": "No s'ha pogut eliminar la línia de temps."
+      }
     },
     "header": {
       "greeting_named": "Hola, {name} 👋",
