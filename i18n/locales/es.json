@@ -394,7 +394,8 @@
       "errors": {
         "load_list": "No se han podido cargar las líneas de tiempo.",
         "save": "No se ha podido guardar la línea de tiempo.",
-        "delete": "No se ha podido eliminar la línea de tiempo."
+        "delete": "No se ha podido eliminar la línea de tiempo.",
+        "open_editor": "No se ha podido abrir el editor."
       }
     },
     "header": {
@@ -583,6 +584,16 @@
         "parameter_name_placeholder": "tiempo, intensidad…",
         "parameter_type": "Tipo de dato",
         "parameter_required": "Obligatorio",
+        "parameter_binding": "Modo del valor",
+        "binding_static": "Estático",
+        "binding_dynamic": "Dinámico",
+        "binding_static_hint": "Valor fijo, igual para todos los artículos de este tipo.",
+        "binding_dynamic_hint": "El valor se define en la línea de tiempo, por cada artículo.",
+        "parameter_static_value": "Valor fijo",
+        "static_value_required": "Un parámetro estático y obligatorio necesita un valor fijo.",
+        "parameter_is_duration": "Es la duración (define la longitud del clip)",
+        "is_duration_hint": "El valor (en segundos) será la longitud del clip en la línea de tiempo. No habrá un campo de duración aparte.",
+        "static_duration_value": "Duración fija (s)",
         "create": "Crear acción",
         "save": "Guardar cambios"
       },

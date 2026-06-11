@@ -2,6 +2,7 @@
 const SITE_URL = process.env.NUXT_PUBLIC_SITE_URL ?? "https://stocka.es";
 const SITE_NAME = "Stocka";
 const API_BASE_URL = process.env.NUXT_API_BASE_URL ?? "http://localhost:9095";
+const EDITOR_URL = process.env.NUXT_PUBLIC_EDITOR_URL ?? "http://localhost:3010";
 
 const SECURITY_HEADERS = {
   "strict-transport-security": "max-age=31536000; includeSubDomains",
@@ -42,6 +43,7 @@ export default defineNuxtConfig({
     public: {
       siteUrl: SITE_URL,
       siteName: SITE_NAME,
+      editorUrl: EDITOR_URL,
     },
   },
 

@@ -448,6 +448,14 @@ export interface UpdatePieceTypeAttributeDto {
 /**
  * A single typed parameter of a piece-type action (e.g. `tiempo` of type `INTEGER`). Reuses the
  * attribute {@link AttributeType} and {@link AttributeValidatorsDto} typing system.
+ *
+ * Binding mode:
+ * - `dynamic === false` (the default): the value is fixed once here in `staticValue` and shared by
+ *   every piece of the type, in every timeline.
+ * - `dynamic === true`: no value is stored; it is supplied per clip in the timeline editor, so
+ *   `staticValue` stays empty.
+ * `staticValue` is the canonical serialized string of the value (e.g. `"true"`, a JSON array for
+ * MULTI_SELECT), matching how piece attribute values are stored.
  */
 export interface ActionParameterDto {
   name: string
@@ -456,6 +464,11 @@ export interface ActionParameterDto {
   required: boolean
   position?: number
   validators?: AttributeValidatorsDto
+  dynamic?: boolean
+  staticValue?: string | null
+  // When true (only one numeric param per action), this parameter's value (in seconds) is the clip
+  // length on the timeline, so there is no separate clip-duration field.
+  isDuration?: boolean
 }
 
 export interface PieceTypeActionResponseDto {

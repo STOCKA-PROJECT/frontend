@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import type { ActionParameterDto, AttributeType, AttributeValidatorsDto, OrganizationRole } from '~/types/api'
+import type {
+  ActionParameterDto,
+  AttributeType,
+  AttributeValidatorsDto,
+  OrganizationRole,
+  PieceTypeAttributeResponseDto
+} from '~/types/api'
 import {
   ATTRIBUTE_TYPES,
   NAME_PATTERN,
@@ -31,8 +37,33 @@ const nameTouched = ref(Boolean(props.modelValue.name))
 const type = ref<AttributeType>(props.modelValue.type)
 const required = ref(props.modelValue.required)
 const validators = ref<AttributeValidatorsDto>({ ...(props.modelValue.validators ?? {}) })
+// Binding mode: static (a fixed value shared by every piece of the type) or dynamic (set per clip
+// in the timeline editor). Defaults to static.
+const dynamic = ref(props.modelValue.dynamic ?? false)
+const staticValue = ref<string | null>(props.modelValue.staticValue ?? null)
+// When set, this numeric parameter's value (seconds) is the clip length on the timeline.
+const isDuration = ref(props.modelValue.isDuration ?? false)
 const newOption = ref('')
 const optionError = ref<string | null>(null)
+
+// Only numeric parameters can be the clip duration.
+const canBeDuration = computed(() => type.value === 'INTEGER' || type.value === 'DECIMAL')
+
+// A synthetic attribute so the existing typed value field can edit the fixed static value, reusing
+// the same per-type controls and validators as piece attributes.
+const staticFieldAttribute = computed<PieceTypeAttributeResponseDto>(() => ({
+  id: props.index,
+  name: name.value || 'valor',
+  displayName: (isDuration.value && canBeDuration.value)
+    ? t('dashboard.pieceTypes.action_form.static_duration_value')
+    : t('dashboard.pieceTypes.action_form.parameter_static_value'),
+  type: type.value,
+  required: required.value,
+  position: props.index,
+  validators: validators.value
+}))
+const staticValueMissing = computed(() =>
+  !dynamic.value && required.value && (staticValue.value == null || staticValue.value === ''))
 
 const visibleValidators = computed(() => VALIDATOR_FIELDS[type.value])
 const showValidators = computed(() => visibleValidators.value.length > 0)
@@ -59,8 +90,17 @@ function onTypeChange(next: AttributeType) {
   if (next === type.value) return
   type.value = next
   validators.value = next === 'MEMBER' ? { eligibleRoles: [...ORG_ROLES] } : {}
+  // The previous static value no longer matches the new type's shape.
+  staticValue.value = null
+  // Only numeric parameters can act as the clip duration.
+  if (next !== 'INTEGER' && next !== 'DECIMAL') isDuration.value = false
   optionError.value = null
   newOption.value = ''
+}
+
+function setBinding(next: boolean) {
+  dynamic.value = next
+  if (next) staticValue.value = null
 }
 
 function setValidator<K extends ValidatorKey>(key: K, value: AttributeValidatorsDto[K]) {
@@ -125,13 +165,18 @@ function toggleEligibleRole(role: OrganizationRole, checked: boolean) {
   setValidator('eligibleRoles', [...current] as never)
 }
 
-watch([displayName, name, type, required, validators], () => {
+watch([displayName, name, type, required, validators, dynamic, staticValue, isDuration], () => {
   const cleaned = cleanValidators(validators.value)
+  const duration = isDuration.value && canBeDuration.value
+  const hasStatic = !dynamic.value && staticValue.value != null && staticValue.value !== ''
   emit('update:modelValue', {
     name: name.value,
     displayName: displayName.value,
     type: type.value,
     required: required.value,
+    dynamic: dynamic.value,
+    ...(hasStatic ? { staticValue: staticValue.value } : {}),
+    ...(duration ? { isDuration: true } : {}),
     ...(cleaned ? { validators: cleaned } : {})
   })
 }, { immediate: true })
@@ -183,6 +228,46 @@ watch([displayName, name, type, required, validators], () => {
       <input v-model="required" type="checkbox" class="h-4 w-4 accent-[var(--c-ink)]">
       <span>{{ t('dashboard.pieceTypes.action_form.parameter_required') }}</span>
     </label>
+
+    <!-- Binding: static (fixed for all pieces of the type) vs dynamic (set per clip in the timeline) -->
+    <div class="flex flex-col gap-2">
+      <label class="field-label">{{ t('dashboard.pieceTypes.action_form.parameter_binding') }}</label>
+      <div class="binding-toggle" role="radiogroup">
+        <button type="button" class="binding-option" :class="{ 'binding-option-active': !dynamic }"
+          role="radio" :aria-checked="!dynamic" @click="setBinding(false)">
+          {{ t('dashboard.pieceTypes.action_form.binding_static') }}
+        </button>
+        <button type="button" class="binding-option" :class="{ 'binding-option-active': dynamic }"
+          role="radio" :aria-checked="dynamic" @click="setBinding(true)">
+          {{ t('dashboard.pieceTypes.action_form.binding_dynamic') }}
+        </button>
+      </div>
+      <p class="field-help">
+        {{ dynamic
+          ? t('dashboard.pieceTypes.action_form.binding_dynamic_hint')
+          : t('dashboard.pieceTypes.action_form.binding_static_hint') }}
+      </p>
+    </div>
+
+    <!-- Duration: this numeric parameter's value (seconds) is the clip length on the timeline -->
+    <div v-if="canBeDuration" class="flex flex-col gap-1">
+      <label class="flex cursor-pointer items-center gap-2 text-[13.5px] text-ink">
+        <input v-model="isDuration" type="checkbox" class="h-4 w-4 accent-[var(--c-ink)]">
+        <span>{{ t('dashboard.pieceTypes.action_form.parameter_is_duration') }}</span>
+      </label>
+      <p v-if="isDuration" class="field-help">{{ t('dashboard.pieceTypes.action_form.is_duration_hint') }}</p>
+    </div>
+
+    <!-- Static value: the fixed value applied to every piece of this type -->
+    <div v-if="!dynamic" class="rounded-[10px] border border-line bg-bg-card p-3">
+      <DashboardPieceAttributeField
+        :attribute="staticFieldAttribute"
+        :model-value="staticValue"
+        @update:model-value="staticValue = $event" />
+      <p v-if="staticValueMissing" class="field-error mt-1.5">
+        {{ t('dashboard.pieceTypes.action_form.static_value_required') }}
+      </p>
+    </div>
 
     <div v-if="showValidators" class="flex flex-col gap-3 rounded-[10px] border border-line bg-bg-card p-3">
       <h4 class="text-[11px] font-semibold uppercase tracking-[.06em] text-ink-muted">
@@ -335,6 +420,33 @@ watch([displayName, name, type, required, validators], () => {
 .field-input:focus { border-color: var(--c-accent); background: var(--c-bg-field-focus, var(--c-bg-card)); }
 .field-input-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; }
 .field-input-error { border-color: var(--c-danger); }
+
+.binding-toggle {
+  display: inline-flex;
+  align-self: flex-start;
+  border: 1px solid var(--c-line);
+  border-radius: 9px;
+  background: var(--c-bg-card);
+  padding: 2px;
+  gap: 2px;
+}
+.binding-option {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--c-ink-soft);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.binding-option:hover:not(.binding-option-active) { color: var(--c-ink); }
+.binding-option-active {
+  background: var(--c-ink);
+  color: var(--c-bg-card);
+}
 
 .param-remove {
   display: inline-flex;

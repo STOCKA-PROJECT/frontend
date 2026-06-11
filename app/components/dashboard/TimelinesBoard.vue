@@ -95,9 +95,21 @@ function openCreate() {
   formDialog.value = { open: true, mode: 'create', targetId: null, name: '', loading: false, error: null }
 }
 
-// "Modificar": placeholder, does nothing for now (will eventually open a detail view).
-function onModify(_timeline: TimelineResponseDto) {
-  // Intentionally empty.
+// "Modificar": opens the specialized Timeline Editor in a new window. We mint a short-lived
+// handoff ticket from the backend and hand it to the editor, which exchanges it for its own
+// session (the editor lives at a different origin and cannot share our cookies).
+const editorUrl = useRuntimeConfig().public.editorUrl as string
+
+async function onModify(timeline: TimelineResponseDto) {
+  try {
+    const api = useApi()
+    const { ticket } = await api<{ ticket: string }>('/auth/handoff', { method: 'POST' })
+    const url = `${editorUrl}/open?ticket=${encodeURIComponent(ticket)}`
+      + `&org=${encodeURIComponent(props.orgSlug)}&timeline=${timeline.id}`
+    window.open(url, '_blank', 'noopener')
+  } catch (e) {
+    showError(extractErrorMessage(e, t('dashboard.timelines.errors.open_editor')))
+  }
 }
 
 function onRename(timeline: TimelineResponseDto) {

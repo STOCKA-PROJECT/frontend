@@ -41,7 +41,7 @@ const displayNameInput = ref<HTMLInputElement | null>(null)
 function newParamDraft(value?: ActionParameterDto): ParamDraft {
   return {
     uid: uidCounter++,
-    value: value ?? { name: '', displayName: '', type: 'TEXT', required: true }
+    value: value ?? { name: '', displayName: '', type: 'TEXT', required: true, dynamic: false }
   }
 }
 
@@ -101,6 +101,7 @@ const nameInvalid = computed(() => name.value.length > 0 && !NAME_PATTERN.test(n
 
 const paramsValid = computed(() => {
   const seen = new Set<string>()
+  let durations = 0
   for (const d of params.value) {
     const p = d.value
     if (!NAME_PATTERN.test(p.name)) return false
@@ -108,6 +109,14 @@ const paramsValid = computed(() => {
     seen.add(p.name)
     if ((p.type === 'SELECT' || p.type === 'MULTI_SELECT') && !(p.validators?.options?.length)) return false
     if (p.type === 'MEMBER' && !(p.validators?.eligibleRoles?.length)) return false
+    // A required static parameter must carry a fixed value (mirrors the backend rule).
+    if (!p.dynamic && p.required && (p.staticValue == null || p.staticValue === '')) return false
+    if (p.isDuration) {
+      durations++
+      // At most one duration parameter, and a static one needs a fixed length.
+      if (durations > 1) return false
+      if (!p.dynamic && (p.staticValue == null || p.staticValue === '')) return false
+    }
   }
   return true
 })

@@ -394,7 +394,8 @@
       "errors": {
         "load_list": "No s'han pogut carregar les línies de temps.",
         "save": "No s'ha pogut desar la línia de temps.",
-        "delete": "No s'ha pogut eliminar la línia de temps."
+        "delete": "No s'ha pogut eliminar la línia de temps.",
+        "open_editor": "No s'ha pogut obrir l'editor."
       }
     },
     "header": {
@@ -583,6 +584,16 @@
         "parameter_name_placeholder": "temps, intensitat…",
         "parameter_type": "Tipus de dada",
         "parameter_required": "Obligatori",
+        "parameter_binding": "Mode del valor",
+        "binding_static": "Estàtic",
+        "binding_dynamic": "Dinàmic",
+        "binding_static_hint": "Valor fix, igual per a tots els articles d''aquest tipus.",
+        "binding_dynamic_hint": "El valor es defineix a la línia de temps, per a cada article.",
+        "parameter_static_value": "Valor fix",
+        "static_value_required": "Un paràmetre estàtic i obligatori necessita un valor fix.",
+        "parameter_is_duration": "És la durada (defineix la longitud del clip)",
+        "is_duration_hint": "El valor (en segons) serà la longitud del clip a la línia de temps. No hi haurà un camp de durada a part.",
+        "static_duration_value": "Durada fixa (s)",
         "create": "Crear acció",
         "save": "Desar canvis"
       },

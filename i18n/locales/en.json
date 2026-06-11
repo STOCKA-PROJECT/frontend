@@ -394,7 +394,8 @@
       "errors": {
         "load_list": "Could not load timelines.",
         "save": "Could not save the timeline.",
-        "delete": "Could not delete the timeline."
+        "delete": "Could not delete the timeline.",
+        "open_editor": "Could not open the editor."
       }
     },
     "header": {
@@ -583,6 +584,16 @@
         "parameter_name_placeholder": "time, intensity…",
         "parameter_type": "Data type",
         "parameter_required": "Required",
+        "parameter_binding": "Value mode",
+        "binding_static": "Static",
+        "binding_dynamic": "Dynamic",
+        "binding_static_hint": "Fixed value, the same for every piece of this type.",
+        "binding_dynamic_hint": "The value is set in the timeline, per piece.",
+        "parameter_static_value": "Fixed value",
+        "static_value_required": "A required static parameter needs a fixed value.",
+        "parameter_is_duration": "This is the duration (sets the clip length)",
+        "is_duration_hint": "The value (in seconds) will be the clip length on the timeline. There will be no separate duration field.",
+        "static_duration_value": "Fixed duration (s)",
         "create": "Create action",
         "save": "Save changes"
       },
