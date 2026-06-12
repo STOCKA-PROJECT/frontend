@@ -356,8 +356,47 @@
       "items": "Items",
       "locations": "Locations",
       "types": "Item types",
+      "timelines": "Timelines",
+      "ports": "Ports",
       "team": "Team",
       "settings": "Settings"
+    },
+    "timelines": {
+      "page_title": "Timelines",
+      "page_subtitle": "Manage your organization's timelines: create, view and delete.",
+      "count": "{n} timeline | {n} timelines",
+      "empty": "No timelines yet.",
+      "columns": {
+        "name": "Name",
+        "created": "Created",
+        "updated": "Updated",
+        "actions": "Actions"
+      },
+      "actions": {
+        "new": "New timeline",
+        "modify": "Modify",
+        "rename": "Rename",
+        "delete": "Delete"
+      },
+      "dialog": {
+        "title": "New timeline",
+        "edit_title": "Rename",
+        "name_label": "Name",
+        "name_placeholder": "e.g. Launch 2026",
+        "name_required": "Name is required.",
+        "submit": "Create",
+        "save": "Save"
+      },
+      "confirm": {
+        "delete_title": "Delete timeline",
+        "delete_body": "Are you sure you want to delete “{name}”? This action cannot be undone."
+      },
+      "errors": {
+        "load_list": "Could not load timelines.",
+        "save": "Could not save the timeline.",
+        "delete": "Could not delete the timeline.",
+        "open_editor": "Could not open the editor."
+      }
     },
     "header": {
       "greeting_named": "Hi, {name} 👋",
@@ -525,6 +564,48 @@
         "create": "Create attribute",
         "save": "Save changes"
       },
+      "action_form": {
+        "new_title": "New action on \"{type}\"",
+        "edit_title": "Edit action \"{name}\"",
+        "field_name": "Technical name",
+        "field_name_placeholder": "turn_on, restart…",
+        "field_display_name": "Display label",
+        "field_display_name_placeholder": "Turn on, Restart…",
+        "field_description": "Description (optional)",
+        "field_description_placeholder": "What this action does…",
+        "parameters_title": "Parameters ({n})",
+        "add_parameter": "Add parameter",
+        "no_parameters": "This action has no parameters. Add one if the function needs it.",
+        "parameter_n": "Parameter {n}",
+        "remove_parameter": "Remove parameter",
+        "parameter_display_name": "Display label",
+        "parameter_display_name_placeholder": "Time, Intensity…",
+        "parameter_name": "Technical name",
+        "parameter_name_placeholder": "time, intensity…",
+        "parameter_type": "Data type",
+        "parameter_required": "Required",
+        "parameter_binding": "Value mode",
+        "binding_static": "Static",
+        "binding_dynamic": "Dynamic",
+        "binding_static_hint": "Fixed value, the same for every piece of this type.",
+        "binding_dynamic_hint": "The value is set in the timeline, per piece.",
+        "parameter_static_value": "Fixed value",
+        "static_value_required": "A required static parameter needs a fixed value.",
+        "parameter_is_duration": "This is the duration (sets the clip length)",
+        "is_duration_hint": "The value (in seconds) will be the clip length on the timeline. There will be no separate duration field.",
+        "static_duration_value": "Fixed duration (s)",
+        "create": "Create action",
+        "save": "Save changes"
+      },
+      "actions": {
+        "title": "Actions ({n})",
+        "add": "Add action",
+        "empty": "This type has no actions yet. Add the first one to define its functions.",
+        "pill": "Action",
+        "parameter_count": "{n} parameters | {n} parameter | {n} parameters",
+        "delete_confirm_title": "Delete action",
+        "delete_confirm_message": "Are you sure you want to delete the action \"{name}\"? This action cannot be undone."
+      },
       "types": {
         "TEXT": "Short text",
         "LONGTEXT": "Long text",
@@ -552,14 +633,57 @@
         "load_detail": "Couldn't load the item type.",
         "save_type": "Couldn't save the type.",
         "save_attribute": "Couldn't save the attribute.",
+        "save_action": "Couldn't save the action.",
         "delete_type": "Couldn't delete the type.",
         "delete_attribute": "Couldn't delete the attribute.",
+        "delete_action": "Couldn't delete the action.",
+        "load_actions": "Couldn't load the actions.",
         "name_pattern": "Use lowercase letters, numbers, and underscore only. Must start with a letter.",
         "name_required": "Name is required.",
         "display_name_required": "Display label is required.",
         "options_required": "Add at least one option.",
         "type_required": "Pick a data type.",
         "eligibleRoles_required": "Pick at least one eligible role."
+      }
+    },
+    "ports": {
+      "page_title": "Ports",
+      "page_subtitle": "Define your Raspberry Pi ports: each one has a name, a type, a pin (GPIO) and typed parameters.",
+      "list": {
+        "count": "{n} ports | {n} port | {n} ports",
+        "new": "New port",
+        "empty": "You haven't created any ports yet.",
+        "loading": "Loading ports…",
+        "no_parameters": "No parameters",
+        "unknown_type": "Deleted type",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "form": {
+        "new_title": "New port",
+        "edit_title": "Edit port “{name}”",
+        "field_name": "Name",
+        "field_name_placeholder": "LED strip output 1",
+        "field_type": "Item type",
+        "field_type_placeholder": "Select an item type",
+        "field_type_empty": "Create an item type first so you can assign it to a port.",
+        "field_pin": "Pin (GPIO)",
+        "field_pin_placeholder": "21",
+        "field_pin_help": "Raspberry Pi GPIO pin number.",
+        "parameters_title": "Parameters ({n})",
+        "add_parameter": "Add parameter",
+        "no_parameters": "This port has no parameters. Add one if you need it.",
+        "create": "Create",
+        "save": "Save changes"
+      },
+      "delete": {
+        "confirm_title": "Delete port",
+        "confirm_message": "Are you sure you want to delete the port “{name}”? This action cannot be undone.",
+        "confirm_label": "Delete"
+      },
+      "not_available": {
+        "title": "Feature not available",
+        "body": "Ports are only available for enabled organizations. Contact an administrator if you think you should have access."
       }
     },
     "account": {

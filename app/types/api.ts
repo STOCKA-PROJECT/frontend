@@ -143,6 +143,18 @@ export interface OrganizationResponseDto {
   name: string
   slug: string
   currentUserRole: OrganizationRole
+  /**
+   * Whether the private "piece-type actions" feature is available to the current user for this
+   * organization (only enabled when the organization's owner is a global admin). Optional so older
+   * payloads without the flag are treated as disabled.
+   */
+  pieceTypeActionsEnabled?: boolean
+  /**
+   * Whether the private "ports" feature is available to the current user for this organization
+   * (only enabled when the organization's owner is a global admin). Optional so older payloads
+   * without the flag are treated as disabled.
+   */
+  portsEnabled?: boolean
 }
 
 export interface OrganizationLookupResponseDto {
@@ -431,6 +443,108 @@ export interface UpdatePieceTypeAttributeDto {
   required?: boolean
   position?: number
   validators?: AttributeValidatorsDto
+}
+
+/**
+ * A single typed parameter of a piece-type action (e.g. `tiempo` of type `INTEGER`). Reuses the
+ * attribute {@link AttributeType} and {@link AttributeValidatorsDto} typing system.
+ *
+ * Binding mode:
+ * - `dynamic === false` (the default): the value is fixed once here in `staticValue` and shared by
+ *   every piece of the type, in every timeline.
+ * - `dynamic === true`: no value is stored; it is supplied per clip in the timeline editor, so
+ *   `staticValue` stays empty.
+ * `staticValue` is the canonical serialized string of the value (e.g. `"true"`, a JSON array for
+ * MULTI_SELECT), matching how piece attribute values are stored.
+ */
+export interface ActionParameterDto {
+  name: string
+  displayName: string
+  type: AttributeType
+  required: boolean
+  position?: number
+  validators?: AttributeValidatorsDto
+  dynamic?: boolean
+  staticValue?: string | null
+  // When true (only one numeric param per action), this parameter's value (in seconds) is the clip
+  // length on the timeline, so there is no separate clip-duration field.
+  isDuration?: boolean
+}
+
+export interface PieceTypeActionResponseDto {
+  id: number
+  name: string
+  displayName: string
+  description?: string | null
+  position: number
+  parameters: ActionParameterDto[]
+}
+
+export interface CreatePieceTypeActionDto {
+  name: string
+  displayName: string
+  description?: string
+  position?: number
+  parameters: ActionParameterDto[]
+}
+
+export interface UpdatePieceTypeActionDto {
+  name?: string
+  displayName?: string
+  description?: string
+  position?: number
+  parameters?: ActionParameterDto[]
+}
+
+/**
+ * A port (Raspberry Pi GPIO output) declared by an organization, e.g. "Salida tira led 1" wired to
+ * pin 21 and related to an existing piece type via {@link pieceTypeId} ({@link pieceTypeName} is its
+ * resolved display name, {@code null} if the type was deleted), with a list of typed
+ * {@link parameters} (reusing the same {@link ActionParameterDto} machinery as piece-type actions).
+ * Private, organization-gated feature — see {@link OrganizationResponseDto.portsEnabled}.
+ */
+export interface PortResponseDto {
+  id: number
+  name: string
+  pieceTypeId: number
+  pieceTypeName: string | null
+  pin: number | null
+  position: number
+  parameters: ActionParameterDto[]
+}
+
+export interface CreatePortDto {
+  name: string
+  pieceTypeId: number
+  pin: number
+  parameters: ActionParameterDto[]
+}
+
+export interface UpdatePortDto {
+  name?: string
+  pieceTypeId?: number
+  pin?: number
+  parameters?: ActionParameterDto[]
+}
+
+/**
+ * A timeline (línea de tiempo) belonging to an organization. Identified by a {@link name} that is
+ * unique within its organization; {@link createdAt}/{@link updatedAt} are managed automatically.
+ */
+export interface TimelineResponseDto {
+  id: number
+  organizationId: number
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateTimelineDto {
+  name: string
+}
+
+export interface UpdateTimelineDto {
+  name?: string
 }
 
 export interface OrganizationPieceAttributeResponseDto {

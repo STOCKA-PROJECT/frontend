@@ -118,5 +118,26 @@ withDefaults(defineProps<{ name: string; size?: number }>(), { size: 16 })
       <path d="M14 20h3" />
       <path d="M20 20h1" />
     </template>
+    <template v-else-if="name === 'cpu'">
+      <rect x="4" y="4" width="16" height="16" rx="2" />
+      <rect x="9" y="9" width="6" height="6" />
+      <path d="M9 2v2" />
+      <path d="M15 2v2" />
+      <path d="M9 20v2" />
+      <path d="M15 20v2" />
+      <path d="M2 9h2" />
+      <path d="M2 15h2" />
+      <path d="M20 9h2" />
+      <path d="M20 15h2" />
+    </template>
+    <template v-else-if="name === 'edit'">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </template>
+    <template v-else-if="name === 'external'">
+      <path d="M15 3h6v6" />
+      <path d="M10 14 21 3" />
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    </template>
   </svg>
 </template>

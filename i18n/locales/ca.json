@@ -356,8 +356,47 @@
       "items": "Articles",
       "locations": "Ubicacions",
       "types": "Tipus d'article",
+      "timelines": "Timelines",
+      "ports": "Ports",
       "team": "Equip",
       "settings": "Configuració"
+    },
+    "timelines": {
+      "page_title": "Timelines",
+      "page_subtitle": "Gestiona les línies de temps de la teva organització: crea, consulta i elimina.",
+      "count": "{n} línia de temps | {n} línies de temps",
+      "empty": "Encara no hi ha línies de temps.",
+      "columns": {
+        "name": "Nom",
+        "created": "Creat",
+        "updated": "Editat",
+        "actions": "Accions"
+      },
+      "actions": {
+        "new": "Nova timeline",
+        "modify": "Modificar",
+        "rename": "Reanomenar",
+        "delete": "Eliminar"
+      },
+      "dialog": {
+        "title": "Nova timeline",
+        "edit_title": "Canviar el nom",
+        "name_label": "Nom",
+        "name_placeholder": "Ex. Llançament 2026",
+        "name_required": "El nom és obligatori.",
+        "submit": "Crear",
+        "save": "Desar"
+      },
+      "confirm": {
+        "delete_title": "Eliminar timeline",
+        "delete_body": "Segur que vols eliminar «{name}»? Aquesta acció no es pot desfer."
+      },
+      "errors": {
+        "load_list": "No s'han pogut carregar les línies de temps.",
+        "save": "No s'ha pogut desar la línia de temps.",
+        "delete": "No s'ha pogut eliminar la línia de temps.",
+        "open_editor": "No s'ha pogut obrir l'editor."
+      }
     },
     "header": {
       "greeting_named": "Hola, {name} 👋",
@@ -525,6 +564,48 @@
         "create": "Crear atribut",
         "save": "Desar canvis"
       },
+      "action_form": {
+        "new_title": "Nova acció a «{type}»",
+        "edit_title": "Edita l'acció «{name}»",
+        "field_name": "Nom tècnic",
+        "field_name_placeholder": "encendre, reiniciar…",
+        "field_display_name": "Etiqueta visible",
+        "field_display_name_placeholder": "Encendre, Reiniciar…",
+        "field_description": "Descripció (opcional)",
+        "field_description_placeholder": "Què fa aquesta acció…",
+        "parameters_title": "Paràmetres ({n})",
+        "add_parameter": "Afegir paràmetre",
+        "no_parameters": "Aquesta acció no té paràmetres. Afegeix-ne un si la funció els necessita.",
+        "parameter_n": "Paràmetre {n}",
+        "remove_parameter": "Treure paràmetre",
+        "parameter_display_name": "Etiqueta visible",
+        "parameter_display_name_placeholder": "Temps, Intensitat…",
+        "parameter_name": "Nom tècnic",
+        "parameter_name_placeholder": "temps, intensitat…",
+        "parameter_type": "Tipus de dada",
+        "parameter_required": "Obligatori",
+        "parameter_binding": "Mode del valor",
+        "binding_static": "Estàtic",
+        "binding_dynamic": "Dinàmic",
+        "binding_static_hint": "Valor fix, igual per a tots els articles d''aquest tipus.",
+        "binding_dynamic_hint": "El valor es defineix a la línia de temps, per a cada article.",
+        "parameter_static_value": "Valor fix",
+        "static_value_required": "Un paràmetre estàtic i obligatori necessita un valor fix.",
+        "parameter_is_duration": "És la durada (defineix la longitud del clip)",
+        "is_duration_hint": "El valor (en segons) serà la longitud del clip a la línia de temps. No hi haurà un camp de durada a part.",
+        "static_duration_value": "Durada fixa (s)",
+        "create": "Crear acció",
+        "save": "Desar canvis"
+      },
+      "actions": {
+        "title": "Accions ({n})",
+        "add": "Afegir acció",
+        "empty": "Aquest tipus encara no té accions. Afegeix-ne la primera per definir les seves funcions.",
+        "pill": "Acció",
+        "parameter_count": "{n} paràmetres | {n} paràmetre | {n} paràmetres",
+        "delete_confirm_title": "Eliminar acció",
+        "delete_confirm_message": "Segur que vols eliminar l'acció «{name}»? Aquesta acció no es pot desfer."
+      },
       "types": {
         "TEXT": "Text curt",
         "LONGTEXT": "Text llarg",
@@ -552,14 +633,57 @@
         "load_detail": "No s'ha pogut carregar el tipus d'article.",
         "save_type": "No s'ha pogut desar el tipus.",
         "save_attribute": "No s'ha pogut desar l'atribut.",
+        "save_action": "No s'ha pogut desar l'acció.",
         "delete_type": "No s'ha pogut eliminar el tipus.",
         "delete_attribute": "No s'ha pogut eliminar l'atribut.",
+        "delete_action": "No s'ha pogut eliminar l'acció.",
+        "load_actions": "No s'han pogut carregar les accions.",
         "name_pattern": "Utilitza només minúscules, números i guió baix. Ha de començar per una lletra.",
         "name_required": "El nom és obligatori.",
         "display_name_required": "L'etiqueta visible és obligatòria.",
         "options_required": "Afegeix almenys una opció.",
         "type_required": "Selecciona un tipus de dada.",
         "eligibleRoles_required": "Selecciona almenys un rol elegible."
+      }
+    },
+    "ports": {
+      "page_title": "Ports",
+      "page_subtitle": "Defineix els ports de la teva Raspberry Pi: cadascun té un nom, un tipus, un pin (GPIO) i paràmetres tipats.",
+      "list": {
+        "count": "{n} ports | {n} port | {n} ports",
+        "new": "Nou port",
+        "empty": "Encara no has creat cap port.",
+        "loading": "Carregant ports…",
+        "no_parameters": "Sense paràmetres",
+        "unknown_type": "Tipus eliminat",
+        "edit": "Edita",
+        "delete": "Elimina"
+      },
+      "form": {
+        "new_title": "Nou port",
+        "edit_title": "Edita el port «{name}»",
+        "field_name": "Nom",
+        "field_name_placeholder": "Sortida tira led 1",
+        "field_type": "Tipus d'article",
+        "field_type_placeholder": "Selecciona un tipus d'article",
+        "field_type_empty": "Crea primer un tipus d'article per poder assignar-lo a un port.",
+        "field_pin": "Pin (GPIO)",
+        "field_pin_placeholder": "21",
+        "field_pin_help": "Número de pin GPIO de la Raspberry Pi.",
+        "parameters_title": "Paràmetres ({n})",
+        "add_parameter": "Afegeix un paràmetre",
+        "no_parameters": "Aquest port no té paràmetres. Afegeix-ne un si cal.",
+        "create": "Crea",
+        "save": "Desa els canvis"
+      },
+      "delete": {
+        "confirm_title": "Eliminar port",
+        "confirm_message": "Segur que vols eliminar el port «{name}»? Aquesta acció no es pot desfer.",
+        "confirm_label": "Elimina"
+      },
+      "not_available": {
+        "title": "Funció no disponible",
+        "body": "Els ports només estan disponibles per a organitzacions habilitades. Contacta amb un administrador si creus que hi hauries de tenir accés."
       }
     },
     "account": {

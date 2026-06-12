@@ -356,8 +356,47 @@
       "items": "Artículos",
       "locations": "Ubicaciones",
       "types": "Tipos de artículo",
+      "timelines": "Timelines",
+      "ports": "Puertos",
       "team": "Equipo",
       "settings": "Ajustes"
+    },
+    "timelines": {
+      "page_title": "Timelines",
+      "page_subtitle": "Gestiona las líneas de tiempo de tu organización: crea, consulta y elimina.",
+      "count": "{n} línea de tiempo | {n} líneas de tiempo",
+      "empty": "Todavía no hay líneas de tiempo.",
+      "columns": {
+        "name": "Nombre",
+        "created": "Creado",
+        "updated": "Editado",
+        "actions": "Acciones"
+      },
+      "actions": {
+        "new": "Nueva timeline",
+        "modify": "Modificar",
+        "rename": "Renombrar",
+        "delete": "Eliminar"
+      },
+      "dialog": {
+        "title": "Nueva timeline",
+        "edit_title": "Cambiar nombre",
+        "name_label": "Nombre",
+        "name_placeholder": "Ej. Lanzamiento 2026",
+        "name_required": "El nombre es obligatorio.",
+        "submit": "Crear",
+        "save": "Guardar"
+      },
+      "confirm": {
+        "delete_title": "Eliminar timeline",
+        "delete_body": "¿Seguro que quieres eliminar «{name}»? Esta acción no se puede deshacer."
+      },
+      "errors": {
+        "load_list": "No se han podido cargar las líneas de tiempo.",
+        "save": "No se ha podido guardar la línea de tiempo.",
+        "delete": "No se ha podido eliminar la línea de tiempo.",
+        "open_editor": "No se ha podido abrir el editor."
+      }
     },
     "header": {
       "greeting_named": "Hola, {name} 👋",
@@ -525,6 +564,48 @@
         "create": "Crear atributo",
         "save": "Guardar cambios"
       },
+      "action_form": {
+        "new_title": "Nueva acción en «{type}»",
+        "edit_title": "Editar acción «{name}»",
+        "field_name": "Nombre técnico",
+        "field_name_placeholder": "encender, reiniciar…",
+        "field_display_name": "Etiqueta visible",
+        "field_display_name_placeholder": "Encender, Reiniciar…",
+        "field_description": "Descripción (opcional)",
+        "field_description_placeholder": "Qué hace esta acción…",
+        "parameters_title": "Parámetros ({n})",
+        "add_parameter": "Añadir parámetro",
+        "no_parameters": "Esta acción no tiene parámetros. Añade uno si la función los necesita.",
+        "parameter_n": "Parámetro {n}",
+        "remove_parameter": "Quitar parámetro",
+        "parameter_display_name": "Etiqueta visible",
+        "parameter_display_name_placeholder": "Tiempo, Intensidad…",
+        "parameter_name": "Nombre técnico",
+        "parameter_name_placeholder": "tiempo, intensidad…",
+        "parameter_type": "Tipo de dato",
+        "parameter_required": "Obligatorio",
+        "parameter_binding": "Modo del valor",
+        "binding_static": "Estático",
+        "binding_dynamic": "Dinámico",
+        "binding_static_hint": "Valor fijo, igual para todos los artículos de este tipo.",
+        "binding_dynamic_hint": "El valor se define en la línea de tiempo, por cada artículo.",
+        "parameter_static_value": "Valor fijo",
+        "static_value_required": "Un parámetro estático y obligatorio necesita un valor fijo.",
+        "parameter_is_duration": "Es la duración (define la longitud del clip)",
+        "is_duration_hint": "El valor (en segundos) será la longitud del clip en la línea de tiempo. No habrá un campo de duración aparte.",
+        "static_duration_value": "Duración fija (s)",
+        "create": "Crear acción",
+        "save": "Guardar cambios"
+      },
+      "actions": {
+        "title": "Acciones ({n})",
+        "add": "Añadir acción",
+        "empty": "Este tipo aún no tiene acciones. Añade la primera para definir sus funciones.",
+        "pill": "Acción",
+        "parameter_count": "{n} parámetros | {n} parámetro | {n} parámetros",
+        "delete_confirm_title": "Eliminar acción",
+        "delete_confirm_message": "¿Seguro que quieres eliminar la acción «{name}»? Esta acción no se puede deshacer."
+      },
       "types": {
         "TEXT": "Texto corto",
         "LONGTEXT": "Texto largo",
@@ -552,14 +633,57 @@
         "load_detail": "No se ha podido cargar el tipo de artículo.",
         "save_type": "No se ha podido guardar el tipo.",
         "save_attribute": "No se ha podido guardar el atributo.",
+        "save_action": "No se ha podido guardar la acción.",
         "delete_type": "No se ha podido eliminar el tipo.",
         "delete_attribute": "No se ha podido eliminar el atributo.",
+        "delete_action": "No se ha podido eliminar la acción.",
+        "load_actions": "No se han podido cargar las acciones.",
         "name_pattern": "Usa solo minúsculas, números y guion bajo. Debe empezar por una letra.",
         "name_required": "El nombre es obligatorio.",
         "display_name_required": "La etiqueta visible es obligatoria.",
         "options_required": "Añade al menos una opción.",
         "type_required": "Selecciona un tipo de dato.",
         "eligibleRoles_required": "Selecciona al menos un rol elegible."
+      }
+    },
+    "ports": {
+      "page_title": "Puertos",
+      "page_subtitle": "Define los puertos de tu Raspberry Pi: cada uno tiene un nombre, un tipo, un pin (GPIO) y parámetros tipados.",
+      "list": {
+        "count": "{n} puertos | {n} puerto | {n} puertos",
+        "new": "Nuevo puerto",
+        "empty": "Aún no has creado ningún puerto.",
+        "loading": "Cargando puertos…",
+        "no_parameters": "Sin parámetros",
+        "unknown_type": "Tipo eliminado",
+        "edit": "Editar",
+        "delete": "Eliminar"
+      },
+      "form": {
+        "new_title": "Nuevo puerto",
+        "edit_title": "Editar puerto «{name}»",
+        "field_name": "Nombre",
+        "field_name_placeholder": "Salida tira led 1",
+        "field_type": "Tipo de artículo",
+        "field_type_placeholder": "Selecciona un tipo de artículo",
+        "field_type_empty": "Crea primero un tipo de artículo para poder asignarlo a un puerto.",
+        "field_pin": "Pin (GPIO)",
+        "field_pin_placeholder": "21",
+        "field_pin_help": "Número de pin GPIO de la Raspberry Pi.",
+        "parameters_title": "Parámetros ({n})",
+        "add_parameter": "Añadir parámetro",
+        "no_parameters": "Este puerto no tiene parámetros. Añade uno si lo necesitas.",
+        "create": "Crear",
+        "save": "Guardar cambios"
+      },
+      "delete": {
+        "confirm_title": "Eliminar puerto",
+        "confirm_message": "¿Seguro que quieres eliminar el puerto «{name}»? Esta acción no se puede deshacer.",
+        "confirm_label": "Eliminar"
+      },
+      "not_available": {
+        "title": "Función no disponible",
+        "body": "Los puertos solo están disponibles para organizaciones habilitadas. Contacta con un administrador si crees que deberías tener acceso."
       }
     },
     "account": {

@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import type { PieceTypeResponseDto } from '~/types/api'
+import type { PieceTypeActionResponseDto, PieceTypeResponseDto } from '~/types/api'
 
 const props = defineProps<{
   detail: PieceTypeResponseDto | null
   canWrite: boolean
+  actions?: PieceTypeActionResponseDto[]
+  canViewActions?: boolean
+  canManageActions?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -12,6 +15,9 @@ const emit = defineEmits<{
   'add-attribute': []
   'edit-attribute': [attrId: number]
   'delete-attribute': [attrId: number]
+  'add-action': []
+  'edit-action': [actionId: number]
+  'delete-action': [actionId: number]
 }>()
 
 const { t, locale } = useI18n()
@@ -28,6 +34,8 @@ function fmtDate(iso: string | undefined) {
 }
 
 const attributesCount = computed(() => props.detail?.attributes.length ?? 0)
+const actionsList = computed<PieceTypeActionResponseDto[]>(() => props.actions ?? [])
+const actionsCount = computed(() => actionsList.value.length)
 </script>
 
 <template>
@@ -103,6 +111,36 @@ const attributesCount = computed(() => props.detail?.attributes.length ?? 0)
               <DashboardPieceTypeAttributeRow :attr="attr" :can-write="canWrite"
                 @edit="emit('edit-attribute', attr.id)"
                 @delete="emit('delete-attribute', attr.id)" />
+            </li>
+          </ul>
+        </section>
+
+        <section v-if="canViewActions" class="mt-6">
+          <div class="mb-3 flex items-center justify-between gap-2">
+            <h3 class="text-[11.5px] font-semibold uppercase tracking-[.06em] text-ink-muted">
+              {{ t('dashboard.pieceTypes.actions.title', { n: actionsCount }) }}
+            </h3>
+            <button v-if="canManageActions" type="button" class="action-btn"
+              @click="emit('add-action')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span>{{ t('dashboard.pieceTypes.actions.add') }}</span>
+            </button>
+          </div>
+
+          <div v-if="!actionsList.length"
+            class="rounded-[10px] border border-dashed border-line bg-bg-soft px-4 py-8 text-center">
+            <p class="text-[13px] text-ink-muted">{{ t('dashboard.pieceTypes.actions.empty') }}</p>
+          </div>
+
+          <ul v-else class="flex flex-col gap-1.5">
+            <li v-for="action in actionsList" :key="action.id">
+              <DashboardPieceTypeActionRow :action="action" :can-manage="canManageActions ?? false"
+                @edit="emit('edit-action', action.id)"
+                @delete="emit('delete-action', action.id)" />
             </li>
           </ul>
         </section>
