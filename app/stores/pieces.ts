@@ -1,13 +1,16 @@
 import { defineStore } from 'pinia'
 import type {
   CreatePieceDto,
+  ImportMode,
   Page,
   PieceAttachmentKind,
   PieceAttachmentResponseDto,
   PieceHistoryItemDto,
+  PieceImportReportDto,
   PieceListFilters,
   PieceListItemDto,
   PieceResponseDto,
+  SpreadsheetFormat,
   UpdatePieceDto,
   UpdatePieceLocationDto
 } from '~/types/api'
@@ -218,6 +221,67 @@ export const usePiecesStore = defineStore('pieces', () => {
     invalidateAll()
   }
 
+  // ---- Bulk import / export -------------------------------------------
+
+  function buildExportParams(format: SpreadsheetFormat, f?: PieceListFilters): URLSearchParams {
+    const params = new URLSearchParams({ format })
+    if (f?.typeId != null) params.set('typeId', String(f.typeId))
+    if (f?.locationId != null) params.set('locationId', String(f.locationId))
+    if (f?.ownerUserId != null) params.set('ownerUserId', String(f.ownerUserId))
+    if (f?.status) params.set('status', f.status)
+    if (f?.q && f.q.trim().length > 0) params.set('q', f.q.trim())
+    return params
+  }
+
+  /**
+   * Downloads the filtered piece list as a CSV/XLSX blob. Uses a raw `fetch`
+   * (cookie auth, same-origin `/api` proxy) like the attachment download, since
+   * the response is a binary file rather than JSON.
+   */
+  async function exportPieces(orgSlug: string, format: SpreadsheetFormat, f?: PieceListFilters): Promise<Blob> {
+    if (import.meta.server) return Promise.reject(new Error('export_unavailable_on_server'))
+    const params = buildExportParams(format, f)
+    const res = await fetch(`/api/organizations/${orgSlug}/pieces/export?${params.toString()}`)
+    if (!res.ok) throw new Error(`export_failed_${res.status}`)
+    return res.blob()
+  }
+
+  /** Downloads an empty import template (just the column headers) as a blob. */
+  async function downloadImportTemplate(orgSlug: string, format: SpreadsheetFormat): Promise<Blob> {
+    if (import.meta.server) return Promise.reject(new Error('template_unavailable_on_server'))
+    const res = await fetch(`/api/organizations/${orgSlug}/pieces/import/template?format=${format}`)
+    if (!res.ok) throw new Error(`template_failed_${res.status}`)
+    return res.blob()
+  }
+
+  /**
+   * Imports pieces from a CSV/XLSX file. With `dryRun=true` the backend always
+   * answers 200 with a validation report and writes nothing. With `dryRun=false`
+   * it applies the import atomically (200) or rejects it (422) — in the rejected
+   * case `useApi` throws a FetchError whose `response._data` is the report, which
+   * the caller can surface to the user.
+   */
+  async function importPieces(
+    orgSlug: string,
+    file: File,
+    format: SpreadsheetFormat,
+    mode: ImportMode,
+    dryRun: boolean
+  ): Promise<PieceImportReportDto> {
+    const api = useApi()
+    const form = new FormData()
+    form.append('file', file)
+    const report = await api<PieceImportReportDto>(`/organizations/${orgSlug}/pieces/import`, {
+      method: 'POST',
+      params: { format, mode, dryRun },
+      body: form
+    })
+    if (!dryRun && report.applied) {
+      invalidateAll()
+    }
+    return report
+  }
+
   async function uploadAttachment(
     orgSlug: string,
     pieceId: number,
@@ -367,6 +431,10 @@ export const usePiecesStore = defineStore('pieces', () => {
     create,
     update,
     softDelete,
+
+    exportPieces,
+    downloadImportTemplate,
+    importPieces,
 
     uploadAttachment,
     deleteAttachment,

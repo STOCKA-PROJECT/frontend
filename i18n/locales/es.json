@@ -966,6 +966,54 @@
       "unassigned_location": "Sin ubicación",
       "no_owner": "Sin propietario",
       "total_count": "{n} artículos en total | {n} artículo | {n} artículos",
+      "import_export": {
+        "open": "Importar / Exportar",
+        "open_export_only": "Exportar",
+        "title": "Importar y exportar artículos",
+        "export": {
+          "heading": "Exportar",
+          "description": "Descarga los artículos según los filtros aplicados.",
+          "csv": "CSV",
+          "xlsx": "Excel (.xlsx)"
+        },
+        "template": {
+          "heading": "Plantilla"
+        },
+        "import": {
+          "heading": "Importar",
+          "description": "Sube un CSV o Excel. Primero valida (sin guardar nada) y luego confirma.",
+          "mode_label": "Si el número de serie ya existe",
+          "mode_create": "Crear solo (rechazar duplicados)",
+          "mode_upsert": "Crear y actualizar (upsert)",
+          "choose_file": "Seleccionar archivo",
+          "no_file": "Ningún archivo seleccionado",
+          "hint_columns": "Columnas: name, serial_number, piece_types (separa con ;), owner_email, location_path (p. ej. Almacén/Estante) y una columna por atributo «Tipo / Atributo».",
+          "validate": "Validar",
+          "validating": "Validando…",
+          "commit": "Importar",
+          "committing": "Importando…",
+          "reset": "Empezar de nuevo"
+        },
+        "report": {
+          "total": "{n} filas",
+          "created": "{n} nuevas",
+          "updated": "{n} actualizadas",
+          "skipped": "{n} omitidas",
+          "failed": "{n} con error",
+          "applied": "Importación aplicada correctamente.",
+          "will_apply": "Vista previa: aún no se ha guardado nada.",
+          "has_errors": "Corrige los errores y vuelve a validar antes de importar.",
+          "warnings_title": "Avisos",
+          "errors_title": "Filas con error",
+          "row": "Fila {n}"
+        },
+        "toast": {
+          "export_error": "No se pudo exportar el archivo.",
+          "import_success": "Importación completada: {created} creadas, {updated} actualizadas.",
+          "import_error": "No se pudo completar la importación.",
+          "rejected": "La importación tiene errores; corrígelos y vuelve a intentarlo."
+        }
+      },
       "actions": {
         "new": "Nuevo artículo",
         "edit": "Editar",

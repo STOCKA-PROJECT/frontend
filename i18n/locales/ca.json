@@ -966,6 +966,54 @@
       "unassigned_location": "Sense ubicació",
       "no_owner": "Sense propietari",
       "total_count": "{n} articles en total | {n} article | {n} articles",
+      "import_export": {
+        "open": "Importar / Exportar",
+        "open_export_only": "Exportar",
+        "title": "Importar i exportar articles",
+        "export": {
+          "heading": "Exportar",
+          "description": "Descarrega els articles segons els filtres aplicats.",
+          "csv": "CSV",
+          "xlsx": "Excel (.xlsx)"
+        },
+        "template": {
+          "heading": "Plantilla"
+        },
+        "import": {
+          "heading": "Importar",
+          "description": "Puja un CSV o Excel. Primer valida (sense desar res) i després confirma.",
+          "mode_label": "Si el número de sèrie ja existeix",
+          "mode_create": "Crear només (rebutjar duplicats)",
+          "mode_upsert": "Crear i actualitzar (upsert)",
+          "choose_file": "Selecciona un fitxer",
+          "no_file": "Cap fitxer seleccionat",
+          "hint_columns": "Columnes: name, serial_number, piece_types (separa amb ;), owner_email, location_path (p. ex. Magatzem/Prestatge) i una columna per atribut «Tipus / Atribut».",
+          "validate": "Validar",
+          "validating": "Validant…",
+          "commit": "Importar",
+          "committing": "Important…",
+          "reset": "Comença de nou"
+        },
+        "report": {
+          "total": "{n} files",
+          "created": "{n} noves",
+          "updated": "{n} actualitzades",
+          "skipped": "{n} omeses",
+          "failed": "{n} amb error",
+          "applied": "Importació aplicada correctament.",
+          "will_apply": "Vista prèvia: encara no s'ha desat res.",
+          "has_errors": "Corregeix els errors i torna a validar abans d'importar.",
+          "warnings_title": "Avisos",
+          "errors_title": "Files amb error",
+          "row": "Fila {n}"
+        },
+        "toast": {
+          "export_error": "No s'ha pogut exportar el fitxer.",
+          "import_success": "Importació completada: {created} creades, {updated} actualitzades.",
+          "import_error": "No s'ha pogut completar la importació.",
+          "rejected": "La importació té errors; corregeix-los i torna-ho a provar."
+        }
+      },
       "actions": {
         "new": "Nou article",
         "edit": "Edita",

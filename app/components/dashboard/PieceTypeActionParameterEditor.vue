@@ -19,6 +19,9 @@ import {
 const props = defineProps<{
   modelValue: ActionParameterDto
   index: number
+  // When true, hides the binding-mode toggle and forces the parameter to be static (used by ports,
+  // whose parameters always carry a fixed value rather than being set per clip in the timeline).
+  staticOnly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -38,11 +41,12 @@ const type = ref<AttributeType>(props.modelValue.type)
 const required = ref(props.modelValue.required)
 const validators = ref<AttributeValidatorsDto>({ ...(props.modelValue.validators ?? {}) })
 // Binding mode: static (a fixed value shared by every piece of the type) or dynamic (set per clip
-// in the timeline editor). Defaults to static.
-const dynamic = ref(props.modelValue.dynamic ?? false)
+// in the timeline editor). Defaults to static; forced static when the editor is in staticOnly mode.
+const dynamic = ref(props.staticOnly ? false : (props.modelValue.dynamic ?? false))
 const staticValue = ref<string | null>(props.modelValue.staticValue ?? null)
 // When set, this numeric parameter's value (seconds) is the clip length on the timeline.
-const isDuration = ref(props.modelValue.isDuration ?? false)
+// Forced off in staticOnly mode (ports), which has no timeline duration concept.
+const isDuration = ref(props.staticOnly ? false : (props.modelValue.isDuration ?? false))
 const newOption = ref('')
 const optionError = ref<string | null>(null)
 
@@ -229,8 +233,9 @@ watch([displayName, name, type, required, validators, dynamic, staticValue, isDu
       <span>{{ t('dashboard.pieceTypes.action_form.parameter_required') }}</span>
     </label>
 
-    <!-- Binding: static (fixed for all pieces of the type) vs dynamic (set per clip in the timeline) -->
-    <div class="flex flex-col gap-2">
+    <!-- Binding: static (fixed for all pieces of the type) vs dynamic (set per clip in the timeline).
+         Hidden in staticOnly mode (ports), where parameters are always static. -->
+    <div v-if="!staticOnly" class="flex flex-col gap-2">
       <label class="field-label">{{ t('dashboard.pieceTypes.action_form.parameter_binding') }}</label>
       <div class="binding-toggle" role="radiogroup">
         <button type="button" class="binding-option" :class="{ 'binding-option-active': !dynamic }"
@@ -249,8 +254,9 @@ watch([displayName, name, type, required, validators, dynamic, staticValue, isDu
       </p>
     </div>
 
-    <!-- Duration: this numeric parameter's value (seconds) is the clip length on the timeline -->
-    <div v-if="canBeDuration" class="flex flex-col gap-1">
+    <!-- Duration: this numeric parameter's value (seconds) is the clip length on the timeline.
+         Hidden in staticOnly mode (ports), which has no timeline duration concept. -->
+    <div v-if="canBeDuration && !staticOnly" class="flex flex-col gap-1">
       <label class="flex cursor-pointer items-center gap-2 text-[13.5px] text-ink">
         <input v-model="isDuration" type="checkbox" class="h-4 w-4 accent-[var(--c-ink)]">
         <span>{{ t('dashboard.pieceTypes.action_form.parameter_is_duration') }}</span>
