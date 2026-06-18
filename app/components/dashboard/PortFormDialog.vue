@@ -102,6 +102,8 @@ const paramsValid = computed(() => {
     seen.add(p.name)
     if ((p.type === 'SELECT' || p.type === 'MULTI_SELECT') && !(p.validators?.options?.length)) return false
     if (p.type === 'MEMBER' && !(p.validators?.eligibleRoles?.length)) return false
+    // Port parameters are always static, so a required one needs a fixed value (matches the backend).
+    if (p.required && (p.staticValue == null || p.staticValue === '')) return false
   }
   return true
 })
@@ -223,6 +225,7 @@ function submit() {
                 :key="draft.uid"
                 :model-value="draft.value"
                 :index="index"
+                static-only
                 @update:model-value="(value) => onParamUpdate(draft.uid, value)"
                 @remove="removeParameter(draft.uid)"
               />

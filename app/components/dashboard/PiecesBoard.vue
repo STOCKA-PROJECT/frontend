@@ -22,6 +22,8 @@ const team = useTeamStore()
 
 const canWrite = computed(() => props.role === 'OWNER' || props.role === 'MANAGER' || props.role === 'USER')
 
+const importExportOpen = ref(false)
+
 const errorMsg = ref<string | null>(null)
 let errorTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -142,6 +144,14 @@ function goToCreate() {
   void navigateTo(orgPath('/articulos/nuevo'))
 }
 
+async function onImported() {
+  try {
+    await pieces.fetchList(props.orgSlug)
+  } catch (e) {
+    showError(extractErrorMessage(e, t('dashboard.pieces.errors.load_list')))
+  }
+}
+
 const confirmDialog = ref<{
   open: boolean
   pieceId: number | null
@@ -194,16 +204,29 @@ function pieceLink(piece: PieceListItemDto) {
           {{ t('dashboard.pieces.total_count', { n: pieces.pageMeta.totalElements }) }}
         </span>
       </div>
-      <button
-        v-if="canWrite"
-        type="button"
-        class="primary-btn"
-        :disabled="pieces.loadingList"
-        @click="goToCreate"
-      >
-        <DashboardIcon name="plus" :size="14" />
-        {{ t('dashboard.pieces.actions.new') }}
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          class="secondary-btn"
+          :disabled="pieces.loadingList"
+          @click="importExportOpen = true"
+        >
+          <DashboardIcon name="upload" :size="14" />
+          {{ canWrite
+            ? t('dashboard.pieces.import_export.open')
+            : t('dashboard.pieces.import_export.open_export_only') }}
+        </button>
+        <button
+          v-if="canWrite"
+          type="button"
+          class="primary-btn"
+          :disabled="pieces.loadingList"
+          @click="goToCreate"
+        >
+          <DashboardIcon name="plus" :size="14" />
+          {{ t('dashboard.pieces.actions.new') }}
+        </button>
+      </div>
     </div>
 
     <div v-if="errorMsg" role="alert"
@@ -257,6 +280,15 @@ function pieceLink(piece: PieceListItemDto) {
       @close="closeConfirm"
       @confirm="confirmDelete"
     />
+
+    <DashboardPieceImportExportDialog
+      :open="importExportOpen"
+      :org-slug="orgSlug"
+      :can-write="canWrite"
+      :filters="pieces.filters"
+      @close="importExportOpen = false"
+      @imported="onImported"
+    />
   </div>
 </template>
 
@@ -280,4 +312,23 @@ function pieceLink(piece: PieceListItemDto) {
   background: color-mix(in oklab, var(--c-ink) 88%, transparent);
 }
 .primary-btn:disabled { opacity: .5; cursor: not-allowed; }
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 9px;
+  background: var(--c-bg-card);
+  color: var(--c-ink);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--c-line);
+  transition: background .15s, border-color .15s;
+}
+.secondary-btn:hover:not(:disabled) {
+  background: var(--c-bg-soft);
+  border-color: var(--c-line-strong);
+}
+.secondary-btn:disabled { opacity: .5; cursor: not-allowed; }
 </style>

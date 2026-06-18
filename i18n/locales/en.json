@@ -966,6 +966,54 @@
       "unassigned_location": "No location",
       "no_owner": "No owner",
       "total_count": "{n} items total | {n} item | {n} items",
+      "import_export": {
+        "open": "Import / Export",
+        "open_export_only": "Export",
+        "title": "Import and export items",
+        "export": {
+          "heading": "Export",
+          "description": "Download the items matching the active filters.",
+          "csv": "CSV",
+          "xlsx": "Excel (.xlsx)"
+        },
+        "template": {
+          "heading": "Template"
+        },
+        "import": {
+          "heading": "Import",
+          "description": "Upload a CSV or Excel file. Validate first (nothing is saved), then confirm.",
+          "mode_label": "If the serial number already exists",
+          "mode_create": "Create only (reject duplicates)",
+          "mode_upsert": "Create and update (upsert)",
+          "choose_file": "Choose file",
+          "no_file": "No file selected",
+          "hint_columns": "Columns: name, serial_number, piece_types (separate with ;), owner_email, location_path (e.g. Warehouse/Shelf) and one column per attribute «Type / Attribute».",
+          "validate": "Validate",
+          "validating": "Validating…",
+          "commit": "Import",
+          "committing": "Importing…",
+          "reset": "Start over"
+        },
+        "report": {
+          "total": "{n} rows",
+          "created": "{n} new",
+          "updated": "{n} updated",
+          "skipped": "{n} skipped",
+          "failed": "{n} failed",
+          "applied": "Import applied successfully.",
+          "will_apply": "Preview: nothing has been saved yet.",
+          "has_errors": "Fix the errors and validate again before importing.",
+          "warnings_title": "Warnings",
+          "errors_title": "Rows with errors",
+          "row": "Row {n}"
+        },
+        "toast": {
+          "export_error": "Could not export the file.",
+          "import_success": "Import complete: {created} created, {updated} updated.",
+          "import_error": "Could not complete the import.",
+          "rejected": "The import has errors; fix them and try again."
+        }
+      },
       "actions": {
         "new": "New item",
         "edit": "Edit",

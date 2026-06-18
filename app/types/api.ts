@@ -649,3 +649,36 @@ export interface UpdateNotificationPreferenceDto {
   locations: LifecycleAction[]
   pieceTypes: LifecycleAction[]
 }
+
+// ---- Piece import / export ----------------------------------------------
+
+/** File formats accepted by the bulk import/export endpoints. */
+export type SpreadsheetFormat = 'csv' | 'xlsx'
+
+/** Behaviour applied to a row whose serial number already exists. */
+export type ImportMode = 'create' | 'upsert'
+
+/** Outcome computed for a single import row. */
+export type ImportRowAction = 'CREATE' | 'UPDATE' | 'SKIP' | 'ERROR'
+
+export interface ImportRowResultDto {
+  rowNumber: number
+  action: ImportRowAction
+  pieceId: number | null
+  serialNumber: string | null
+  name: string | null
+  errors: string[]
+}
+
+export interface PieceImportReportDto {
+  dryRun: boolean
+  applied: boolean
+  mode: ImportMode
+  totalRows: number
+  created: number
+  updated: number
+  skipped: number
+  failed: number
+  rows: ImportRowResultDto[]
+  warnings: string[]
+}
