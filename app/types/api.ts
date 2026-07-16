@@ -355,12 +355,26 @@ export interface PieceHistoryItemDto {
   createdAt: string
 }
 
+/**
+ * Filtro sobre un atributo personalizado (scope ORG o TYPE). La interpretación de `values`
+ * depende del `AttributeType` del atributo (el backend lo resuelve por id):
+ * - SELECT / BOOLEAN / MEMBER / MULTI_SELECT: lista de valores (OR entre ellos).
+ * - TEXT / LONGTEXT / URL / EMAIL: términos "contiene" case-insensitive (OR entre ellos).
+ * - INTEGER / DECIMAL / PRICE / DATE / DATETIME: exactamente `[min, max]`; '' = extremo abierto.
+ */
+export interface PieceAttributeFilter {
+  scope: AttributeScope
+  attributeId: number
+  values: string[]
+}
+
 export interface PieceListFilters {
-  typeId?: number
+  typeIds?: number[]
   locationId?: number
   ownerUserId?: number
   status?: PieceStatus
   q?: string
+  attrs?: PieceAttributeFilter[]
   page?: number
   size?: number
   sort?: string

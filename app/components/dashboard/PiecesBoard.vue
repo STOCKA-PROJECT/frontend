@@ -19,6 +19,7 @@ const pieces = usePiecesStore()
 const pieceTypes = usePieceTypesStore()
 const locations = useLocationsStore()
 const team = useTeamStore()
+const orgAttributes = useOrganizationPieceAttributesStore()
 
 const canWrite = computed(() => props.role === 'OWNER' || props.role === 'MANAGER' || props.role === 'USER')
 
@@ -89,6 +90,7 @@ async function loadAll() {
       pieceTypes.fetchAll(props.orgSlug).catch(() => undefined),
       locations.fetchTree(props.orgSlug).catch(() => undefined),
       team.fetchMembers(props.orgSlug).catch(() => undefined),
+      orgAttributes.fetchAll(props.orgSlug).catch(() => undefined),
       pieces.fetchList(props.orgSlug)
     ])
   } catch (e) {
@@ -237,12 +239,20 @@ function pieceLink(piece: PieceListItemDto) {
     <div class="flex-1 min-h-0 overflow-hidden rounded-[14px] border border-line bg-bg-card">
       <DashboardPiecesFilterBar
         :filters="pieces.filters"
-        :piece-types="pieceTypes.list"
         :locations="flatLocations"
         :members="team.getMembers(orgSlug) ?? []"
         :loading="pieces.loadingList"
         @change="onFilterChange"
         @clear="onClearFilters"
+      />
+
+      <DashboardPiecesAdvancedFilters
+        :filters="pieces.filters"
+        :piece-types="pieceTypes.list"
+        :org-attributes="orgAttributes.listFor(orgSlug)"
+        :members="team.getMembers(orgSlug) ?? []"
+        :loading="pieces.loadingList"
+        @change="onFilterChange"
       />
 
       <DashboardPiecesTable

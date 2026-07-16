@@ -2,13 +2,11 @@
 import type {
   LocationResponseDto,
   MemberResponseDto,
-  PieceListFilters,
-  PieceTypeResponseDto
+  PieceListFilters
 } from '~/types/api'
 
 const props = defineProps<{
   filters: PieceListFilters
-  pieceTypes: PieceTypeResponseDto[]
   locations: LocationResponseDto[]
   members: MemberResponseDto[]
   loading?: boolean
@@ -38,10 +36,6 @@ function onQInput(e: Event) {
 
 onBeforeUnmount(() => { if (qTimer) clearTimeout(qTimer) })
 
-function onTypeChange(e: Event) {
-  const v = (e.target as HTMLSelectElement).value
-  emit('change', { typeId: v ? Number(v) : undefined })
-}
 function onLocationChange(e: Event) {
   const v = (e.target as HTMLSelectElement).value
   emit('change', { locationId: v ? Number(v) : undefined })
@@ -56,8 +50,8 @@ function onStatusChange(e: Event) {
 }
 
 const hasAnyFilter = computed(() =>
-  Boolean(props.filters.q || props.filters.typeId || props.filters.locationId
-    || props.filters.ownerUserId || props.filters.status)
+  Boolean(props.filters.q || props.filters.typeIds?.length || props.filters.locationId
+    || props.filters.ownerUserId || props.filters.status || props.filters.attrs?.length)
 )
 </script>
 
@@ -75,15 +69,6 @@ const hasAnyFilter = computed(() =>
         class="filter-input w-full"
         @input="onQInput"
       >
-    </div>
-
-    <div class="flex flex-col gap-1">
-      <label for="filter-type" class="filter-label">{{ t('dashboard.pieces.filters.type') }}</label>
-      <select id="filter-type" class="filter-select w-full" :value="filters.typeId ?? ''" :disabled="loading"
-        @change="onTypeChange">
-        <option value="">{{ t('dashboard.pieces.filters.all') }}</option>
-        <option v-for="pt in pieceTypes" :key="pt.id" :value="pt.id">{{ pt.name }}</option>
-      </select>
     </div>
 
     <div class="flex flex-col gap-1">

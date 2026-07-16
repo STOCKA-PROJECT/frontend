@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import type {
+  AttributeScope,
   CreatePieceDto,
   ImportMode,
   Page,
   PieceAttachmentKind,
   PieceAttachmentResponseDto,
+  PieceAttributeFilter,
   PieceHistoryItemDto,
   PieceImportReportDto,
   PieceListFilters,
@@ -103,18 +105,41 @@ export const usePiecesStore = defineStore('pieces', () => {
     return byLocation.value[bucketKey(locationId)]
   }
 
-  function buildListParams(f: PieceListFilters): Record<string, string | number> {
-    const params: Record<string, string | number> = {
-      page: f.page ?? 0,
-      size: f.size ?? 20,
-      sort: f.sort ?? 'updatedAt,desc'
-    }
-    if (f.typeId != null) params.typeId = f.typeId
+  /**
+   * Codifica un filtro de atributo como `<scope>:<attributeId>:<v1>|<v2>|...`.
+   * Cada valor se pasa por `encodeURIComponent` ANTES de unir con `|`, de modo que
+   * valores con `:`, `|` o `%` nunca colisionan con los separadores (el backend
+   * decodifica cada token individualmente).
+   */
+  function encodeAttrParam(f: PieceAttributeFilter): string {
+    return `${f.scope}:${f.attributeId}:${f.values.map(v => encodeURIComponent(v)).join('|')}`
+  }
+
+  type FilterParams = Record<string, string | number | string[] | number[]>
+
+  /**
+   * Serialización única de los filtros a query params, compartida por el listado
+   * y por el export para que ambos acepten exactamente el mismo contrato.
+   */
+  function buildFilterParams(f: PieceListFilters): FilterParams {
+    const params: FilterParams = {}
+    if (f.typeIds && f.typeIds.length > 0) params.typeIds = f.typeIds
     if (f.locationId != null) params.locationId = f.locationId
     if (f.ownerUserId != null) params.ownerUserId = f.ownerUserId
     if (f.status) params.status = f.status
     if (f.q && f.q.trim().length > 0) params.q = f.q.trim()
+    const attrs = (f.attrs ?? []).filter(a => a.values.some(v => v !== ''))
+    if (attrs.length > 0) params.attr = attrs.map(encodeAttrParam)
     return params
+  }
+
+  function buildListParams(f: PieceListFilters): FilterParams {
+    return {
+      page: f.page ?? 0,
+      size: f.size ?? 20,
+      sort: f.sort ?? 'updatedAt,desc',
+      ...buildFilterParams(f)
+    }
   }
 
   async function fetchList(orgSlug: string, partial?: Partial<PieceListFilters>) {
@@ -138,11 +163,31 @@ export const usePiecesStore = defineStore('pieces', () => {
   function setFilters(orgSlug: string, patch: Partial<PieceListFilters>): Promise<Page<PieceListItemDto>> {
     const next: PieceListFilters = { ...filters.value, ...patch }
     // Cualquier cambio de filtro (no de página/tamaño/orden) reinicia a la primera página.
-    const filterKeys: Array<keyof PieceListFilters> = ['typeId', 'locationId', 'ownerUserId', 'status', 'q']
-    const filterChanged = filterKeys.some(k => k in patch && patch[k] !== filters.value[k])
+    // Comparación estructural porque typeIds/attrs son arrays.
+    const filterKeys: Array<keyof PieceListFilters> = ['typeIds', 'locationId', 'ownerUserId', 'status', 'q', 'attrs']
+    const filterChanged = filterKeys.some(k =>
+      k in patch && JSON.stringify(patch[k] ?? null) !== JSON.stringify(filters.value[k] ?? null)
+    )
     if (filterChanged) next.page = 0
     filters.value = next
     return fetchList(orgSlug)
+  }
+
+  /**
+   * Upsert de un filtro de atributo dentro de `filters.attrs`. Un `values` vacío
+   * (o todo en blanco) elimina el filtro de ese atributo.
+   */
+  function setAttributeFilter(
+    orgSlug: string,
+    scope: AttributeScope,
+    attributeId: number,
+    values: string[]
+  ): Promise<Page<PieceListItemDto>> {
+    const rest = (filters.value.attrs ?? [])
+      .filter(a => !(a.scope === scope && a.attributeId === attributeId))
+    const isEmpty = values.length === 0 || values.every(v => v === '')
+    const attrs = isEmpty ? rest : [...rest, { scope, attributeId, values }]
+    return setFilters(orgSlug, { attrs })
   }
 
   function resetFilters(orgSlug: string) {
@@ -225,11 +270,14 @@ export const usePiecesStore = defineStore('pieces', () => {
 
   function buildExportParams(format: SpreadsheetFormat, f?: PieceListFilters): URLSearchParams {
     const params = new URLSearchParams({ format })
-    if (f?.typeId != null) params.set('typeId', String(f.typeId))
-    if (f?.locationId != null) params.set('locationId', String(f.locationId))
-    if (f?.ownerUserId != null) params.set('ownerUserId', String(f.ownerUserId))
-    if (f?.status) params.set('status', f.status)
-    if (f?.q && f.q.trim().length > 0) params.set('q', f.q.trim())
+    if (!f) return params
+    for (const [key, value] of Object.entries(buildFilterParams(f))) {
+      if (Array.isArray(value)) {
+        for (const v of value) params.append(key, String(v))
+      } else {
+        params.set(key, String(value))
+      }
+    }
     return params
   }
 
@@ -423,6 +471,7 @@ export const usePiecesStore = defineStore('pieces', () => {
     loadingList,
     fetchList,
     setFilters,
+    setAttributeFilter,
     resetFilters,
 
     detailById,
