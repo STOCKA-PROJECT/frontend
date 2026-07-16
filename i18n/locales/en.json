@@ -944,6 +944,44 @@
         "generic": "Something went wrong. Please try again."
       }
     },
+    "contacts": {
+      "title": "External contacts",
+      "subtitle": "People outside the organization who can own items",
+      "add": "Add contact",
+      "add_dialog_title": "New contact",
+      "edit_dialog_title": "Edit contact",
+      "dialog_subtitle": "Contacts have no access to the organization; they only exist so items can be assigned to them.",
+      "edit": "Edit contact",
+      "delete": "Delete contact",
+      "badge": "Contact",
+      "empty": "No contacts yet. Add external people so you can assign items to them.",
+      "field_name": "First name",
+      "field_last_name": "Last name",
+      "field_email": "Email",
+      "field_phone": "Phone",
+      "field_notes": "Notes",
+      "email_placeholder": "person\\@example.com",
+      "email_invalid": "The email is not valid.",
+      "link": "Link to member",
+      "unlink": "Unlink",
+      "linked": "Linked",
+      "linked_to": "Linked to {name}",
+      "link_dialog_title": "Link contact to a member",
+      "link_dialog_subtitle": "If {name} has joined the organization, link their contact to their account.",
+      "link_member_label": "Member",
+      "link_migrate_pieces": "Migrate their items",
+      "link_migrate_help": "Items currently owned by this contact will become owned by the member.",
+      "link_migrated_toast": "Ownership of {n} item(s) was migrated to the linked member.",
+      "confirm_delete_title": "Delete contact",
+      "confirm_delete_message": "Are you sure you want to remove {name} from the contact directory?",
+      "confirm_unlink_title": "Unlink contact",
+      "confirm_unlink_message": "Remove the link between {name} and their member? Already migrated items are not changed.",
+      "errors": {
+        "save": "The contact could not be saved.",
+        "delete": "The contact could not be deleted.",
+        "link": "The link could not be updated."
+      }
+    },
     "members": {
       "no_selection": "No selection",
       "search_placeholder": "Search member…",
@@ -987,7 +1025,7 @@
           "mode_upsert": "Create and update (upsert)",
           "choose_file": "Choose file",
           "no_file": "No file selected",
-          "hint_columns": "Columns: name, serial_number, piece_types (separate with ;), owner_email, location_path (e.g. Warehouse/Shelf) and one column per attribute «Type / Attribute».",
+          "hint_columns": "Columns: name, serial_number, piece_types (separate with ;), owner_email (member), owner_contact (external contact, by email or name), location_path (e.g. Warehouse/Shelf) and one column per attribute “Type / Attribute”.",
           "validate": "Validate",
           "validating": "Validating…",
           "commit": "Import",
@@ -1059,7 +1097,12 @@
         "field_types": "Item types",
         "types_help": "Pick one or more types. Their attributes are combined in the form. | {n} type selected | {n} types selected",
         "types_help_optional": "No types assigned | {n} type selected | {n} types selected",
-        "no_types_yet": "You haven’t created any item types yet. Add one from “Item types” before creating items."
+        "no_types_yet": "You haven’t created any item types yet. Add one from “Item types” before creating items.",
+        "owner_group_members": "Members",
+        "owner_group_contacts": "External contacts",
+        "owner_create_contact": "Create external contact…",
+        "owner_create_contact_named": "Create contact “{name}”",
+        "owner_no_match": "Nothing matches your search."
       },
       "info": {
         "section_basic": "Information",
