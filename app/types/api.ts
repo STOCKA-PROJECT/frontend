@@ -178,12 +178,28 @@ export interface PieceTypeRefDto {
   name: string
 }
 
+export type PieceOwnerKind = 'USER' | 'CONTACT'
+
+/**
+ * Resumen del propietario embebido en las respuestas de pieza: `kind` indica si
+ * `id` apunta a un miembro (userId) o a un contacto externo (contactId), y
+ * `displayName` ya viene resuelto por el backend para pintar sin cruzar listas.
+ */
+export interface PieceOwnerSummaryDto {
+  kind: PieceOwnerKind
+  id: number
+  displayName: string
+  email?: string | null
+}
+
 export interface PieceListItemDto {
   id: number
   name: string
   serialNumber?: string | null
   pieceTypes: PieceTypeRefDto[]
   ownerUserId?: number
+  ownerContactId?: number
+  owner?: PieceOwnerSummaryDto | null
   locationId?: number
   coverAttachmentId?: number | null
   status: PieceStatus
@@ -312,6 +328,8 @@ export interface PieceResponseDto {
   description?: string
   pieceTypes: PieceTypeRefDto[]
   ownerUserId?: number
+  ownerContactId?: number
+  owner?: PieceOwnerSummaryDto | null
   locationId?: number
   coverAttachmentId?: number | null
   status: PieceStatus
@@ -327,6 +345,7 @@ export interface CreatePieceDto {
   description?: string
   pieceTypeIds: number[]
   ownerUserId?: number
+  ownerContactId?: number
   locationId?: number
   attributeValues?: AttributeValueInputDto[]
 }
@@ -337,6 +356,7 @@ export interface UpdatePieceDto {
   description?: string
   pieceTypeIds?: number[]
   ownerUserId?: number
+  ownerContactId?: number
   clearOwner?: boolean
   locationId?: number
   clearLocation?: boolean
@@ -372,6 +392,7 @@ export interface PieceListFilters {
   typeIds?: number[]
   locationId?: number
   ownerUserId?: number
+  ownerContactId?: number
   status?: PieceStatus
   q?: string
   attrs?: PieceAttributeFilter[]
@@ -625,6 +646,46 @@ export interface InvitationResponseDto {
 export interface CreateInvitationDto {
   email: string
   role: OrganizationRole
+}
+
+export interface ContactResponseDto {
+  id: number
+  organizationId: number
+  name: string
+  lastName?: string | null
+  email?: string | null
+  phone?: string | null
+  notes?: string | null
+  linkedUserId?: number | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateContactDto {
+  name: string
+  lastName?: string
+  email?: string
+  phone?: string
+  notes?: string
+}
+
+/** PATCH parcial: null/omitido deja el campo igual; cadena vacía limpia los opcionales. */
+export interface UpdateContactDto {
+  name?: string
+  lastName?: string
+  email?: string
+  phone?: string
+  notes?: string
+}
+
+export interface LinkContactDto {
+  userId: number
+  migratePieces?: boolean
+}
+
+export interface LinkContactResponseDto {
+  contact: ContactResponseDto
+  migratedPieces: number
 }
 
 export interface ApiError {

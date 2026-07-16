@@ -126,6 +126,7 @@ export const usePiecesStore = defineStore('pieces', () => {
     if (f.typeIds && f.typeIds.length > 0) params.typeIds = f.typeIds
     if (f.locationId != null) params.locationId = f.locationId
     if (f.ownerUserId != null) params.ownerUserId = f.ownerUserId
+    if (f.ownerContactId != null) params.ownerContactId = f.ownerContactId
     if (f.status) params.status = f.status
     if (f.q && f.q.trim().length > 0) params.q = f.q.trim()
     const attrs = (f.attrs ?? []).filter(a => a.values.some(v => v !== ''))
@@ -164,7 +165,7 @@ export const usePiecesStore = defineStore('pieces', () => {
     const next: PieceListFilters = { ...filters.value, ...patch }
     // Cualquier cambio de filtro (no de página/tamaño/orden) reinicia a la primera página.
     // Comparación estructural porque typeIds/attrs son arrays.
-    const filterKeys: Array<keyof PieceListFilters> = ['typeIds', 'locationId', 'ownerUserId', 'status', 'q', 'attrs']
+    const filterKeys: Array<keyof PieceListFilters> = ['typeIds', 'locationId', 'ownerUserId', 'ownerContactId', 'status', 'q', 'attrs']
     const filterChanged = filterKeys.some(k =>
       k in patch && JSON.stringify(patch[k] ?? null) !== JSON.stringify(filters.value[k] ?? null)
     )
@@ -211,9 +212,13 @@ export const usePiecesStore = defineStore('pieces', () => {
     const item: PieceListItemDto = {
       id: piece.id,
       name: piece.name,
+      serialNumber: piece.serialNumber,
       pieceTypes: piece.pieceTypes,
       ownerUserId: piece.ownerUserId,
+      ownerContactId: piece.ownerContactId,
+      owner: piece.owner,
       locationId: piece.locationId,
+      coverAttachmentId: piece.coverAttachmentId,
       status: piece.status,
       createdAt: piece.createdAt,
       updatedAt: piece.updatedAt

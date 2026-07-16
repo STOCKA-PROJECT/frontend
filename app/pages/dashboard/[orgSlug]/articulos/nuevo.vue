@@ -12,6 +12,7 @@ const pieceTypes = usePieceTypesStore()
 const orgAttributes = useOrganizationPieceAttributesStore()
 const locations = useLocationsStore()
 const team = useTeamStore()
+const contactsStore = useContactsStore()
 
 // `resolve-org-slug.global.ts` already guarantees the org exists in the store
 // and the user is a member.
@@ -47,6 +48,7 @@ function flattenTree(nodes: LocationTreeNodeDto[], parents: string[] = []): Loca
 }
 const flatLocations = computed(() => flattenTree(locations.tree))
 const members = computed(() => (orgSlug.value && team.getMembers(orgSlug.value)) || [])
+const contacts = computed(() => (orgSlug.value && contactsStore.getContacts(orgSlug.value)) || [])
 
 const loading = ref(true)
 const saving = ref(false)
@@ -75,6 +77,9 @@ async function loadDeps() {
       team.getMembers(slug)
         ? Promise.resolve()
         : team.fetchMembers(slug).catch(() => undefined),
+      contactsStore.getContacts(slug)
+        ? Promise.resolve()
+        : contactsStore.fetchContacts(slug).catch(() => undefined),
       orgAttributes.loadedOrgSlugs.has(slug)
         ? Promise.resolve()
         : orgAttributes.fetchAll(slug).catch(() => undefined)
@@ -132,10 +137,13 @@ function onCancel() {
     <div v-if="loading" class="h-[280px] animate-pulse rounded-xl bg-bg-soft" />
     <div v-else class="rounded-[14px] border border-line bg-bg-card px-6 py-6 max-md:px-4">
       <DashboardPieceForm
+        v-if="orgSlug"
+        :org-slug="orgSlug"
         :piece-types="pieceTypes.list"
         :locations="flatLocations"
         :members="members"
-        :org-attributes="orgSlug ? orgAttributes.listFor(orgSlug) : []"
+        :contacts="contacts"
+        :org-attributes="orgAttributes.listFor(orgSlug)"
         :loading="saving"
         :error-msg="errorMsg"
         @submit="onSubmit"

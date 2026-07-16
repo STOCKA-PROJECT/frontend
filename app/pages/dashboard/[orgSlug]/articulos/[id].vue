@@ -13,6 +13,7 @@ const pieceTypes = usePieceTypesStore()
 const orgAttributes = useOrganizationPieceAttributesStore()
 const locations = useLocationsStore()
 const team = useTeamStore()
+const contactsStore = useContactsStore()
 
 // `resolve-org-slug.global.ts` already guarantees the org exists in the store
 // and the user is a member.
@@ -97,6 +98,9 @@ async function loadAll() {
       team.getMembers(slug)
         ? Promise.resolve()
         : team.fetchMembers(slug).catch(() => undefined),
+      contactsStore.getContacts(slug)
+        ? Promise.resolve()
+        : contactsStore.fetchContacts(slug).catch(() => undefined),
       orgAttributes.loadedOrgSlugs.has(slug)
         ? Promise.resolve()
         : orgAttributes.fetchAll(slug).catch(() => undefined)
@@ -171,6 +175,7 @@ async function doDelete() {
 }
 
 const members = computed(() => (orgSlug.value && team.getMembers(orgSlug.value)) || [])
+const contacts = computed(() => (orgSlug.value && contactsStore.getContacts(orgSlug.value)) || [])
 const currentOrgAttributes = computed(() =>
   orgSlug.value ? orgAttributes.listFor(orgSlug.value) : []
 )
@@ -292,10 +297,12 @@ const qrOpen = ref(false)
       <section class="panel">
         <DashboardPieceInfoPanel
           v-if="tab === 'info'"
+          :org-slug="orgSlug"
           :piece="piece"
           :piece-types="pieceTypes.list.length > 0 ? pieceTypes.list : piecePieceTypes"
           :locations="flatLocations"
           :members="members"
+          :contacts="contacts"
           :org-attributes="currentOrgAttributes"
           :can-write="canWrite"
           :saving="saving"

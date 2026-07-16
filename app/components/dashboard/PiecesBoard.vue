@@ -20,6 +20,7 @@ const pieceTypes = usePieceTypesStore()
 const locations = useLocationsStore()
 const team = useTeamStore()
 const orgAttributes = useOrganizationPieceAttributesStore()
+const contacts = useContactsStore()
 
 const canWrite = computed(() => props.role === 'OWNER' || props.role === 'MANAGER' || props.role === 'USER')
 
@@ -91,6 +92,7 @@ async function loadAll() {
       locations.fetchTree(props.orgSlug).catch(() => undefined),
       team.fetchMembers(props.orgSlug).catch(() => undefined),
       orgAttributes.fetchAll(props.orgSlug).catch(() => undefined),
+      contacts.fetchContacts(props.orgSlug).catch(() => undefined),
       pieces.fetchList(props.orgSlug)
     ])
   } catch (e) {
@@ -241,6 +243,7 @@ function pieceLink(piece: PieceListItemDto) {
         :filters="pieces.filters"
         :locations="flatLocations"
         :members="team.getMembers(orgSlug) ?? []"
+        :contacts="contacts.getContacts(orgSlug) ?? []"
         :loading="pieces.loadingList"
         @change="onFilterChange"
         @clear="onClearFilters"

@@ -98,9 +98,12 @@ function locationLabel(id?: number): string {
   if (id == null) return t('dashboard.pieces.unassigned_location')
   return props.locationName?.(id) ?? `#${id}`
 }
-function ownerLabel(id?: number): string {
-  if (id == null) return t('dashboard.pieces.no_owner')
-  return props.ownerName?.(id) ?? `#${id}`
+// El backend embebe el nombre del propietario (miembro o contacto externo) en
+// `p.owner`; el fallback por id cubre respuestas antiguas aún cacheadas.
+function ownerLabel(p: PieceListItemDto): string {
+  if (p.owner) return p.owner.displayName
+  if (p.ownerUserId == null) return t('dashboard.pieces.no_owner')
+  return props.ownerName?.(p.ownerUserId) ?? `#${p.ownerUserId}`
 }
 
 function onRowClick(piece: PieceListItemDto, e: MouseEvent) {
@@ -209,7 +212,7 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
                 <span class="text-ink-soft">{{ locationLabel(p.locationId) }}</span>
               </td>
               <td v-if="showOwner" class="td">
-                <span class="text-ink-soft">{{ ownerLabel(p.ownerUserId) }}</span>
+                <span class="text-ink-soft">{{ ownerLabel(p) }}</span>
               </td>
               <td class="td">
                 <span :class="['tag', statusClass(p.status)]">
@@ -326,7 +329,7 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
               </span>
               <span v-if="showLocation && (showOwner || p.updatedAt)" class="text-ink-muted/60">·</span>
               <span v-if="showOwner" class="truncate">
-                {{ ownerLabel(p.ownerUserId) }}
+                {{ ownerLabel(p) }}
               </span>
               <span v-if="showOwner && p.updatedAt" class="text-ink-muted/60">·</span>
               <span>{{ relativeDate(p.updatedAt) }}</span>
