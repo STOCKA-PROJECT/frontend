@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { FetchError } from 'ofetch'
 import type {
   AttributeValueInputDto,
+  ContactResponseDto,
+  CreateContactDto,
   CreatePieceDto,
   LocationResponseDto,
   MemberResponseDto,
@@ -9,13 +12,16 @@ import type {
   PieceTypeAttributeResponseDto,
   PieceTypeResponseDto
 } from '~/types/api'
+import type { OwnerRef } from '~/components/dashboard/OwnerSelect.vue'
 
 const ownerEligibleRoles: OrganizationRole[] = ['OWNER', 'MANAGER', 'USER']
 
 const props = withDefaults(defineProps<{
+  orgSlug: string
   pieceTypes: PieceTypeResponseDto[]
   locations: LocationResponseDto[]
   members: MemberResponseDto[]
+  contacts?: ContactResponseDto[]
   orgAttributes?: OrganizationPieceAttributeResponseDto[]
   loading?: boolean
   errorMsg?: string | null
@@ -23,7 +29,8 @@ const props = withDefaults(defineProps<{
 }>(), {
   loading: false,
   errorMsg: null,
-  orgAttributes: () => []
+  orgAttributes: () => [],
+  contacts: () => []
 })
 
 const emit = defineEmits<{
@@ -37,7 +44,7 @@ const name = ref('')
 const serialNumber = ref('')
 const description = ref('')
 const selectedTypeIds = ref<Set<number>>(new Set())
-const ownerUserId = ref<number | null>(null)
+const owner = ref<OwnerRef | null>(null)
 const locationId = ref<number | null>(null)
 const attributeValues = ref<Record<number, string | null>>({})
 const orgAttributeValues = ref<Record<number, string | null>>({})
@@ -177,7 +184,8 @@ function submit() {
   const trimmedSerial = serialNumber.value.trim()
   if (trimmedSerial) payload.serialNumber = trimmedSerial
   if (description.value.trim()) payload.description = description.value.trim()
-  if (ownerUserId.value != null) payload.ownerUserId = ownerUserId.value
+  if (owner.value?.kind === 'USER') payload.ownerUserId = owner.value.id
+  else if (owner.value?.kind === 'CONTACT') payload.ownerContactId = owner.value.id
   if (locationId.value != null) payload.locationId = locationId.value
   if (values.length > 0) payload.attributeValues = values
 
@@ -187,6 +195,41 @@ function submit() {
 const visibleError = computed(() => props.errorMsg ?? localError.value)
 const buttonLabel = computed(() => props.submitLabel ?? t('dashboard.pieces.form.submit_create'))
 const selectedTypesCount = computed(() => selectedTypeIds.value.size)
+
+function extractErrorMessage(e: unknown, fallback: string): string {
+  if (e instanceof FetchError) {
+    const data = e.response?._data as { message?: string; detail?: string } | undefined
+    return data?.message ?? data?.detail ?? fallback
+  }
+  return fallback
+}
+
+// Alta de contacto al vuelo desde el propio selector de propietario.
+const contactsStore = useContactsStore()
+const contactDialogOpen = ref(false)
+const contactDialogLoading = ref(false)
+const contactDialogError = ref<string | null>(null)
+const contactInitialName = ref('')
+
+function openCreateContact(query: string) {
+  contactInitialName.value = query
+  contactDialogError.value = null
+  contactDialogOpen.value = true
+}
+
+async function submitCreateContact(payload: CreateContactDto) {
+  contactDialogLoading.value = true
+  contactDialogError.value = null
+  try {
+    const created = await contactsStore.createContact(props.orgSlug, payload)
+    owner.value = { kind: 'CONTACT', id: created.id }
+    contactDialogOpen.value = false
+  } catch (e) {
+    contactDialogError.value = extractErrorMessage(e, t('dashboard.contacts.errors.save'))
+  } finally {
+    contactDialogLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -320,16 +363,28 @@ const selectedTypesCount = computed(() => selectedTypeIds.value.size)
         <label for="piece-owner" class="form-label">
           {{ t('dashboard.pieces.form.field_owner') }}
         </label>
-        <DashboardMemberSelect
+        <DashboardOwnerSelect
           input-id="piece-owner"
-          v-model="ownerUserId"
+          v-model="owner"
           :members="members"
+          :contacts="contacts"
           :eligible-roles="ownerEligibleRoles"
           :placeholder="t('dashboard.pieces.form.no_owner')"
           :disabled="loading"
+          can-create-contact
+          @create-contact="openCreateContact"
         />
       </div>
     </div>
+
+    <DashboardContactFormDialog
+      :open="contactDialogOpen"
+      :loading="contactDialogLoading"
+      :error-msg="contactDialogError"
+      :initial-name="contactInitialName"
+      @submit="submitCreateContact"
+      @close="contactDialogOpen = false"
+    />
 
     <div class="flex flex-col gap-1.5">
       <span class="form-label">

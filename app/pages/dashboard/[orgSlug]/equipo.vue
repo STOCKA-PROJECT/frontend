@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { FetchError } from 'ofetch'
 import type {
+  ContactResponseDto,
+  CreateContactDto,
   CreateInvitationDto,
   InvitationResponseDto,
+  LinkContactDto,
   MemberResponseDto,
   OrganizationRole
 } from '~/types/api'
@@ -14,7 +17,9 @@ const localePath = useLocalePath()
 
 const orgs = useOrganizationsStore()
 const team = useTeamStore()
+const contactsStore = useContactsStore()
 const auth = useAuthStore()
+const toast = useToastStore()
 
 // `resolve-org-slug.global.ts` already guarantees the org exists in the store
 // and the user is a member.
@@ -30,6 +35,7 @@ const currentUserId = computed(() => auth.user?.id ?? -1)
 
 const members = computed(() => (orgSlug.value && team.getMembers(orgSlug.value)) || [])
 const invitations = computed(() => (orgSlug.value && team.getInvitations(orgSlug.value)) || [])
+const contacts = computed(() => (orgSlug.value && contactsStore.getContacts(orgSlug.value)) || [])
 const canSeeInvitations = computed(() => role.value === 'OWNER' || role.value === 'MANAGER')
 const ownerCount = computed(() => members.value.filter(m => m.role === 'OWNER').length)
 const isCurrentUserLastOwner = computed(() => {
@@ -43,7 +49,7 @@ async function loadAll() {
   if (!orgSlug.value) return
   const slug = orgSlug.value
   pageError.value = null
-  const tasks: Promise<unknown>[] = [team.fetchMembers(slug)]
+  const tasks: Promise<unknown>[] = [team.fetchMembers(slug), contactsStore.fetchContacts(slug)]
   if (canSeeInvitations.value) tasks.push(team.fetchInvitations(slug))
   try {
     await Promise.all(tasks)
@@ -200,6 +206,129 @@ async function confirmLeave() {
   }
 }
 
+// Contacts: create/edit dialog
+const contactFormOpen = ref(false)
+const contactFormLoading = ref(false)
+const contactFormError = ref<string | null>(null)
+const contactBeingEdited = ref<ContactResponseDto | null>(null)
+
+function openAddContact() {
+  contactBeingEdited.value = null
+  contactFormError.value = null
+  contactFormOpen.value = true
+}
+
+function openEditContact(contact: ContactResponseDto) {
+  contactBeingEdited.value = contact
+  contactFormError.value = null
+  contactFormOpen.value = true
+}
+
+function closeContactForm() {
+  if (contactFormLoading.value) return
+  contactFormOpen.value = false
+}
+
+async function submitContactForm(payload: CreateContactDto) {
+  if (!orgSlug.value) return
+  contactFormLoading.value = true
+  contactFormError.value = null
+  try {
+    if (contactBeingEdited.value) {
+      await contactsStore.updateContact(orgSlug.value, contactBeingEdited.value.id, payload)
+    } else {
+      await contactsStore.createContact(orgSlug.value, payload)
+    }
+    contactFormOpen.value = false
+  } catch (e) {
+    contactFormError.value = errorMessage(e, t('dashboard.contacts.errors.save'))
+  } finally {
+    contactFormLoading.value = false
+  }
+}
+
+// Contacts: link to member dialog
+const linkTarget = ref<ContactResponseDto | null>(null)
+const linkLoading = ref(false)
+const linkError = ref<string | null>(null)
+
+function openLinkContact(contact: ContactResponseDto) {
+  linkError.value = null
+  linkTarget.value = contact
+}
+
+async function submitLinkContact(payload: LinkContactDto) {
+  if (!linkTarget.value || !orgSlug.value) return
+  linkLoading.value = true
+  linkError.value = null
+  try {
+    const result = await contactsStore.linkContact(orgSlug.value, linkTarget.value.id, payload)
+    linkTarget.value = null
+    if (result.migratedPieces > 0) {
+      toast.push({
+        type: 'success',
+        description: t('dashboard.contacts.link_migrated_toast', { n: result.migratedPieces })
+      })
+    }
+  } catch (e) {
+    linkError.value = errorMessage(e, t('dashboard.contacts.errors.link'))
+  } finally {
+    linkLoading.value = false
+  }
+}
+
+// Contacts: unlink confirm
+const unlinkTarget = ref<ContactResponseDto | null>(null)
+const unlinkLoading = ref(false)
+
+const unlinkMessage = computed(() => unlinkTarget.value
+  ? t('dashboard.contacts.confirm_unlink_message', {
+      name: `${unlinkTarget.value.name} ${unlinkTarget.value.lastName ?? ''}`.trim()
+    })
+  : '')
+
+async function confirmUnlinkContact() {
+  if (!unlinkTarget.value || !orgSlug.value) return
+  unlinkLoading.value = true
+  pageError.value = null
+  try {
+    await contactsStore.unlinkContact(orgSlug.value, unlinkTarget.value.id)
+    unlinkTarget.value = null
+  } catch (e) {
+    pageError.value = errorMessage(e, t('dashboard.contacts.errors.link'))
+    unlinkTarget.value = null
+  } finally {
+    unlinkLoading.value = false
+  }
+}
+
+// Contacts: delete confirm
+const removeContactTarget = ref<ContactResponseDto | null>(null)
+const removeContactLoading = ref(false)
+
+const removeContactMessage = computed(() => removeContactTarget.value
+  ? t('dashboard.contacts.confirm_delete_message', {
+      name: `${removeContactTarget.value.name} ${removeContactTarget.value.lastName ?? ''}`.trim()
+    })
+  : '')
+
+async function confirmRemoveContact() {
+  if (!removeContactTarget.value || !orgSlug.value) return
+  removeContactLoading.value = true
+  pageError.value = null
+  try {
+    await contactsStore.removeContact(orgSlug.value, removeContactTarget.value.id)
+    removeContactTarget.value = null
+  } catch (e) {
+    // El backend responde 409 (contacts.owns_pieces) mientras el contacto
+    // posea artículos; el detail ya llega traducido vía Accept-Language.
+    pageError.value = errorMessage(e, t('dashboard.contacts.errors.delete'))
+    removeContactTarget.value = null
+  } finally {
+    removeContactLoading.value = false
+  }
+}
+
 function errorMessage(e: unknown, fallback: string): string {
   if (e instanceof FetchError && e.data && typeof e.data === 'object' && 'message' in e.data) {
     const msg = (e.data as { message?: unknown }).message
@@ -242,6 +371,18 @@ function errorMessage(e: unknown, fallback: string): string {
         :current-user-role="role"
         @invite="openInvite"
         @cancel="(inv) => cancelInviteTarget = inv"
+      />
+
+      <DashboardContactsCard
+        :contacts="contacts"
+        :members="members"
+        :loading="contactsStore.loading"
+        :current-user-role="role"
+        @add="openAddContact"
+        @edit="openEditContact"
+        @link="openLinkContact"
+        @unlink="(c) => unlinkTarget = c"
+        @remove="(c) => removeContactTarget = c"
       />
 
       <div class="mt-2 flex justify-end">
@@ -312,6 +453,48 @@ function errorMessage(e: unknown, fallback: string): string {
       :cancel-label="t('dashboard.team.cancel')"
       @confirm="confirmLeave"
       @close="leaveOpen = false"
+    />
+
+    <DashboardContactFormDialog
+      :open="contactFormOpen"
+      :loading="contactFormLoading"
+      :error-msg="contactFormError"
+      :contact="contactBeingEdited"
+      @submit="submitContactForm"
+      @close="closeContactForm"
+    />
+
+    <DashboardLinkContactDialog
+      :open="!!linkTarget"
+      :loading="linkLoading"
+      :error-msg="linkError"
+      :contact="linkTarget"
+      :members="members"
+      @submit="submitLinkContact"
+      @close="linkTarget = null"
+    />
+
+    <DashboardConfirmDialog
+      :open="!!unlinkTarget"
+      :title="t('dashboard.contacts.confirm_unlink_title')"
+      :message="unlinkMessage"
+      :loading="unlinkLoading"
+      :confirm-label="t('dashboard.contacts.unlink')"
+      :cancel-label="t('dashboard.team.cancel')"
+      @confirm="confirmUnlinkContact"
+      @close="unlinkTarget = null"
+    />
+
+    <DashboardConfirmDialog
+      :open="!!removeContactTarget"
+      tone="danger"
+      :title="t('dashboard.contacts.confirm_delete_title')"
+      :message="removeContactMessage"
+      :loading="removeContactLoading"
+      :confirm-label="t('dashboard.contacts.delete')"
+      :cancel-label="t('dashboard.team.cancel')"
+      @confirm="confirmRemoveContact"
+      @close="removeContactTarget = null"
     />
   </div>
 </template>

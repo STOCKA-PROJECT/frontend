@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { FetchError } from 'ofetch'
 import type {
   AttributeValueInputDto,
+  ContactResponseDto,
+  CreateContactDto,
   LocationResponseDto,
   MemberResponseDto,
   OrganizationPieceAttributeResponseDto,
@@ -10,19 +13,22 @@ import type {
   PieceTypeResponseDto,
   UpdatePieceDto
 } from '~/types/api'
+import type { OwnerRef } from '~/components/dashboard/OwnerSelect.vue'
 
 const ownerEligibleRoles: OrganizationRole[] = ['OWNER', 'MANAGER', 'USER']
 
 const props = withDefaults(defineProps<{
+  orgSlug: string
   piece: PieceResponseDto
   pieceTypes: PieceTypeResponseDto[]
   locations: LocationResponseDto[]
   members: MemberResponseDto[]
+  contacts?: ContactResponseDto[]
   orgAttributes?: OrganizationPieceAttributeResponseDto[]
   canWrite: boolean
   saving?: boolean
   errorMsg?: string | null
-}>(), { saving: false, errorMsg: null, orgAttributes: () => [] })
+}>(), { saving: false, errorMsg: null, orgAttributes: () => [], contacts: () => [] })
 
 const emit = defineEmits<{
   save: [payload: UpdatePieceDto]
@@ -36,7 +42,7 @@ const editName = ref('')
 const editSerialNumber = ref('')
 const editDescription = ref('')
 const editLocationId = ref<number | null>(null)
-const editOwnerUserId = ref<number | null>(null)
+const editOwner = ref<OwnerRef | null>(null)
 const editTypeIds = ref<Set<number>>(new Set())
 const editAttributes = ref<Record<number, string | null>>({})
 const editOrgAttributes = ref<Record<number, string | null>>({})
@@ -107,7 +113,7 @@ function startEdit() {
   editSerialNumber.value = props.piece.serialNumber ?? ''
   editDescription.value = props.piece.description ?? ''
   editLocationId.value = props.piece.locationId ?? null
-  editOwnerUserId.value = props.piece.ownerUserId ?? null
+  editOwner.value = currentOwnerRef()
   editTypeIds.value = new Set(currentTypeIds.value)
   const typeAttrs: Record<number, string | null> = {}
   const orgAttrs: Record<number, string | null> = {}
@@ -183,11 +189,15 @@ function submit() {
     }
   }
 
-  if ((editOwnerUserId.value ?? null) !== (props.piece.ownerUserId ?? null)) {
-    if (editOwnerUserId.value == null) {
+  const currentOwner = currentOwnerRef()
+  const nextOwner = editOwner.value
+  if (currentOwner?.kind !== nextOwner?.kind || currentOwner?.id !== nextOwner?.id) {
+    if (nextOwner == null) {
       payload.clearOwner = true
+    } else if (nextOwner.kind === 'USER') {
+      payload.ownerUserId = nextOwner.id
     } else {
-      payload.ownerUserId = editOwnerUserId.value
+      payload.ownerContactId = nextOwner.id
     }
   }
 
@@ -228,10 +238,63 @@ function locationLabel(id?: number): string {
   if (id == null) return t('dashboard.pieces.unassigned_location')
   return props.locations.find(l => l.id === id)?.name ?? `#${id}`
 }
+/** Referencia {kind,id} del propietario actual de la pieza, o null si no tiene. */
+function currentOwnerRef(): OwnerRef | null {
+  if (props.piece.ownerUserId != null) return { kind: 'USER', id: props.piece.ownerUserId }
+  if (props.piece.ownerContactId != null) return { kind: 'CONTACT', id: props.piece.ownerContactId }
+  return null
+}
+
+/**
+ * Nombre visible del propietario: el backend ya lo resuelve en `piece.owner`,
+ * con fallback a la lista de miembros para respuestas antiguas cacheadas.
+ */
+const ownerDisplay = computed(() => {
+  if (props.piece.owner) return props.piece.owner.displayName
+  if (props.piece.ownerUserId != null) return ownerLabel(props.piece.ownerUserId)
+  return t('dashboard.pieces.no_owner')
+})
+
+// Se mantiene para renderizar atributos de tipo MEMBER (siempre miembros).
 function ownerLabel(id?: number): string {
   if (id == null) return t('dashboard.pieces.no_owner')
   const m = props.members.find(x => x.userId === id)
   return m ? `${m.name} ${m.lastName}`.trim() : `#${id}`
+}
+
+// Alta de contacto al vuelo desde el selector de propietario en edición.
+const contactsStore = useContactsStore()
+const contactDialogOpen = ref(false)
+const contactDialogLoading = ref(false)
+const contactDialogError = ref<string | null>(null)
+const contactInitialName = ref('')
+
+function openCreateContact(query: string) {
+  contactInitialName.value = query
+  contactDialogError.value = null
+  contactDialogOpen.value = true
+}
+
+async function submitCreateContact(payload: CreateContactDto) {
+  contactDialogLoading.value = true
+  contactDialogError.value = null
+  try {
+    const created = await contactsStore.createContact(props.orgSlug, payload)
+    editOwner.value = { kind: 'CONTACT', id: created.id }
+    contactDialogOpen.value = false
+  } catch (e) {
+    contactDialogError.value = extractErrorMessage(e, t('dashboard.contacts.errors.save'))
+  } finally {
+    contactDialogLoading.value = false
+  }
+}
+
+function extractErrorMessage(e: unknown, fallback: string): string {
+  if (e instanceof FetchError) {
+    const data = e.response?._data as { message?: string; detail?: string } | undefined
+    return data?.message ?? data?.detail ?? fallback
+  }
+  return fallback
 }
 
 function renderValue(
@@ -321,7 +384,12 @@ function renderValue(
       </div>
       <div class="info-row">
         <dt>{{ t('dashboard.pieces.form.field_owner') }}</dt>
-        <dd>{{ ownerLabel(piece.ownerUserId) }}</dd>
+        <dd class="flex items-center gap-2">
+          <span>{{ ownerDisplay }}</span>
+          <span v-if="piece.owner?.kind === 'CONTACT'" class="contact-badge">
+            {{ t('dashboard.contacts.badge') }}
+          </span>
+        </dd>
       </div>
     </dl>
 
@@ -403,17 +471,29 @@ function renderValue(
           <label for="edit-owner" class="form-label">
             {{ t('dashboard.pieces.form.field_owner') }}
           </label>
-          <DashboardMemberSelect
+          <DashboardOwnerSelect
             input-id="edit-owner"
-            v-model="editOwnerUserId"
+            v-model="editOwner"
             :members="members"
+            :contacts="contacts"
             :eligible-roles="ownerEligibleRoles"
             :placeholder="t('dashboard.pieces.form.no_owner')"
             :disabled="saving"
+            can-create-contact
+            @create-contact="openCreateContact"
           />
         </div>
       </div>
     </div>
+
+    <DashboardContactFormDialog
+      :open="contactDialogOpen"
+      :loading="contactDialogLoading"
+      :error-msg="contactDialogError"
+      :initial-name="contactInitialName"
+      @submit="submitCreateContact"
+      @close="contactDialogOpen = false"
+    />
 
     <div v-if="!editing && hasOrgAttributes" class="border-t border-line pt-4">
       <h3 class="mb-3 text-[15px] font-semibold tracking-[-0.01em] text-ink">
@@ -574,6 +654,21 @@ function renderValue(
   border: 1px solid var(--c-line);
   font-size: 12px;
   color: var(--c-ink-soft);
+}
+
+.contact-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  border: 1px solid var(--c-line);
+  background: var(--c-bg-soft);
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--c-ink-soft);
+  white-space: nowrap;
 }
 
 .type-pill {

@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import type {
+  ContactResponseDto,
   LocationResponseDto,
   MemberResponseDto,
   PieceListFilters,
   PieceTypeResponseDto
 } from '~/types/api'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   filters: PieceListFilters
   pieceTypes: PieceTypeResponseDto[]
   locations: LocationResponseDto[]
   members: MemberResponseDto[]
+  contacts?: ContactResponseDto[]
   loading?: boolean
-}>()
+}>(), { contacts: () => [] })
 
 const emit = defineEmits<{
   change: [patch: Partial<PieceListFilters>]
@@ -46,10 +48,25 @@ function onLocationChange(e: Event) {
   const v = (e.target as HTMLSelectElement).value
   emit('change', { locationId: v ? Number(v) : undefined })
 }
+// El propietario es un único filtro con dos directorios: los <option> llevan
+// el id prefijado ("u:<userId>" miembro / "c:<contactId>" contacto) y el patch
+// deja siempre a undefined el directorio contrario.
 function onOwnerChange(e: Event) {
   const v = (e.target as HTMLSelectElement).value
-  emit('change', { ownerUserId: v ? Number(v) : undefined })
+  if (!v) {
+    emit('change', { ownerUserId: undefined, ownerContactId: undefined })
+  } else if (v.startsWith('c:')) {
+    emit('change', { ownerUserId: undefined, ownerContactId: Number(v.slice(2)) })
+  } else {
+    emit('change', { ownerUserId: Number(v.slice(2)), ownerContactId: undefined })
+  }
 }
+
+const ownerFilterValue = computed(() => {
+  if (props.filters.ownerUserId != null) return `u:${props.filters.ownerUserId}`
+  if (props.filters.ownerContactId != null) return `c:${props.filters.ownerContactId}`
+  return ''
+})
 function onStatusChange(e: Event) {
   const v = (e.target as HTMLSelectElement).value
   emit('change', { status: v ? (v as 'ACTIVE' | 'PENDING') : undefined })
@@ -57,7 +74,7 @@ function onStatusChange(e: Event) {
 
 const hasAnyFilter = computed(() =>
   Boolean(props.filters.q || props.filters.typeId || props.filters.locationId
-    || props.filters.ownerUserId || props.filters.status)
+    || props.filters.ownerUserId || props.filters.ownerContactId || props.filters.status)
 )
 </script>
 
@@ -97,12 +114,19 @@ const hasAnyFilter = computed(() =>
 
     <div class="flex flex-col gap-1">
       <label for="filter-owner" class="filter-label">{{ t('dashboard.pieces.filters.owner') }}</label>
-      <select id="filter-owner" class="filter-select w-full" :value="filters.ownerUserId ?? ''" :disabled="loading"
+      <select id="filter-owner" class="filter-select w-full" :value="ownerFilterValue" :disabled="loading"
         @change="onOwnerChange">
         <option value="">{{ t('dashboard.pieces.filters.all') }}</option>
-        <option v-for="m in members" :key="m.userId" :value="m.userId">
-          {{ m.name }} {{ m.lastName }}
-        </option>
+        <optgroup :label="t('dashboard.pieces.form.owner_group_members')">
+          <option v-for="m in members" :key="`u-${m.userId}`" :value="`u:${m.userId}`">
+            {{ m.name }} {{ m.lastName }}
+          </option>
+        </optgroup>
+        <optgroup v-if="contacts.length > 0" :label="t('dashboard.pieces.form.owner_group_contacts')">
+          <option v-for="c in contacts" :key="`c-${c.id}`" :value="`c:${c.id}`">
+            {{ c.name }} {{ c.lastName ?? '' }}
+          </option>
+        </optgroup>
       </select>
     </div>
 

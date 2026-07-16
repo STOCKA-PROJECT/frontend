@@ -112,6 +112,7 @@ export const usePiecesStore = defineStore('pieces', () => {
     if (f.typeId != null) params.typeId = f.typeId
     if (f.locationId != null) params.locationId = f.locationId
     if (f.ownerUserId != null) params.ownerUserId = f.ownerUserId
+    if (f.ownerContactId != null) params.ownerContactId = f.ownerContactId
     if (f.status) params.status = f.status
     if (f.q && f.q.trim().length > 0) params.q = f.q.trim()
     return params
@@ -138,7 +139,7 @@ export const usePiecesStore = defineStore('pieces', () => {
   function setFilters(orgSlug: string, patch: Partial<PieceListFilters>): Promise<Page<PieceListItemDto>> {
     const next: PieceListFilters = { ...filters.value, ...patch }
     // Cualquier cambio de filtro (no de página/tamaño/orden) reinicia a la primera página.
-    const filterKeys: Array<keyof PieceListFilters> = ['typeId', 'locationId', 'ownerUserId', 'status', 'q']
+    const filterKeys: Array<keyof PieceListFilters> = ['typeId', 'locationId', 'ownerUserId', 'ownerContactId', 'status', 'q']
     const filterChanged = filterKeys.some(k => k in patch && patch[k] !== filters.value[k])
     if (filterChanged) next.page = 0
     filters.value = next
@@ -166,9 +167,13 @@ export const usePiecesStore = defineStore('pieces', () => {
     const item: PieceListItemDto = {
       id: piece.id,
       name: piece.name,
+      serialNumber: piece.serialNumber,
       pieceTypes: piece.pieceTypes,
       ownerUserId: piece.ownerUserId,
+      ownerContactId: piece.ownerContactId,
+      owner: piece.owner,
       locationId: piece.locationId,
+      coverAttachmentId: piece.coverAttachmentId,
       status: piece.status,
       createdAt: piece.createdAt,
       updatedAt: piece.updatedAt
@@ -228,6 +233,7 @@ export const usePiecesStore = defineStore('pieces', () => {
     if (f?.typeId != null) params.set('typeId', String(f.typeId))
     if (f?.locationId != null) params.set('locationId', String(f.locationId))
     if (f?.ownerUserId != null) params.set('ownerUserId', String(f.ownerUserId))
+    if (f?.ownerContactId != null) params.set('ownerContactId', String(f.ownerContactId))
     if (f?.status) params.set('status', f.status)
     if (f?.q && f.q.trim().length > 0) params.set('q', f.q.trim())
     return params
