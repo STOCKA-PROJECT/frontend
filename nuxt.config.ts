@@ -111,6 +111,18 @@ export default defineNuxtConfig({
 
   nitro: {
     compressPublicAssets: true,
+    // URLs de producción: van dentro del wrangler.json que Nitro genera en el build de
+    // Cloudflare Workers, así cada deploy las re-aplica. No configurarlas a mano en el
+    // dashboard: `wrangler deploy` ELIMINA las variables de texto añadidas por dashboard.
+    // Solo afecta al deploy en Workers; `nuxt dev` y builds locales las ignoran.
+    cloudflare: {
+      wrangler: {
+        vars: {
+          NUXT_API_BASE_URL: "https://stocka.xeye.es",
+          NUXT_PUBLIC_EDITOR_URL: "https://timeline.joanmartorellcoll03.workers.dev",
+        },
+      },
+    },
     routeRules: {
       "/**": {
         headers: SECURITY_HEADERS,
