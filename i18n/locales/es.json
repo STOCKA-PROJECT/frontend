@@ -524,7 +524,12 @@
         "field_name": "Nombre",
         "field_name_placeholder": "Herramienta, Equipo informático…",
         "create": "Crear",
-        "save": "Guardar"
+        "save": "Guardar",
+        "edit_title": "Editar el tipo",
+        "field_kind": "Tipo de salida",
+        "field_kind_none": "Solo inventario (sin salida)",
+        "field_kind_help": "Si el tipo controla una pieza del belén, elige qué salida usa: sus acciones y sus puertos deberán ser de ese tipo.",
+        "field_kind_change_help": "Cambiarlo vuelve a validar las acciones del tipo; no se puede quitar una vez asignado."
       },
       "attribute_form": {
         "new_title": "Nuevo atributo en \"{type}\"",
@@ -595,7 +600,12 @@
         "is_duration_hint": "El valor (en segundos) será la longitud del clip en la línea de tiempo. No habrá un campo de duración aparte.",
         "static_duration_value": "Duración fija (s)",
         "create": "Crear acción",
-        "save": "Guardar cambios"
+        "save": "Guardar cambios",
+        "catalog_hint": "Este tipo controla una salida de tipo «{kind}»: la acción y los parámetros salen del catálogo del reproductor.",
+        "field_name_catalog_placeholder": "Elige una acción del catálogo",
+        "field_name_catalog_help": "Al elegirla se rellenan los parámetros que admite; decide cuáles se fijan y cuáles se ponen en cada clip.",
+        "name_not_in_catalog": "Esta acción no existe en el catálogo para este tipo de salida.",
+        "params_not_in_catalog": "Parámetros que el catálogo no conoce para esta acción: {names}."
       },
       "actions": {
         "title": "Acciones ({n})",
@@ -644,6 +654,34 @@
         "options_required": "Añade al menos una opción.",
         "type_required": "Selecciona un tipo de dato.",
         "eligibleRoles_required": "Selecciona al menos un rol elegible."
+      },
+      "catalogActions": {
+        "turn_on": "Encender",
+        "turn_off": "Apagar",
+        "focoOn": "Encender el foco",
+        "focoOff": "Apagar el foco",
+        "setBrightness": "Brillo de la tira",
+        "clear": "Apagar los LED",
+        "fill": "Rellenar de color",
+        "animate": "Animación",
+        "start_up": "Subir",
+        "start_down": "Bajar",
+        "stop": "Parar",
+        "play": "Reproducir"
+      },
+      "catalogParams": {
+        "time": "Tiempo (s)",
+        "hold_time": "Tiempo pulsado (s)",
+        "pulse_delay": "Retardo del pulso (s)",
+        "brightness": "Brillo",
+        "color": "Color",
+        "first": "Primer LED",
+        "last": "Último LED",
+        "animation_type": "Animación",
+        "duration": "Duración (s)",
+        "from_color": "Color inicial",
+        "audio_name": "Archivo de audio",
+        "video_name": "Archivo de vídeo"
       }
     },
     "ports": {
@@ -657,7 +695,8 @@
         "no_parameters": "Sin parámetros",
         "unknown_type": "Tipo eliminado",
         "edit": "Editar",
-        "delete": "Eliminar"
+        "delete": "Eliminar",
+        "infrastructure": "Infraestructura"
       },
       "form": {
         "new_title": "Nuevo puerto",
@@ -674,7 +713,26 @@
         "add_parameter": "Añadir parámetro",
         "no_parameters": "Este puerto no tiene parámetros. Añade uno si lo necesitas.",
         "create": "Crear",
-        "save": "Guardar cambios"
+        "save": "Guardar cambios",
+        "field_name_help": "Es el nombre que usará el reproductor; debe ser único en la organización.",
+        "field_kind": "Tipo de salida",
+        "field_kind_placeholder": "Elige el tipo de salida",
+        "field_kind_help": "Determina si hace falta un tipo de artículo, un pin y qué configuración lleva.",
+        "field_kind_immutable": "El tipo de salida de un puerto no se puede cambiar.",
+        "field_type_help": "Solo se muestran los tipos de artículo del mismo tipo de salida.",
+        "field_type_empty_for_kind": "No hay ningún tipo de artículo de salida «{kind}». Crea uno o asígnale este tipo de salida.",
+        "infrastructure_help": "Puerto de infraestructura: no pertenece a ningún tipo de artículo.",
+        "pin_reserved": "Pin reservado: {reason}.",
+        "pin_not_ws281x": "Este pin no puede controlar una tira WS281x (usa 12, 18, 13, 19, 10 o 21).",
+        "pin_ws281x_channel": "Pin {via}: la tira debe usar el canal {channel}.",
+        "config_title": "Configuración",
+        "config_default": "por defecto {value}",
+        "config_enabled": "Activado",
+        "strip_placeholder": "Elige la tira",
+        "strip_empty": "Crea primero un puerto de tipo «Tira LED».",
+        "advanced_title": "Avanzado: parámetros antiguos ({n})",
+        "advanced_help": "Los parámetros tipados antiguos se conservan por compatibilidad; el reproductor solo usa la configuración.",
+        "catalog_error": "No se ha podido cargar el catálogo de salidas."
       },
       "delete": {
         "confirm_title": "Eliminar puerto",
@@ -684,6 +742,26 @@
       "not_available": {
         "title": "Función no disponible",
         "body": "Los puertos solo están disponibles para organizaciones habilitadas. Contacta con un administrador si crees que deberías tener acceso."
+      },
+      "config": {
+        "dma": "Canal DMA",
+        "channel": "Canal PWM",
+        "length": "Número de LED",
+        "brightness": "Brillo",
+        "freq_hz": "Frecuencia (Hz)",
+        "invert": "Señal invertida",
+        "strip": "Tira",
+        "first": "Primer LED",
+        "last": "Último LED",
+        "pinR": "Pin motor R (bajar)",
+        "pinL": "Pin motor L (subir)",
+        "sensorPin": "Pin del sensor IR",
+        "downTime": "Tiempo de bajada (s)"
+      },
+      "config_help": {
+        "first": "Los segmentos pueden ir al revés (primero > último).",
+        "last": "Entre 0 y el número de LED de la tira menos 1.",
+        "strip": "Nombre de un puerto de tipo Tira LED."
       }
     },
     "account": {
@@ -1217,6 +1295,15 @@
         "not_found": "Artículo no encontrado."
       },
       "new_breadcrumb": "Nuevo"
+    },
+    "kinds": {
+      "relay": "Relé",
+      "led_strip": "Tira LED",
+      "led_segment": "Segmento LED",
+      "motor": "Motor",
+      "audio": "Audio",
+      "video": "Vídeo",
+      "button": "Pulsador"
     }
   },
   "invitations": {
@@ -1271,7 +1358,17 @@
     },
     "piece_types": {
       "not_found": "Tipo de artículo no encontrado.",
-      "attribute_invalid": "El atributo no es válido."
+      "attribute_invalid": "El atributo no es válido.",
+      "kind_invalid": "El tipo de salida «{kind}» no existe en el catálogo.",
+      "kind_change_invalid": "No se puede cambiar el tipo de salida: la acción «{action}» no es válida para {kind}.",
+      "kind_in_use": "No se puede cambiar el tipo de salida: el puerto «{port}» es de tipo {kind}.",
+      "action_not_in_catalog": "La acción «{action}» no existe para salidas de tipo {kind}.",
+      "action_param_unknown": "El parámetro «{param}» no existe en la acción «{action}» del catálogo.",
+      "action_param_missing": "La acción necesita el parámetro obligatorio «{param}».",
+      "action_param_type_mismatch": "El parámetro «{param}» debe ser de tipo {expected}.",
+      "action_param_options_invalid": "Las opciones de «{param}» deben estar entre: {values}.",
+      "action_param_static_invalid": "El valor fijo de «{param}» no es válido para su tipo.",
+      "action_duration_param_mismatch": "El parámetro de duración debe ser «{expected}», no «{param}»."
     },
     "locations": {
       "not_found": "Ubicación no encontrada."
@@ -1299,6 +1396,31 @@
     },
     "server": {
       "internal_error": "Error interno del servidor."
+    },
+    "ports": {
+      "not_found": "Puerto no encontrado.",
+      "name_required": "El nombre del puerto es obligatorio.",
+      "name_conflict": "Ya existe un puerto con ese nombre en la organización.",
+      "piece_type_required": "Este tipo de salida necesita un tipo de artículo.",
+      "pin_invalid": "El pin debe ser un GPIO válido de la Raspberry Pi (0–27).",
+      "pin_conflict": "Ya existe un puerto con ese pin en la organización.",
+      "kind_required": "El tipo de salida del puerto es obligatorio.",
+      "kind_invalid": "El tipo de salida «{kind}» no existe en el catálogo.",
+      "kind_immutable": "No se puede cambiar el tipo de salida de un puerto; elimínalo y créalo de nuevo.",
+      "pin_not_allowed": "Los puertos de tipo {kind} no llevan pin; la dirección va en la configuración.",
+      "pin_reserved": "El pin {pin} está reservado en la placa y no se puede usar.",
+      "piece_type_kind_mismatch": "El tipo de artículo «{type}» es de salida {typeKind}, pero el puerto es {portKind}.",
+      "config_unknown_key": "La configuración del puerto tiene una clave desconocida: «{key}».",
+      "config_missing_key": "La configuración del puerto necesita «{key}».",
+      "config_type_mismatch": "En la configuración del puerto, «{key}» debe ser de tipo {type}.",
+      "config_out_of_range": "En la configuración del puerto, «{key}» debe estar entre {min} y {max}.",
+      "motor_pins_not_distinct": "Los tres pines del motor deben ser distintos.",
+      "strip_pin_unsupported": "El pin {pin} no admite tiras WS281x en esta placa.",
+      "strip_channel_mismatch": "La tira en el pin {pin} debe usar el canal {channel}.",
+      "segment_strip_not_found": "La tira «{strip}» no existe como puerto de tipo Tira LED en la organización.",
+      "segment_out_of_range": "El segmento {first}–{last} se sale de la tira (0–{max}).",
+      "strip_shrink_breaks_segment": "No se puede acortar la tira: el segmento «{segment}» ({first}–{last}) quedaría fuera.",
+      "strip_in_use": "La tira tiene segmentos que dependen de ella: {segments}."
     }
   }
 }

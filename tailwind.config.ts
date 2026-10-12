@@ -61,8 +61,9 @@ export default {
         topbar: 'var(--topbar-h)'
       },
       fontFamily: {
-        sans: ['Inter', ...defaultTheme.fontFamily.sans],
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
+        display: ['Archivo', 'Helvetica Neue', 'Arial', ...defaultTheme.fontFamily.sans],
+        sans: ['IBM Plex Sans', 'system-ui', ...defaultTheme.fontFamily.sans],
+        mono: ['IBM Plex Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
       },
       maxWidth: {
         wrap: '1180px'

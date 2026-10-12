@@ -61,9 +61,12 @@ const actionsCount = computed(() => actionsList.value.length)
       <header class="flex flex-col gap-2 border-b border-line px-4 py-4 sm:px-6">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
           <div class="min-w-0">
-            <h2 class="truncate text-[18px] font-semibold tracking-[-0.015em] text-ink sm:text-[20px]">
-              {{ detail.name }}
-            </h2>
+            <div class="flex flex-wrap items-center gap-2">
+              <h2 class="truncate text-[18px] font-semibold tracking-[-0.015em] text-ink sm:text-[20px]">
+                {{ detail.name }}
+              </h2>
+              <span v-if="detail.kind" class="kind-badge">{{ t(`dashboard.kinds.${detail.kind}`) }}</span>
+            </div>
             <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[12px] text-ink-muted">
               <span>{{ t('dashboard.pieceTypes.detail.created_at', { date: fmtDate(detail.createdAt) }) }}</span>
               <span aria-hidden="true">·</span>
@@ -167,4 +170,21 @@ const actionsCount = computed(() => actionsList.value.length)
 .action-btn:hover { background: var(--c-bg-soft); border-color: var(--c-line-strong); }
 .action-btn-danger { color: var(--c-danger); border-color: color-mix(in oklab, var(--c-danger) 35%, transparent); }
 .action-btn-danger:hover { background: var(--c-danger-soft); }
+
+/* Brandbook badge brand (quadrat): el tipus de sortida que condueix aquest tipus. */
+.kind-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 3px;
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.kind-badge::before { content: ""; width: 6px; height: 6px; border-radius: 1px; background: currentColor; }
 </style>

@@ -524,7 +524,12 @@
         "field_name": "Name",
         "field_name_placeholder": "Tool, Computer equipment…",
         "create": "Create",
-        "save": "Save"
+        "save": "Save",
+        "edit_title": "Edit type",
+        "field_kind": "Output kind",
+        "field_kind_none": "Inventory only (no output)",
+        "field_kind_help": "If the type drives a piece of the nativity scene, pick which output it uses: its actions and ports must match that kind.",
+        "field_kind_change_help": "Changing it re-validates the type’s actions; it cannot be cleared once set."
       },
       "attribute_form": {
         "new_title": "New attribute on \"{type}\"",
@@ -595,7 +600,12 @@
         "is_duration_hint": "The value (in seconds) will be the clip length on the timeline. There will be no separate duration field.",
         "static_duration_value": "Fixed duration (s)",
         "create": "Create action",
-        "save": "Save changes"
+        "save": "Save changes",
+        "catalog_hint": "This type drives a “{kind}” output: the action and its parameters come from the player catalog.",
+        "field_name_catalog_placeholder": "Pick a catalog action",
+        "field_name_catalog_help": "Picking it pre-fills the parameters it accepts; decide which are fixed and which are set per clip.",
+        "name_not_in_catalog": "This action does not exist in the catalog for this output kind.",
+        "params_not_in_catalog": "Parameters the catalog does not know for this action: {names}."
       },
       "actions": {
         "title": "Actions ({n})",
@@ -644,6 +654,34 @@
         "options_required": "Add at least one option.",
         "type_required": "Pick a data type.",
         "eligibleRoles_required": "Pick at least one eligible role."
+      },
+      "catalogActions": {
+        "turn_on": "Turn on",
+        "turn_off": "Turn off",
+        "focoOn": "Spotlight on",
+        "focoOff": "Spotlight off",
+        "setBrightness": "Strip brightness",
+        "clear": "Clear LEDs",
+        "fill": "Fill with colour",
+        "animate": "Animation",
+        "start_up": "Raise",
+        "start_down": "Lower",
+        "stop": "Stop",
+        "play": "Play"
+      },
+      "catalogParams": {
+        "time": "Time (s)",
+        "hold_time": "Hold time (s)",
+        "pulse_delay": "Pulse delay (s)",
+        "brightness": "Brightness",
+        "color": "Colour",
+        "first": "First LED",
+        "last": "Last LED",
+        "animation_type": "Animation",
+        "duration": "Duration (s)",
+        "from_color": "Start colour",
+        "audio_name": "Audio file",
+        "video_name": "Video file"
       }
     },
     "ports": {
@@ -657,7 +695,8 @@
         "no_parameters": "No parameters",
         "unknown_type": "Deleted type",
         "edit": "Edit",
-        "delete": "Delete"
+        "delete": "Delete",
+        "infrastructure": "Infrastructure"
       },
       "form": {
         "new_title": "New port",
@@ -674,7 +713,26 @@
         "add_parameter": "Add parameter",
         "no_parameters": "This port has no parameters. Add one if you need it.",
         "create": "Create",
-        "save": "Save changes"
+        "save": "Save changes",
+        "field_name_help": "The name the player will use; it must be unique in the organization.",
+        "field_kind": "Output kind",
+        "field_kind_placeholder": "Pick the output kind",
+        "field_kind_help": "Decides whether an item type and a pin are needed and which config keys apply.",
+        "field_kind_immutable": "The output kind of a port cannot be changed.",
+        "field_type_help": "Only item types of the same output kind are listed.",
+        "field_type_empty_for_kind": "There is no item type of kind “{kind}”. Create one or give an existing type this kind.",
+        "infrastructure_help": "Infrastructure port: it belongs to no item type.",
+        "pin_reserved": "Reserved pin: {reason}.",
+        "pin_not_ws281x": "This pin cannot drive a WS281x strip (use 12, 18, 13, 19, 10 or 21).",
+        "pin_ws281x_channel": "{via} pin: the strip must use channel {channel}.",
+        "config_title": "Configuration",
+        "config_default": "default {value}",
+        "config_enabled": "Enabled",
+        "strip_placeholder": "Pick the strip",
+        "strip_empty": "Create a “LED strip” port first.",
+        "advanced_title": "Advanced: legacy parameters ({n})",
+        "advanced_help": "Legacy typed parameters are kept for compatibility; the player only uses the configuration.",
+        "catalog_error": "The output catalog could not be loaded."
       },
       "delete": {
         "confirm_title": "Delete port",
@@ -684,6 +742,26 @@
       "not_available": {
         "title": "Feature not available",
         "body": "Ports are only available for enabled organizations. Contact an administrator if you think you should have access."
+      },
+      "config": {
+        "dma": "DMA channel",
+        "channel": "PWM channel",
+        "length": "LED count",
+        "brightness": "Brightness",
+        "freq_hz": "Frequency (Hz)",
+        "invert": "Inverted signal",
+        "strip": "Strip",
+        "first": "First LED",
+        "last": "Last LED",
+        "pinR": "Motor pin R (lower)",
+        "pinL": "Motor pin L (raise)",
+        "sensorPin": "IR sensor pin",
+        "downTime": "Lowering time (s)"
+      },
+      "config_help": {
+        "first": "Segments may run backwards (first > last).",
+        "last": "Between 0 and the strip LED count minus 1.",
+        "strip": "Name of a LED strip port."
       }
     },
     "account": {
@@ -1217,6 +1295,15 @@
         "not_found": "Item not found."
       },
       "new_breadcrumb": "New"
+    },
+    "kinds": {
+      "relay": "Relay",
+      "led_strip": "LED strip",
+      "led_segment": "LED segment",
+      "motor": "Motor",
+      "audio": "Audio",
+      "video": "Video",
+      "button": "Button"
     }
   },
   "invitations": {
@@ -1271,7 +1358,17 @@
     },
     "piece_types": {
       "not_found": "Piece type not found.",
-      "attribute_invalid": "The attribute is not valid."
+      "attribute_invalid": "The attribute is not valid.",
+      "kind_invalid": "Output kind “{kind}” does not exist in the catalog.",
+      "kind_change_invalid": "Cannot change the output kind: action “{action}” is not valid for {kind}.",
+      "kind_in_use": "Cannot change the output kind: port “{port}” is of kind {kind}.",
+      "action_not_in_catalog": "Action “{action}” does not exist for outputs of kind {kind}.",
+      "action_param_unknown": "Parameter “{param}” does not exist in catalog action “{action}”.",
+      "action_param_missing": "The action requires the mandatory parameter “{param}”.",
+      "action_param_type_mismatch": "Parameter “{param}” must be of type {expected}.",
+      "action_param_options_invalid": "The options of “{param}” must be among: {values}.",
+      "action_param_static_invalid": "The fixed value of “{param}” is not valid for its type.",
+      "action_duration_param_mismatch": "The duration parameter must be “{expected}”, not “{param}”."
     },
     "locations": {
       "not_found": "Location not found."
@@ -1299,6 +1396,31 @@
     },
     "server": {
       "internal_error": "Internal server error."
+    },
+    "ports": {
+      "not_found": "Port not found.",
+      "name_required": "The port name is required.",
+      "name_conflict": "A port with that name already exists in the organization.",
+      "piece_type_required": "This output kind needs an item type.",
+      "pin_invalid": "The pin must be a valid Raspberry Pi GPIO (0–27).",
+      "pin_conflict": "A port with that pin already exists in the organization.",
+      "kind_required": "The output kind of the port is required.",
+      "kind_invalid": "Output kind “{kind}” does not exist in the catalog.",
+      "kind_immutable": "The output kind of a port cannot be changed; delete it and create it again.",
+      "pin_not_allowed": "Ports of kind {kind} carry no pin; the address goes in the config.",
+      "pin_reserved": "Pin {pin} is reserved on the board and cannot be used.",
+      "piece_type_kind_mismatch": "Item type “{type}” is of kind {typeKind}, but the port is {portKind}.",
+      "config_unknown_key": "The port config has an unknown key: “{key}”.",
+      "config_missing_key": "The port config requires “{key}”.",
+      "config_type_mismatch": "In the port config, “{key}” must be of type {type}.",
+      "config_out_of_range": "In the port config, “{key}” must be between {min} and {max}.",
+      "motor_pins_not_distinct": "The three motor pins must be different.",
+      "strip_pin_unsupported": "Pin {pin} cannot drive WS281x strips on this board.",
+      "strip_channel_mismatch": "The strip on pin {pin} must use channel {channel}.",
+      "segment_strip_not_found": "Strip “{strip}” does not exist as a LED strip port in the organization.",
+      "segment_out_of_range": "Segment {first}–{last} falls outside the strip (0–{max}).",
+      "strip_shrink_breaks_segment": "Cannot shorten the strip: segment “{segment}” ({first}–{last}) would fall outside.",
+      "strip_in_use": "The strip has segments that depend on it: {segments}."
     }
   }
 }

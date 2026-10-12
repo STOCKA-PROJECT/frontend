@@ -9,13 +9,16 @@ const props = defineProps<{
 const { t } = useI18n()
 const ports = usePortsStore()
 const pieceTypes = usePieceTypesStore()
+const contract = useContractStore()
 const toast = useToastStore()
 const apiError = useApiError()
 
 const canWrite = computed(() => props.role === 'OWNER' || props.role === 'MANAGER')
 
-// Ports are related to an existing piece type; the form needs the org's piece types to choose from.
-const pieceTypeOptions = computed(() => pieceTypes.list.map(t => ({ id: t.id, name: t.name })))
+// The form filters piece types by the chosen kind, so it needs each type's kind.
+const pieceTypeOptions = computed(() => pieceTypes.list.map(t => ({ id: t.id, name: t.name, kind: t.kind ?? null })))
+// Segments reference a strip by name.
+const stripNames = computed(() => ports.list.filter(p => p.kind === 'led_strip').map(p => p.name))
 
 function notifyError(e: unknown) {
   const view = apiError(e)
@@ -26,7 +29,8 @@ async function loadAll() {
   try {
     await Promise.all([
       ports.fetchAll(props.orgSlug),
-      pieceTypes.fetchAll(props.orgSlug)
+      pieceTypes.fetchAll(props.orgSlug),
+      contract.load()
     ])
   } catch (e) {
     notifyError(e)
@@ -145,6 +149,7 @@ const showInitialLoading = computed(() => ports.loading && !ports.loaded)
       :open="formDialog.open"
       :mode="formDialog.mode"
       :piece-types="pieceTypeOptions"
+      :strips="stripNames"
       :initial="formDialog.target"
       :loading="formDialog.loading"
       :error-msg="formDialog.error"
@@ -166,19 +171,20 @@ const showInitialLoading = computed(() => ports.loading && !ports.loaded)
 </template>
 
 <style scoped>
+/* Brandbook: l'acció principal de la vista en brand, control-md. */
 .new-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 38px;
-  padding: 0 14px;
-  border-radius: 9px;
-  font-size: 13.5px;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 500;
-  border: 1px solid var(--c-ink);
-  background: var(--c-ink);
-  color: var(--c-bg-card);
-  transition: background .15s;
+  border: 1px solid var(--c-accent);
+  background: var(--c-accent);
+  color: var(--c-on-accent, #fff);
+  transition: background .12s, border-color .12s;
 }
-.new-btn:hover { background: color-mix(in oklab, var(--c-ink) 90%, transparent); }
+.new-btn:hover { border-color: var(--c-accent-ink); background: var(--c-accent-ink); }
 </style>

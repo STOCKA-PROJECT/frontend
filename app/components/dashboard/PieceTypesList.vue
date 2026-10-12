@@ -61,6 +61,7 @@ const { t } = useI18n()
           :class="{ 'is-active': selectedId === t_.id }"
           @click="emit('select', t_.id)">
           <span class="truncate font-medium">{{ t_.name }}</span>
+          <span v-if="t_.kind" class="kind-chip">{{ t(`dashboard.kinds.${t_.kind}`) }}</span>
           <span class="ml-auto count-chip">
             {{ t('dashboard.pieceTypes.list.attribute_count', { n: t_.attributes.length }) }}
           </span>
@@ -167,4 +168,21 @@ const { t } = useI18n()
 @media (hover: none) and (pointer: coarse) {
   .row-actions { display: flex !important; }
 }
+
+.kind-chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 3px;
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.kind-chip::before { content: ""; width: 5px; height: 5px; border-radius: 1px; background: currentColor; }
 </style>

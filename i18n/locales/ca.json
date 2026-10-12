@@ -524,7 +524,12 @@
         "field_name": "Nom",
         "field_name_placeholder": "Eina, Equip informàtic…",
         "create": "Crear",
-        "save": "Desar"
+        "save": "Desar",
+        "edit_title": "Edita el tipus",
+        "field_kind": "Tipus de sortida",
+        "field_kind_none": "Només inventari (sense sortida)",
+        "field_kind_help": "Si el tipus controla una peça del pessebre, tria quina sortida fa servir: les seves accions i els seus ports hauran de ser d’aquest tipus.",
+        "field_kind_change_help": "Canviar-lo torna a validar les accions del tipus; no es pot treure un cop assignat."
       },
       "attribute_form": {
         "new_title": "Nou atribut a \"{type}\"",
@@ -595,7 +600,12 @@
         "is_duration_hint": "El valor (en segons) serà la longitud del clip a la línia de temps. No hi haurà un camp de durada a part.",
         "static_duration_value": "Durada fixa (s)",
         "create": "Crear acció",
-        "save": "Desar canvis"
+        "save": "Desar canvis",
+        "catalog_hint": "Aquest tipus condueix una sortida de tipus «{kind}»: l’acció i els paràmetres surten del catàleg del reproductor.",
+        "field_name_catalog_placeholder": "Tria una acció del catàleg",
+        "field_name_catalog_help": "En triar-la s’omplen els paràmetres que admet; decideix quins es fixen i quins es posen a cada clip.",
+        "name_not_in_catalog": "Aquesta acció no existeix al catàleg per a aquest tipus de sortida.",
+        "params_not_in_catalog": "Paràmetres que el catàleg no coneix per a aquesta acció: {names}."
       },
       "actions": {
         "title": "Accions ({n})",
@@ -644,6 +654,34 @@
         "options_required": "Afegeix almenys una opció.",
         "type_required": "Selecciona un tipus de dada.",
         "eligibleRoles_required": "Selecciona almenys un rol elegible."
+      },
+      "catalogActions": {
+        "turn_on": "Encendre",
+        "turn_off": "Apagar",
+        "focoOn": "Encendre el focus",
+        "focoOff": "Apagar el focus",
+        "setBrightness": "Brillantor de la tira",
+        "clear": "Apagar els LED",
+        "fill": "Omplir de color",
+        "animate": "Animació",
+        "start_up": "Pujar",
+        "start_down": "Baixar",
+        "stop": "Aturar",
+        "play": "Reproduir"
+      },
+      "catalogParams": {
+        "time": "Temps (s)",
+        "hold_time": "Temps premut (s)",
+        "pulse_delay": "Retard del pols (s)",
+        "brightness": "Brillantor",
+        "color": "Color",
+        "first": "Primer LED",
+        "last": "Últim LED",
+        "animation_type": "Animació",
+        "duration": "Durada (s)",
+        "from_color": "Color inicial",
+        "audio_name": "Fitxer d’àudio",
+        "video_name": "Fitxer de vídeo"
       }
     },
     "ports": {
@@ -657,7 +695,8 @@
         "no_parameters": "Sense paràmetres",
         "unknown_type": "Tipus eliminat",
         "edit": "Edita",
-        "delete": "Elimina"
+        "delete": "Elimina",
+        "infrastructure": "Infraestructura"
       },
       "form": {
         "new_title": "Nou port",
@@ -674,7 +713,26 @@
         "add_parameter": "Afegeix un paràmetre",
         "no_parameters": "Aquest port no té paràmetres. Afegeix-ne un si cal.",
         "create": "Crea",
-        "save": "Desa els canvis"
+        "save": "Desa els canvis",
+        "field_name_help": "És el nom que farà servir el reproductor; ha de ser únic a l’organització.",
+        "field_kind": "Tipus de sortida",
+        "field_kind_placeholder": "Tria el tipus de sortida",
+        "field_kind_help": "Determina si cal un tipus d’article, un pin i quina configuració porta.",
+        "field_kind_immutable": "El tipus de sortida d’un port no es pot canviar.",
+        "field_type_help": "Només es mostren els tipus d’article del mateix tipus de sortida.",
+        "field_type_empty_for_kind": "No hi ha cap tipus d’article de sortida «{kind}». Crea’n un o assigna-li aquest tipus de sortida.",
+        "infrastructure_help": "Port d’infraestructura: no pertany a cap tipus d’article.",
+        "pin_reserved": "Pin reservat: {reason}.",
+        "pin_not_ws281x": "Aquest pin no pot controlar una tira WS281x (usa 12, 18, 13, 19, 10 o 21).",
+        "pin_ws281x_channel": "Pin {via}: la tira ha d’usar el canal {channel}.",
+        "config_title": "Configuració",
+        "config_default": "per defecte {value}",
+        "config_enabled": "Activat",
+        "strip_placeholder": "Tria la tira",
+        "strip_empty": "Crea primer un port de tipus «Tira LED».",
+        "advanced_title": "Avançat: paràmetres antics ({n})",
+        "advanced_help": "Els paràmetres tipats antics es conserven per compatibilitat; el reproductor només fa servir la configuració.",
+        "catalog_error": "No s’ha pogut carregar el catàleg de sortides."
       },
       "delete": {
         "confirm_title": "Eliminar port",
@@ -684,6 +742,26 @@
       "not_available": {
         "title": "Funció no disponible",
         "body": "Els ports només estan disponibles per a organitzacions habilitades. Contacta amb un administrador si creus que hi hauries de tenir accés."
+      },
+      "config": {
+        "dma": "Canal DMA",
+        "channel": "Canal PWM",
+        "length": "Nombre de LED",
+        "brightness": "Brillantor",
+        "freq_hz": "Freqüència (Hz)",
+        "invert": "Senyal invertit",
+        "strip": "Tira",
+        "first": "Primer LED",
+        "last": "Últim LED",
+        "pinR": "Pin motor R (baixar)",
+        "pinL": "Pin motor L (pujar)",
+        "sensorPin": "Pin del sensor IR",
+        "downTime": "Temps de baixada (s)"
+      },
+      "config_help": {
+        "first": "Els segments poden anar al revés (primer > últim).",
+        "last": "Dins de 0 i el nombre de LED de la tira menys 1.",
+        "strip": "Nom d’un port de tipus Tira LED."
       }
     },
     "account": {
@@ -1217,6 +1295,15 @@
         "not_found": "Article no trobat."
       },
       "new_breadcrumb": "Nou"
+    },
+    "kinds": {
+      "relay": "Relé",
+      "led_strip": "Tira LED",
+      "led_segment": "Segment LED",
+      "motor": "Motor",
+      "audio": "Àudio",
+      "video": "Vídeo",
+      "button": "Polsador"
     }
   },
   "invitations": {
@@ -1271,7 +1358,17 @@
     },
     "piece_types": {
       "not_found": "Tipus d'article no trobat.",
-      "attribute_invalid": "L'atribut no és vàlid."
+      "attribute_invalid": "L'atribut no és vàlid.",
+      "kind_invalid": "El tipus de sortida «{kind}» no existeix al catàleg.",
+      "kind_change_invalid": "No es pot canviar el tipus de sortida: l’acció «{action}» no és vàlida per a {kind}.",
+      "kind_in_use": "No es pot canviar el tipus de sortida: el port «{port}» és de tipus {kind}.",
+      "action_not_in_catalog": "L’acció «{action}» no existeix per a sortides de tipus {kind}.",
+      "action_param_unknown": "El paràmetre «{param}» no existeix a l’acció «{action}» del catàleg.",
+      "action_param_missing": "L’acció necessita el paràmetre obligatori «{param}».",
+      "action_param_type_mismatch": "El paràmetre «{param}» ha de ser de tipus {expected}.",
+      "action_param_options_invalid": "Les opcions de «{param}» han de ser d’entre: {values}.",
+      "action_param_static_invalid": "El valor fix de «{param}» no és vàlid per al seu tipus.",
+      "action_duration_param_mismatch": "El paràmetre de durada ha de ser «{expected}», no «{param}»."
     },
     "locations": {
       "not_found": "Ubicació no trobada."
@@ -1299,6 +1396,31 @@
     },
     "server": {
       "internal_error": "Error intern del servidor."
+    },
+    "ports": {
+      "not_found": "Port no trobat.",
+      "name_required": "El nom del port és obligatori.",
+      "name_conflict": "Ja existeix un port amb aquest nom a l’organització.",
+      "piece_type_required": "Aquest tipus de sortida necessita un tipus d’article.",
+      "pin_invalid": "El pin ha de ser un GPIO vàlid de la Raspberry Pi (0–27).",
+      "pin_conflict": "Ja existeix un port amb aquest pin a l’organització.",
+      "kind_required": "El tipus de sortida del port és obligatori.",
+      "kind_invalid": "El tipus de sortida «{kind}» no existeix al catàleg.",
+      "kind_immutable": "No es pot canviar el tipus de sortida d’un port; elimina’l i crea’l de nou.",
+      "pin_not_allowed": "Els ports de tipus {kind} no porten pin; l’adreça va a la configuració.",
+      "pin_reserved": "El pin {pin} està reservat a la placa i no es pot usar.",
+      "piece_type_kind_mismatch": "El tipus d’article «{type}» és de sortida {typeKind}, però el port és {portKind}.",
+      "config_unknown_key": "La configuració del port té una clau desconeguda: «{key}».",
+      "config_missing_key": "La configuració del port necessita «{key}».",
+      "config_type_mismatch": "A la configuració del port, «{key}» ha de ser de tipus {type}.",
+      "config_out_of_range": "A la configuració del port, «{key}» ha d’estar entre {min} i {max}.",
+      "motor_pins_not_distinct": "Els tres pins del motor han de ser diferents.",
+      "strip_pin_unsupported": "El pin {pin} no admet tires WS281x en aquesta placa.",
+      "strip_channel_mismatch": "La tira al pin {pin} ha d’usar el canal {channel}.",
+      "segment_strip_not_found": "La tira «{strip}» no existeix com a port de tipus Tira LED a l’organització.",
+      "segment_out_of_range": "El segment {first}–{last} surt de la tira (0–{max}).",
+      "strip_shrink_breaks_segment": "No es pot escurçar la tira: el segment «{segment}» ({first}–{last}) en quedaria fora.",
+      "strip_in_use": "La tira té segments que en depenen: {segments}."
     }
   }
 }

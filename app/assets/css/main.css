@@ -4,35 +4,48 @@
 
 @layer base {
   :root {
-    --c-bg: #f4efe6;
-    --c-bg-card: #faf6ee;
-    --c-bg-alt: #ede7da;
-    --c-bg-soft: #efe9dc;
-    --c-field: #fffdf8;
+    /* Tokens del brandbook de Stocka (tema clar). Els noms --c-* es conserven; els valors són els
+       del sistema de disseny: superfícies fredes, verd petroli per a l'acció, ambre com a realç. */
+    --c-bg: #f4f6f7;            /* surface-page */
+    --c-bg-card: #ffffff;       /* surface-panel */
+    --c-bg-alt: #ebeef0;        /* surface-sunken */
+    --c-bg-soft: #eef3f4;       /* surface-hover */
+    --c-field: #ffffff;
     --c-field-focus: #ffffff;
+    --c-selected: #ddeef0;      /* surface-selected */
 
-    --c-ink: #2a2722;
-    --c-ink-soft: #6b655b;
-    --c-ink-muted: #9a9389;
+    --c-ink: #16212b;
+    --c-ink-soft: #46535f;      /* ink-muted */
+    --c-ink-muted: #5f6c78;     /* ink-subtle */
 
-    --c-line: #e4ddce;
-    --c-line-strong: #d4ccba;
+    --c-line: #e1e5e8;          /* line-subtle */
+    --c-line-strong: #c5ccd2;   /* line-strong */
+    --c-line-control: #77838e;  /* line-control */
 
-    --c-accent: #6b8068;
-    --c-accent-ink: #3c5239;
-    --c-accent-soft: #d9e3d4;
+    --c-accent: #0b5a66;        /* brand */
+    --c-accent-ink: #084752;    /* brand-hover */
+    --c-accent-soft: #ddeef0;   /* brand-soft */
+    --c-on-accent: #ffffff;     /* on-brand */
+    --c-highlight: #f0a63a;     /* accent (ambre) */
+    --c-highlight-ink: #8a5200;
+    --c-on-highlight: #2b1b00;
 
-    --c-danger: #b5534b;
-    --c-danger-soft: #f1d7d3;
-    --c-warn: #c48c3a;
-    --c-warn-bg: #f3ddd5;
-    --c-warn-ink: #8f3e34;
-    --c-warn-soft: #f4e4c8;
-    --c-ok: var(--c-accent);
+    --c-danger: #a8281d;
+    --c-danger-soft: #fbe3df;
+    --c-warn: #8a4b00;
+    --c-warn-bg: #fcebd0;
+    --c-warn-ink: #8a4b00;
+    --c-warn-soft: #fcebd0;
+    --c-ok: #0f6b4f;
+    --c-ok-soft: #ddf2e9;
 
-    --shadow-sm: 0 1px 2px rgba(60, 50, 30, .04);
-    --shadow-md: 0 4px 20px rgba(60, 50, 30, .06), 0 1px 2px rgba(60, 50, 30, .04);
-    --shadow-lg: 0 20px 60px rgba(60, 50, 30, .08), 0 2px 6px rgba(60, 50, 30, .04);
+    --shadow-sm: 0 1px 2px #16212b14;
+    --shadow-md: 0 1px 2px #16212b14, 0 4px 12px #16212b1f;
+    --shadow-lg: 0 8px 24px #16212b29, 0 24px 48px -8px #16212b33;
+
+    --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
     --nav-h: 68px;
     --sidebar-w: 248px;
@@ -45,8 +58,6 @@
 
   body {
     @apply min-h-screen bg-bg font-sans text-ink antialiased;
-    font-feature-settings: "cv11", "ss01", "ss03";
-    letter-spacing: -0.005em;
   }
 
   *:focus-visible {

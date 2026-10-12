@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { FetchError } from 'ofetch'
 import type {
   CreatePieceTypeActionDto,
   CreatePieceTypeAttributeDto,
@@ -9,6 +8,7 @@ import type {
   UpdatePieceTypeActionDto,
   UpdatePieceTypeAttributeDto
 } from '~/types/api'
+import type { OutputKind } from '~/types/contract'
 
 const props = withDefaults(defineProps<{
   orgSlug: string
@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<{
 
 const { t } = useI18n()
 const pieceTypes = usePieceTypesStore()
+const apiError = useApiError()
 
 const selectedId = ref<number | null>(null)
 
@@ -47,12 +48,10 @@ onBeforeUnmount(() => {
   if (errorTimer) clearTimeout(errorTimer)
 })
 
+/** Localized backend message by error code (errors.<code>), or the given fallback. */
 function extractErrorMessage(e: unknown, fallback: string): string {
-  if (e instanceof FetchError) {
-    const data = e.response?._data as { message?: string } | undefined
-    return data?.message ?? fallback
-  }
-  return fallback
+  const view = apiError(e)
+  return view.code === 'unknown' ? fallback : view.description
 }
 
 async function loadAll() {
@@ -92,12 +91,14 @@ const formDialog = ref<{
   mode: 'create' | 'rename'
   targetId?: number
   initialName: string
+  initialKind: OutputKind | null
   loading: boolean
   error: string | null
 }>({
   open: false,
   mode: 'create',
   initialName: '',
+  initialKind: null,
   loading: false,
   error: null
 })
@@ -107,6 +108,7 @@ function openCreateType() {
     open: true,
     mode: 'create',
     initialName: '',
+    initialKind: null,
     loading: false,
     error: null
   }
@@ -119,6 +121,7 @@ function openRenameType(id: number) {
     mode: 'rename',
     targetId: id,
     initialName: t_?.name ?? '',
+    initialKind: t_?.kind ?? null,
     loading: false,
     error: null
   }
@@ -128,15 +131,20 @@ function closeFormDialog() {
   formDialog.value = { ...formDialog.value, open: false, error: null, loading: false }
 }
 
-async function submitFormDialog(payload: { name: string }) {
+async function submitFormDialog(payload: { name: string, kind: OutputKind | null }) {
   formDialog.value.loading = true
   formDialog.value.error = null
   try {
     if (formDialog.value.mode === 'create') {
-      const created = await pieceTypes.create(props.orgSlug, { name: payload.name })
+      const created = await pieceTypes.create(props.orgSlug, { name: payload.name, ...(payload.kind ? { kind: payload.kind } : {}) })
       selectedId.value = created.id
     } else if (formDialog.value.targetId) {
-      await pieceTypes.update(props.orgSlug, formDialog.value.targetId, { name: payload.name })
+      // Kind changes are validated by the backend against the type's actions and ports.
+      const kindChanged = payload.kind !== null && payload.kind !== formDialog.value.initialKind
+      await pieceTypes.update(props.orgSlug, formDialog.value.targetId, {
+        name: payload.name,
+        ...(kindChanged ? { kind: payload.kind! } : {})
+      })
     }
     closeFormDialog()
   } catch (e) {
@@ -448,6 +456,7 @@ const attrDialogTypeName = computed(() => {
       :open="formDialog.open"
       :mode="formDialog.mode"
       :initial-name="formDialog.initialName"
+      :initial-kind="formDialog.initialKind"
       :loading="formDialog.loading"
       :error-msg="formDialog.error"
       @close="closeFormDialog"
@@ -469,6 +478,7 @@ const attrDialogTypeName = computed(() => {
       :open="actionFormDialog.open"
       :mode="actionFormDialog.mode"
       :type-name="actionDialogTypeName"
+      :kind="selected?.kind ?? null"
       :initial="actionFormDialog.initial"
       :loading="actionFormDialog.loading"
       :error-msg="actionFormDialog.error"

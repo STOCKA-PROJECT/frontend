@@ -1,3 +1,5 @@
+import type { OutputKind } from '~/types/contract'
+
 export type Language = 'ES' | 'EN' | 'CA'
 
 export type RoleName = 'USER' | 'ADMIN'
@@ -448,6 +450,8 @@ export interface PieceTypeResponseDto {
   id: number
   organizationId: number
   name: string
+  /** Output kind the type drives (catalog id), or null for inventory-only types. */
+  kind?: OutputKind | null
   createdAt: string
   updatedAt: string
   attributes: PieceTypeAttributeResponseDto[]
@@ -464,11 +468,14 @@ export interface CreatePieceTypeAttributeDto {
 
 export interface CreatePieceTypeDto {
   name: string
+  kind?: OutputKind | null
   attributes?: CreatePieceTypeAttributeDto[]
 }
 
 export interface UpdatePieceTypeDto {
   name?: string
+  /** Changing the kind re-validates the type's actions; clearing it is not supported. */
+  kind?: OutputKind
 }
 
 export interface UpdatePieceTypeAttributeDto {
@@ -541,24 +548,36 @@ export interface UpdatePieceTypeActionDto {
 export interface PortResponseDto {
   id: number
   name: string
-  pieceTypeId: number
+  /** Output kind from the catalog; immutable after creation. */
+  kind: OutputKind
+  /** Null for infrastructure ports (strips, button). */
+  pieceTypeId: number | null
   pieceTypeName: string | null
+  /** GPIO pin for kinds that have one (relay, led_strip, button); null otherwise. */
   pin: number | null
+  /** Kind-specific keys validated against the catalog (never includes `pin`). */
+  config: Record<string, unknown>
   position: number
+  /** Legacy typed parameters; the show package only uses `config`. */
   parameters: ActionParameterDto[]
 }
 
 export interface CreatePortDto {
   name: string
-  pieceTypeId: number
-  pin: number
-  parameters: ActionParameterDto[]
+  kind: OutputKind
+  pieceTypeId?: number | null
+  pin?: number | null
+  config?: Record<string, unknown>
+  parameters?: ActionParameterDto[]
 }
 
 export interface UpdatePortDto {
   name?: string
-  pieceTypeId?: number
-  pin?: number
+  /** Only the current kind is accepted: the kind of a port cannot change. */
+  kind?: OutputKind
+  pieceTypeId?: number | null
+  pin?: number | null
+  config?: Record<string, unknown>
   parameters?: ActionParameterDto[]
 }
 
