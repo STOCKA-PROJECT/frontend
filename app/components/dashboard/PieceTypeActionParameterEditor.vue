@@ -289,11 +289,12 @@ watch([displayName, name, type, required, validators, dynamic, staticValue, isDu
       <div v-if="colorPickable" class="flex flex-col gap-1">
         <span class="field-label">{{ t('dashboard.pieceTypes.action_form.parameter_static_value') }}</span>
         <div class="flex items-center gap-2">
+          <!-- Always enabled: picking a colour is how an unset value gets its first colour. -->
           <input
             type="color"
-            class="h-9 w-11 flex-shrink-0 cursor-pointer rounded-[6px] border border-line bg-bg-card p-0.5 disabled:cursor-not-allowed disabled:opacity-40"
-            :value="staticHex ?? '#000000'"
-            :disabled="colorUnset"
+            class="h-9 w-11 flex-shrink-0 cursor-pointer rounded-[6px] border border-line bg-bg-card p-0.5"
+            :class="colorUnset ? 'opacity-40' : ''"
+            :value="staticHex ?? '#ffffff'"
             @input="staticValue = ($event.target as HTMLInputElement).value">
           <span class="font-mono text-[12.5px] text-ink-soft">{{ colorUnset ? '—' : staticHex }}</span>
           <label v-if="!required" class="ml-auto flex cursor-pointer items-center gap-1.5 text-[12px] text-ink-muted">
