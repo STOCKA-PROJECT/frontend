@@ -6,6 +6,7 @@ import type {
   UpdatePieceTypeActionDto
 } from '~/types/api'
 import { attributeTypeFor, durationParamOf, type CatalogAction, type CatalogParam, type OutputKind } from '~/types/contract'
+import { parseRgb, parseRgbList } from '~/utils/color'
 import { ACTION_NAME_PATTERN, slugifyName } from '~/utils/attributeValidators'
 
 // Create/edit an action of a piece type. When the type has an output kind, the technical name is
@@ -146,6 +147,43 @@ const missingCatalogParams = computed<Array<{ name: string, spec: CatalogParam }
   }
   return Object.entries(pool).filter(([n]) => !present.has(n)).map(([name, spec]) => ({ name, spec }))
 })
+
+// ---- LED preview (animation fixed on the action) ----
+const previewAction = computed<'animate' | 'fill' | 'clear' | null>(() => {
+  if (!props.kind || !['led_strip', 'led_segment'].includes(props.kind)) return null
+  return name.value === 'animate' || name.value === 'fill' || name.value === 'clear' ? name.value : null
+})
+/** Animation fixed on the action (a dynamic animation_type is chosen per clip, so there is nothing to preview). */
+const previewAnimation = computed<string | null>(() => {
+  const anim = params.value.find(d => d.value.name === 'animation_type')?.value
+  return anim && !anim.dynamic && anim.staticValue ? anim.staticValue : null
+})
+/** Fixed values coerced to catalog values; dynamic or missing parameters take the catalog default. */
+const previewParams = computed<Record<string, unknown>>(() => {
+  const action = catalogAction.value
+  if (!action) return {}
+  const pool: Record<string, CatalogParam> = { ...action.params }
+  if (previewAnimation.value) Object.assign(pool, action.animations?.[previewAnimation.value]?.params ?? {})
+  const out: Record<string, unknown> = {}
+  for (const [pname, spec] of Object.entries(pool)) {
+    const draft = params.value.find(d => d.value.name === pname)?.value
+    const raw = draft && !draft.dynamic ? draft.staticValue : null
+    let value: unknown = spec.default
+    if (raw != null && raw !== '') {
+      if (spec.type === 'rgb') value = parseRgb(raw) ?? spec.default
+      else if (spec.type === 'rgb_list') value = parseRgbList(raw) ?? spec.default
+      else if (spec.type === 'int' || spec.type === 'number') value = Number.isFinite(Number(raw)) ? Number(raw) : spec.default
+      else value = raw
+    }
+    out[pname] = value
+  }
+  return out
+})
+const previewDuration = computed(() => {
+  const d = previewParams.value.duration
+  return typeof d === 'number' && d > 0 ? d : null
+})
+const showPreview = computed(() => previewAction.value !== null && (previewAction.value !== 'animate' || previewAnimation.value !== null))
 
 function addCatalogParam(pname: string, spec: CatalogParam) {
   const action = catalogAction.value
@@ -330,6 +368,16 @@ function submit() {
               <p v-if="unknownParams.length" class="field-error">
                 {{ t('dashboard.pieceTypes.action_form.params_not_in_catalog', { names: unknownParams.join(', ') }) }}
               </p>
+
+              <DashboardLedPreview
+                v-if="showPreview && previewAction"
+                :action="previewAction"
+                :animation="previewAnimation"
+                :params="previewParams"
+                :pixels="44"
+                :duration-sec="previewDuration"
+                :first="typeof previewParams.first === 'number' ? previewParams.first : null"
+                :last="typeof previewParams.last === 'number' ? previewParams.last : null" />
 
               <!-- Catalog parameters not in the form yet: one click adds them typed and bound dynamically -->
               <div v-if="missingCatalogParams.length" class="flex flex-wrap items-center gap-1.5">
