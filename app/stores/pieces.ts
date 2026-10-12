@@ -339,11 +339,14 @@ export const usePiecesStore = defineStore('pieces', () => {
     orgSlug: string,
     pieceId: number,
     file: File,
-    kind: PieceAttachmentKind
+    kind: PieceAttachmentKind,
+    extra?: { durationMs?: number | null }
   ) {
     const api = useApi()
     const form = new FormData()
     form.append('file', file)
+    // Audio length measured in the browser: the backend stores it, the timeline editor uses it.
+    if (extra?.durationMs != null) form.append('durationMs', String(Math.round(extra.durationMs)))
     const created = await api<PieceAttachmentResponseDto>(
       `/organizations/${orgSlug}/pieces/${pieceId}/attachments`,
       {

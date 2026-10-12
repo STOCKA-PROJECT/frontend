@@ -1239,6 +1239,12 @@
         "uploading": "Pujant…",
         "confirm_delete_title": "Elimina adjunt",
         "confirm_delete_body": "Vols eliminar l'adjunt \"{name}\"? Aquesta acció no es pot desfer.",
+        "audio_title": "Àudio",
+        "audio_empty": "Encara no hi ha fitxers d'àudio. Puja'n un per poder-lo posar a la línia de temps.",
+        "audio_hint": "Formats que reprodueix el pessebre: mp3, wav, ogg, flac i m4a (màx. 50 MB). A l'editor de línia de temps es poden posar sencers o només un tram.",
+        "upload_audio": "Puja àudio",
+        "play": "Reprodueix",
+        "pause": "Pausa",
         "errors": {
           "too_large_local": "El fitxer \"{file}\" supera el màxim de {max}.",
           "upload": "No s'ha pogut pujar el fitxer.",
@@ -1401,7 +1407,8 @@
     },
     "upload": {
       "too_large": "El fitxer és massa gran.",
-      "invalid_kind": "Tipus de fitxer no permès."
+      "invalid_kind": "Tipus de fitxer no permès.",
+      "invalid_duration": "La durada de l'àudio no és vàlida."
     },
     "validation": {
       "required": "Aquest camp és obligatori.",

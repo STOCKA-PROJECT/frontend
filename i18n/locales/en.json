@@ -1239,6 +1239,12 @@
         "uploading": "Uploading…",
         "confirm_delete_title": "Delete attachment",
         "confirm_delete_body": "Delete the attachment \"{name}\"? This action cannot be undone.",
+        "audio_title": "Audio",
+        "audio_empty": "No audio files yet. Upload one to place it on the timeline.",
+        "audio_hint": "Formats the player reproduces: mp3, wav, ogg, flac and m4a (max 50 MB). In the timeline editor they can be used whole or trimmed.",
+        "upload_audio": "Upload audio",
+        "play": "Play",
+        "pause": "Pause",
         "errors": {
           "too_large_local": "The file \"{file}\" exceeds the {max} limit.",
           "upload": "The file could not be uploaded.",
@@ -1401,7 +1407,8 @@
     },
     "upload": {
       "too_large": "The file is too large.",
-      "invalid_kind": "File type not allowed."
+      "invalid_kind": "File type not allowed.",
+      "invalid_duration": "The audio duration is not valid."
     },
     "validation": {
       "required": "This field is required.",

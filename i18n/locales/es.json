@@ -1239,6 +1239,12 @@
         "set_cover": "Hacer portada",
         "confirm_delete_title": "Eliminar adjunto",
         "confirm_delete_body": "¿Eliminar el adjunto \"{name}\"? Esta acción no se puede deshacer.",
+        "audio_title": "Audio",
+        "audio_empty": "Aún no hay archivos de audio. Sube uno para poder ponerlo en la línea de tiempo.",
+        "audio_hint": "Formatos que reproduce el belén: mp3, wav, ogg, flac y m4a (máx. 50 MB). En el editor de línea de tiempo se pueden poner enteros o solo un tramo.",
+        "upload_audio": "Subir audio",
+        "play": "Reproducir",
+        "pause": "Pausa",
         "errors": {
           "too_large_local": "El archivo \"{file}\" supera el máximo de {max}.",
           "upload": "No se ha podido subir el archivo.",
@@ -1401,7 +1407,8 @@
     },
     "upload": {
       "too_large": "El archivo es demasiado grande.",
-      "invalid_kind": "Tipo de archivo no permitido."
+      "invalid_kind": "Tipo de archivo no permitido.",
+      "invalid_duration": "La duración del audio no es válida."
     },
     "validation": {
       "required": "Este campo es obligatorio.",

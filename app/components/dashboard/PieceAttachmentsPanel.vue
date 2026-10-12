@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PieceAttachmentKind, PieceAttachmentResponseDto } from '~/types/api'
+import { formatAudioDuration, probeAudioDuration } from '~/utils/audio'
 
 const props = defineProps<{
   orgSlug: string
@@ -19,10 +20,14 @@ const apiError = useApiError()
 
 const IMAGE_MAX_BYTES = 25 * 1024 * 1024
 const DOCUMENT_MAX_BYTES = 100 * 1024 * 1024
+const AUDIO_MAX_BYTES = 50 * 1024 * 1024
 const IMAGE_ACCEPT = 'image/jpeg,image/png,image/webp,image/gif'
+// What VLC plays on the belén Raspberry Pi; the backend re-checks the real format from the bytes.
+const AUDIO_ACCEPT = 'audio/mpeg,audio/wav,audio/x-wav,audio/ogg,audio/flac,audio/x-flac,audio/mp4,audio/x-m4a,audio/aac,.mp3,.wav,.ogg,.flac,.m4a'
 
 const imageInput = ref<HTMLInputElement | null>(null)
 const documentInput = ref<HTMLInputElement | null>(null)
+const audioInput = ref<HTMLInputElement | null>(null)
 
 const uploading = ref<PieceAttachmentKind | null>(null)
 const errorMsg = ref<string | null>(null)
@@ -41,6 +46,7 @@ function extractErrorMessage(e: unknown, fallback: string): string {
 
 const images = computed(() => props.attachments.filter(a => a.kind === 'IMAGE'))
 const documents = computed(() => props.attachments.filter(a => a.kind === 'DOCUMENT'))
+const audios = computed(() => props.attachments.filter(a => a.kind === 'AUDIO'))
 
 const blobUrlByAttachmentId = ref<Record<number, string>>({})
 const loadingImageIds = ref<Set<number>>(new Set())
@@ -100,7 +106,7 @@ onBeforeUnmount(() => {
 async function uploadFiles(files: FileList | File[], kind: PieceAttachmentKind) {
   const fileArr = Array.from(files)
   if (fileArr.length === 0) return
-  const limit = kind === 'IMAGE' ? IMAGE_MAX_BYTES : DOCUMENT_MAX_BYTES
+  const limit = kind === 'IMAGE' ? IMAGE_MAX_BYTES : kind === 'AUDIO' ? AUDIO_MAX_BYTES : DOCUMENT_MAX_BYTES
   uploading.value = kind
   try {
     for (const file of fileArr) {
@@ -112,7 +118,9 @@ async function uploadFiles(files: FileList | File[], kind: PieceAttachmentKind) 
         continue
       }
       try {
-        await pieces.uploadAttachment(props.orgSlug, props.pieceId, file, kind)
+        // The backend does not decode audio: the browser measures the length and sends it along.
+        const durationMs = kind === 'AUDIO' ? await probeAudioDuration(file) : null
+        await pieces.uploadAttachment(props.orgSlug, props.pieceId, file, kind, { durationMs })
       } catch (e) {
         showError(extractErrorMessage(e, t('dashboard.pieces.attachments.errors.upload')))
       }
@@ -137,6 +145,56 @@ function onDocumentSelect(e: Event) {
   }
   input.value = ''
 }
+
+function onAudioSelect(e: Event) {
+  const input = e.target as HTMLInputElement
+  if (input.files && input.files.length > 0) {
+    void uploadFiles(input.files, 'AUDIO')
+  }
+  input.value = ''
+}
+
+// ---- audio playback (one <audio> at a time, fed by the cached blob URL) ----
+const playingAudioId = ref<number | null>(null)
+const loadingAudioId = ref<number | null>(null)
+let audioEl: HTMLAudioElement | null = null
+
+function stopAudio() {
+  if (audioEl) {
+    audioEl.pause()
+    audioEl.removeAttribute('src')
+    audioEl = null
+  }
+  playingAudioId.value = null
+}
+
+async function toggleAudio(att: PieceAttachmentResponseDto) {
+  if (playingAudioId.value === att.id) {
+    stopAudio()
+    return
+  }
+  stopAudio()
+  loadingAudioId.value = att.id
+  try {
+    const url = await pieces.fetchAttachmentBlobUrl(props.orgSlug, props.pieceId, att.id)
+    const el = new Audio(url)
+    el.addEventListener('ended', () => { if (audioEl === el) stopAudio() })
+    el.addEventListener('error', () => {
+      if (audioEl === el) stopAudio()
+      showError(t('dashboard.pieces.attachments.errors.download'))
+    })
+    audioEl = el
+    playingAudioId.value = att.id
+    await el.play()
+  } catch (e) {
+    stopAudio()
+    showError(extractErrorMessage(e, t('dashboard.pieces.attachments.errors.download')))
+  } finally {
+    loadingAudioId.value = null
+  }
+}
+
+onBeforeUnmount(stopAudio)
 
 const lightboxOpen = ref(false)
 const lightboxUrl = ref<string | null>(null)
@@ -182,6 +240,7 @@ async function confirmDelete() {
   const id = confirmDeleteId.value
   if (id == null) return
   deletingId.value = id
+  if (playingAudioId.value === id) stopAudio()
   try {
     await pieces.deleteAttachment(props.orgSlug, props.pieceId, id)
     confirmDeleteId.value = null
@@ -238,6 +297,25 @@ async function confirmDelete() {
         multiple
         class="hidden"
         @change="onDocumentSelect"
+      >
+      <button
+        type="button"
+        class="upload-btn"
+        :disabled="uploading !== null"
+        @click="audioInput?.click()"
+      >
+        <DashboardIcon name="music" :size="14" />
+        {{ uploading === 'AUDIO'
+          ? t('dashboard.pieces.attachments.uploading')
+          : t('dashboard.pieces.attachments.upload_audio') }}
+      </button>
+      <input
+        ref="audioInput"
+        type="file"
+        :accept="AUDIO_ACCEPT"
+        multiple
+        class="hidden"
+        @change="onAudioSelect"
       >
     </div>
 
@@ -346,6 +424,61 @@ async function confirmDelete() {
           </div>
         </li>
       </ul>
+    </section>
+
+    <section>
+      <h3 class="section-title">
+        {{ t('dashboard.pieces.attachments.audio_title') }}
+        <span class="count">{{ audios.length }}</span>
+      </h3>
+      <div v-if="audios.length === 0" class="empty-state">
+        {{ t('dashboard.pieces.attachments.audio_empty') }}
+      </div>
+      <ul v-else class="flex flex-col divide-y divide-line rounded-lg border border-line bg-bg-card">
+        <li v-for="att in audios" :key="att.id" class="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-3">
+          <div class="flex min-w-0 flex-1 items-center gap-3">
+            <button
+              type="button"
+              class="play-btn"
+              :class="{ 'is-playing': playingAudioId === att.id }"
+              :disabled="loadingAudioId === att.id"
+              :aria-label="playingAudioId === att.id ? t('dashboard.pieces.attachments.pause') : t('dashboard.pieces.attachments.play')"
+              :title="playingAudioId === att.id ? t('dashboard.pieces.attachments.pause') : t('dashboard.pieces.attachments.play')"
+              @click="toggleAudio(att)"
+            >
+              <svg v-if="playingAudioId !== att.id" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor" /></svg>
+              <svg v-else viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="5" width="3.6" height="14" rx="1.2" fill="currentColor" /><rect x="13.4" y="5" width="3.6" height="14" rx="1.2" fill="currentColor" /></svg>
+            </button>
+            <div class="min-w-0 flex-1">
+              <div class="truncate text-[13.5px] font-medium text-ink" :title="att.originalFilename">
+                {{ att.originalFilename }}
+              </div>
+              <div class="flex items-center gap-2 text-[11.5px] text-ink-muted">
+                <span class="font-mono tabular-nums">{{ formatAudioDuration(att.durationMs) }}</span>
+                <span>·</span>
+                <span>{{ humanSize(att.sizeBytes) }}</span>
+                <span>·</span>
+                <span class="truncate">{{ formatDate(att.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" class="ghost-btn" @click="downloadDocument(att)">
+              {{ t('dashboard.pieces.actions.download') }}
+            </button>
+            <button
+              v-if="canWrite"
+              type="button"
+              class="ghost-btn ghost-btn-danger"
+              :disabled="deletingId === att.id"
+              @click="askDelete(att)"
+            >
+              {{ t('dashboard.pieces.actions.delete') }}
+            </button>
+          </div>
+        </li>
+      </ul>
+      <p class="mt-2 text-[11.5px] text-ink-muted">{{ t('dashboard.pieces.attachments.audio_hint') }}</p>
     </section>
 
     <DashboardConfirmDialog
@@ -508,5 +641,27 @@ async function confirmDelete() {
 .ghost-btn-danger:hover:not(:disabled) {
   background: color-mix(in oklab, var(--c-danger) 8%, transparent);
 }
+
+.play-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: 1px solid var(--c-line);
+  background: var(--c-bg-soft);
+  color: var(--c-ink-soft);
+  transition: background .12s, color .12s, border-color .12s;
+}
+.play-btn svg { width: 16px; height: 16px; }
+.play-btn:hover:not(:disabled) { color: var(--c-ink); border-color: var(--c-line-strong); }
+.play-btn.is-playing {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: var(--c-on-accent, #fff);
+}
+.play-btn:disabled { opacity: .5; cursor: not-allowed; }
 
 </style>

@@ -281,7 +281,7 @@ export interface UpdatePieceLocationDto {
   clearLocation?: boolean
 }
 
-export type PieceAttachmentKind = 'IMAGE' | 'DOCUMENT'
+export type PieceAttachmentKind = 'IMAGE' | 'DOCUMENT' | 'AUDIO'
 
 export type PieceHistoryAction =
   | 'PIECE_CREATED'
@@ -318,6 +318,8 @@ export interface PieceAttachmentResponseDto {
   originalFilename: string
   mimeType: string
   sizeBytes: number
+  /** Audio length measured by the browser when uploading (AUDIO only; null when unknown). */
+  durationMs?: number | null
   uploadedByUserId?: number
   createdAt: string
 }
