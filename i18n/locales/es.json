@@ -595,6 +595,8 @@
         "binding_static_hint": "Valor fijo, igual para todos los artículos de este tipo.",
         "binding_dynamic_hint": "El valor se define en la línea de tiempo, por cada artículo.",
         "parameter_static_value": "Valor fijo",
+        "color_unset": "Sin valor",
+        "color_invalid": "No es un color válido. Formato: #rrggbb o r,g,b.",
         "static_value_required": "Un parámetro estático y obligatorio necesita un valor fijo.",
         "parameter_is_duration": "Es la duración (define la longitud del clip)",
         "is_duration_hint": "El valor (en segundos) será la longitud del clip en la línea de tiempo. No habrá un campo de duración aparte.",

@@ -5,7 +5,7 @@ import type {
   PieceTypeActionResponseDto,
   UpdatePieceTypeActionDto
 } from '~/types/api'
-import { attributeTypeFor, durationParamOf, type CatalogAction, type OutputKind } from '~/types/contract'
+import { attributeTypeFor, durationParamOf, type CatalogAction, type CatalogParam, type OutputKind } from '~/types/contract'
 import { ACTION_NAME_PATTERN, slugifyName } from '~/utils/attributeValidators'
 
 // Create/edit an action of a piece type. When the type has an output kind, the technical name is
@@ -50,6 +50,15 @@ const displayNameInput = useTemplateRef<HTMLInputElement>('displayNameInput')
 const hasKind = computed(() => props.kind !== null)
 const catalogActions = computed(() => contract.actionsOf(props.kind))
 const catalogAction = computed<CatalogAction | null>(() => contract.action(props.kind, name.value))
+
+/** Catalog type of a parameter of the chosen action (common or of any animation), or null. */
+function catalogTypeOf(paramName: string): CatalogParam['type'] | null {
+  const action = catalogAction.value
+  if (!action) return null
+  const spec = action.params[paramName]
+    ?? Object.values(action.animations ?? {}).map(a => a.params[paramName]).find(Boolean)
+  return spec?.type ?? null
+}
 
 function newParamDraft(value?: ActionParameterDto): ParamDraft {
   return {
@@ -299,6 +308,7 @@ function submit() {
                 :key="draft.uid"
                 :model-value="draft.value"
                 :index="index"
+                :catalog-type="catalogTypeOf(draft.value.name)"
                 @update:model-value="(value) => onParamUpdate(draft.uid, value)"
                 @remove="removeParameter(draft.uid)"
               />

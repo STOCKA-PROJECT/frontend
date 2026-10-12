@@ -6,6 +6,8 @@ import type {
   OrganizationRole,
   PieceTypeAttributeResponseDto
 } from '~/types/api'
+import type { CatalogParam } from '~/types/contract'
+import { parseRgb, rgbToHex } from '~/utils/color'
 import {
   ATTRIBUTE_TYPES,
   ACTION_NAME_PATTERN,
@@ -22,6 +24,9 @@ const props = defineProps<{
   // When true, hides the binding-mode toggle and forces the parameter to be static (used by ports,
   // whose parameters always carry a fixed value rather than being set per clip in the timeline).
   staticOnly?: boolean
+  // Type of this parameter in the output catalog, when the action comes from it: an `rgb`
+  // parameter gets a colour picker for its fixed value (stored as `#rrggbb`).
+  catalogType?: CatalogParam['type'] | null
 }>()
 
 const emit = defineEmits<{
@@ -68,6 +73,21 @@ const staticFieldAttribute = computed<PieceTypeAttributeResponseDto>(() => ({
 }))
 const staticValueMissing = computed(() =>
   !dynamic.value && required.value && (staticValue.value == null || staticValue.value === ''))
+
+// ---- colour (catalog rgb) ----
+const isColor = computed(() => props.catalogType === 'rgb')
+const colorUnset = computed(() => staticValue.value == null || staticValue.value === '')
+/** Fixed value as `#rrggbb`, whatever format it was typed in; null when it is not a colour. */
+const staticHex = computed(() => {
+  const rgb = parseRgb(staticValue.value)
+  return rgb ? rgbToHex(rgb) : null
+})
+// A fixed value that is neither empty nor a parseable colour keeps the generic field so nothing is lost.
+const colorPickable = computed(() => isColor.value && (colorUnset.value || staticHex.value !== null))
+
+function setColorUnset(unset: boolean) {
+  staticValue.value = unset ? null : (staticHex.value ?? '#ffffff')
+}
 
 const visibleValidators = computed(() => VALIDATOR_FIELDS[type.value])
 const showValidators = computed(() => visibleValidators.value.length > 0)
@@ -266,10 +286,31 @@ watch([displayName, name, type, required, validators, dynamic, staticValue, isDu
 
     <!-- Static value: the fixed value applied to every piece of this type -->
     <div v-if="!dynamic" class="rounded-[10px] border border-line bg-bg-card p-3">
+      <div v-if="colorPickable" class="flex flex-col gap-1">
+        <span class="field-label">{{ t('dashboard.pieceTypes.action_form.parameter_static_value') }}</span>
+        <div class="flex items-center gap-2">
+          <input
+            type="color"
+            class="h-9 w-11 flex-shrink-0 cursor-pointer rounded-[6px] border border-line bg-bg-card p-0.5 disabled:cursor-not-allowed disabled:opacity-40"
+            :value="staticHex ?? '#000000'"
+            :disabled="colorUnset"
+            @input="staticValue = ($event.target as HTMLInputElement).value">
+          <span class="font-mono text-[12.5px] text-ink-soft">{{ colorUnset ? '—' : staticHex }}</span>
+          <label v-if="!required" class="ml-auto flex cursor-pointer items-center gap-1.5 text-[12px] text-ink-muted">
+            <input type="checkbox" class="h-4 w-4 accent-[var(--c-ink)]" :checked="colorUnset"
+              @change="setColorUnset(($event.target as HTMLInputElement).checked)">
+            {{ t('dashboard.pieceTypes.action_form.color_unset') }}
+          </label>
+        </div>
+      </div>
       <DashboardPieceAttributeField
+        v-else
         :attribute="staticFieldAttribute"
         :model-value="staticValue"
         @update:model-value="staticValue = $event" />
+      <p v-if="isColor && !colorPickable" class="field-error mt-1.5">
+        {{ t('dashboard.pieceTypes.action_form.color_invalid') }}
+      </p>
       <p v-if="staticValueMissing" class="field-error mt-1.5">
         {{ t('dashboard.pieceTypes.action_form.static_value_required') }}
       </p>

@@ -595,6 +595,8 @@
         "binding_static_hint": "Fixed value, the same for every piece of this type.",
         "binding_dynamic_hint": "The value is set in the timeline, per piece.",
         "parameter_static_value": "Fixed value",
+        "color_unset": "No value",
+        "color_invalid": "Not a valid colour. Format: #rrggbb or r,g,b.",
         "static_value_required": "A required static parameter needs a fixed value.",
         "parameter_is_duration": "This is the duration (sets the clip length)",
         "is_duration_hint": "The value (in seconds) will be the clip length on the timeline. There will be no separate duration field.",
