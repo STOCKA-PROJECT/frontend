@@ -23,6 +23,40 @@ export function parseRgb(value: unknown): Rgb | null {
   return rgb.every(n => n <= 255) ? rgb : null
 }
 
+/**
+ * Parses a list of colours: an array of colours in any {@link parseRgb} notation, a JSON array in
+ * text form, or colours separated by `;` (`#f00;#0f0`). An empty list is valid.
+ */
+export function parseRgbList(value: unknown): Rgb[] | null {
+  let items: unknown[]
+  if (Array.isArray(value)) {
+    items = value
+  } else if (typeof value === 'string') {
+    const text = value.trim()
+    if (text === '') return []
+    if (text.startsWith('[') && !/^\[\s*\d/.test(text)) {
+      try {
+        const parsed: unknown = JSON.parse(text)
+        if (!Array.isArray(parsed)) return null
+        items = parsed
+      } catch {
+        return null
+      }
+    } else {
+      items = text.split(';')
+    }
+  } else {
+    return null
+  }
+  const out: Rgb[] = []
+  for (const item of items) {
+    const rgb = parseRgb(item)
+    if (!rgb) return null
+    out.push(rgb)
+  }
+  return out
+}
+
 /** `#rrggbb` form of a colour. */
 export function rgbToHex(rgb: Rgb): string {
   return '#' + rgb.map(c => c.toString(16).padStart(2, '0')).join('')

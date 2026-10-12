@@ -7,7 +7,7 @@ import type {
   PieceTypeAttributeResponseDto
 } from '~/types/api'
 import type { CatalogParam } from '~/types/contract'
-import { parseRgb, rgbToHex } from '~/utils/color'
+import { parseRgb, parseRgbList, rgbToHex } from '~/utils/color'
 import {
   ATTRIBUTE_TYPES,
   ACTION_NAME_PATTERN,
@@ -87,6 +87,34 @@ const colorPickable = computed(() => isColor.value && (colorUnset.value || stati
 
 function setColorUnset(unset: boolean) {
   staticValue.value = unset ? null : (staticHex.value ?? '#ffffff')
+}
+
+// ---- colour list (catalog rgb_list, e.g. fade waypoints) ----
+const isColorList = computed(() => props.catalogType === 'rgb_list')
+const parsedColorList = computed(() => parseRgbList(staticValue.value))
+/** Fixed colours as `#rrggbb`; empty when unset or when the stored text is not a list of colours. */
+const colorList = computed<string[]>(() => (parsedColorList.value ?? []).map(rgbToHex))
+const colorListInvalid = computed(() => isColorList.value && !colorUnset.value && parsedColorList.value === null)
+
+/** Stores the list as a JSON array of `#rrggbb` strings (what the backend validates); empty = unset. */
+function setColorList(list: string[]) {
+  staticValue.value = list.length ? JSON.stringify(list) : null
+}
+function addColor() {
+  setColorList([...colorList.value, colorList.value[colorList.value.length - 1] ?? '#ffffff'])
+}
+function updateColor(index: number, hex: string) {
+  setColorList(colorList.value.map((c, i) => (i === index ? hex : c)))
+}
+function removeColor(index: number) {
+  setColorList(colorList.value.filter((_, i) => i !== index))
+}
+function moveColor(index: number, dir: -1 | 1) {
+  const next = [...colorList.value]
+  const target = index + dir
+  if (target < 0 || target >= next.length) return
+  ;[next[index], next[target]] = [next[target]!, next[index]!]
+  setColorList(next)
 }
 
 const visibleValidators = computed(() => VALIDATOR_FIELDS[type.value])
@@ -303,6 +331,26 @@ watch([displayName, name, type, required, validators, dynamic, staticValue, isDu
             {{ t('dashboard.pieceTypes.action_form.color_unset') }}
           </label>
         </div>
+      </div>
+      <div v-else-if="isColorList" class="flex flex-col gap-1.5">
+        <span class="field-label">{{ t('dashboard.pieceTypes.action_form.parameter_static_value') }}</span>
+        <div v-for="(hex, i) in colorList" :key="i" class="flex items-center gap-2">
+          <span class="w-4 flex-shrink-0 text-right text-[11.5px] text-ink-muted">{{ i + 1 }}</span>
+          <input
+            type="color"
+            class="h-9 w-11 flex-shrink-0 cursor-pointer rounded-[6px] border border-line bg-bg-card p-0.5"
+            :value="hex"
+            @input="updateColor(i, ($event.target as HTMLInputElement).value)">
+          <span class="font-mono text-[12.5px] text-ink-soft">{{ hex }}</span>
+          <div class="ml-auto flex items-center gap-0.5 text-ink-muted">
+            <button type="button" class="px-1 text-[12px] disabled:opacity-30" :title="t('dashboard.pieceTypes.action_form.color_list_up')" :disabled="i === 0" @click="moveColor(i, -1)">▲</button>
+            <button type="button" class="px-1 text-[12px] disabled:opacity-30" :title="t('dashboard.pieceTypes.action_form.color_list_down')" :disabled="i === colorList.length - 1" @click="moveColor(i, 1)">▼</button>
+            <button type="button" class="px-1 text-[12px] text-danger" :title="t('dashboard.pieceTypes.action_form.color_list_remove')" @click="removeColor(i)">✕</button>
+          </div>
+        </div>
+        <p v-if="!colorList.length" class="field-help">{{ t('dashboard.pieceTypes.action_form.color_list_empty') }}</p>
+        <p v-if="colorListInvalid" class="field-error">{{ t('dashboard.pieceTypes.action_form.color_list_invalid') }}</p>
+        <button type="button" class="btn btn-outline self-start" @click="addColor">{{ t('dashboard.pieceTypes.action_form.color_list_add') }}</button>
       </div>
       <DashboardPieceAttributeField
         v-else

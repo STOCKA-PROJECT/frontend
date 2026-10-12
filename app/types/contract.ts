@@ -5,7 +5,7 @@ import type { AttributeType } from '~/types/api'
 // and the actions (with typed parameters) a piece type of that kind may define.
 
 export type OutputKind = 'relay' | 'led_strip' | 'led_segment' | 'motor' | 'audio' | 'video' | 'button'
-export type CatalogType = 'int' | 'number' | 'bool' | 'string' | 'rgb' | 'enum'
+export type CatalogType = 'int' | 'number' | 'bool' | 'string' | 'rgb' | 'rgb_list' | 'enum'
 
 export const OUTPUT_KINDS: readonly OutputKind[] = ['relay', 'led_strip', 'led_segment', 'motor', 'audio', 'video', 'button']
 
@@ -75,6 +75,7 @@ export function attributeTypeFor(type: CatalogType): AttributeType {
     case 'enum': return 'SELECT'
     case 'string':
     case 'rgb':
+    case 'rgb_list':
       return 'TEXT'
   }
 }
