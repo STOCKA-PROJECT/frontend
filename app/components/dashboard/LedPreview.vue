@@ -3,8 +3,9 @@ import { createLedAnimation, createLedFill, placeInTarget, type LedAnimator, typ
 
 /**
  * Animated strip of LEDs that approximates what the device will show for an LED action: the
- * animation fixed on the action (or a solid fill), on a target of `pixels` LEDs. Purely
- * cosmetic: the device remains the reference. Same engine as the timeline editor.
+ * animation chosen in the parameters (or a solid fill), on a target of `pixels` LEDs, limited to
+ * the `first`/`last` range when given. A small timeline under the strip shows the position inside
+ * the clip and can be dragged to seek. Same component as the timeline editor, with i18n labels.
  */
 const props = defineProps<{
   action: 'animate' | 'fill' | 'clear'
@@ -12,20 +13,36 @@ const props = defineProps<{
   /** Parameters already coerced to catalog values (`[r, g, b]` colours, numbers). */
   params: Record<string, unknown>
   pixels: number
+  /** Where the LED count comes from, shown in the hint. */
+  source?: string | null
   durationSec?: number | null
   first?: number | null
   last?: number | null
 }>()
 
 const { t } = useI18n()
+const FRAME = 1 / 30
+
 const canvas = ref<HTMLCanvasElement | null>(null)
+const timelineEl = ref<HTMLDivElement | null>(null)
 const playing = ref(true)
 const built = ref(0)
+/** Seconds elapsed inside the clip (loops back to 0 at the end). */
+const elapsed = ref(0)
 let animator: LedAnimator | null = null
 let raf = 0
 let lastTs = 0
 
 const unsupported = computed(() => props.action === 'animate' && !!props.animation && animator === null && built.value > 0)
+
+/** Length of the timeline: the clip, or the device default of the animation when the clip has no duration parameter. */
+const totalSec = computed(() => {
+  if (props.durationSec && props.durationSec > 0) return props.durationSec
+  if (props.action !== 'animate') return 5
+  return props.animation === 'sunrise' ? 10 : props.animation === 'sunset' ? 15 : props.animation === 'fade' ? 1 : 10
+})
+const progress = computed(() => Math.min(1, elapsed.value / totalSec.value))
+const fmt = (s: number) => `${s.toFixed(1)} s`
 
 function build() {
   const opts = { pixels: props.pixels, durationSec: props.durationSec ?? null, first: props.first ?? null, last: props.last ?? null }
@@ -38,6 +55,7 @@ function build() {
     animator = props.animation ? createLedAnimation(props.animation, props.params, opts) : null
   }
   built.value++
+  elapsed.value = 0
   lastTs = 0
   draw(0)
 }
@@ -64,9 +82,15 @@ function draw(dtSec: number) {
 
 function tick(ts: number) {
   if (!playing.value) return
-  const dt = lastTs ? (ts - lastTs) / 1000 : 0
+  const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.5) : 0
   lastTs = ts
-  draw(dt)
+  if (elapsed.value + dt >= totalSec.value) {
+    // End of the clip: start over, like a looping preview.
+    build()
+  } else {
+    elapsed.value += dt
+    draw(dt)
+  }
   raf = requestAnimationFrame(tick)
 }
 
@@ -82,6 +106,46 @@ function togglePlay() {
   else cancelAnimationFrame(raf)
 }
 
+/** Jumps to `sec` by rebuilding the animation and fast-forwarding it frame by frame. */
+function seek(sec: number) {
+  const target = Math.max(0, Math.min(totalSec.value - FRAME, sec))
+  build()
+  let remaining = target
+  while (remaining > 0 && animator) {
+    const step = Math.min(0.5, remaining)
+    animator.step(step)
+    remaining -= step
+  }
+  elapsed.value = target
+  lastTs = 0
+  draw(0)
+}
+
+// ---- scrubbing on the mini timeline ----
+let wasPlaying = true
+function secAt(clientX: number): number {
+  const rect = timelineEl.value?.getBoundingClientRect()
+  if (!rect || rect.width === 0) return 0
+  return ((clientX - rect.left) / rect.width) * totalSec.value
+}
+function onScrubDown(e: PointerEvent) {
+  e.preventDefault()
+  wasPlaying = playing.value
+  playing.value = false
+  cancelAnimationFrame(raf)
+  seek(secAt(e.clientX))
+  const onMove = (ev: PointerEvent) => seek(secAt(ev.clientX))
+  const onUp = () => {
+    window.removeEventListener('pointermove', onMove)
+    window.removeEventListener('pointerup', onUp)
+    playing.value = wasPlaying
+    start()
+  }
+  window.addEventListener('pointermove', onMove)
+  window.addEventListener('pointerup', onUp)
+}
+
+// Any change of the action, animation, parameters or target rebuilds the animation from scratch.
 watch(() => [props.action, props.animation, props.params, props.pixels, props.durationSec, props.first, props.last], () => {
   build()
   start()
@@ -103,6 +167,21 @@ onBeforeUnmount(() => cancelAnimationFrame(raf))
       </button>
     </div>
     <canvas ref="canvas" class="h-6 w-full rounded-[4px] border border-line" height="24" />
+
+    <!-- Mini timeline: position inside the clip; click or drag to seek -->
+    <div class="flex items-center gap-2">
+      <span class="w-12 flex-shrink-0 font-mono text-[10.5px] tabular-nums text-ink-muted">{{ fmt(elapsed) }}</span>
+      <div
+        ref="timelineEl"
+        class="relative h-2 min-w-0 flex-1 cursor-ew-resize rounded-full bg-line/70"
+        :title="t('dashboard.pieceTypes.action_form.preview_scrub')"
+        @pointerdown="onScrubDown">
+        <div class="absolute left-0 top-0 h-full rounded-full bg-accent/50" :style="{ width: progress * 100 + '%' }" />
+        <div class="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-bg-card bg-danger shadow" :style="{ left: progress * 100 + '%' }" />
+      </div>
+      <span class="w-12 flex-shrink-0 text-right font-mono text-[10.5px] tabular-nums text-ink-muted">{{ fmt(totalSec) }}</span>
+    </div>
+
     <p v-if="unsupported" class="field-help">{{ t('dashboard.pieceTypes.action_form.preview_unsupported') }}</p>
     <p v-else class="field-help">{{ t('dashboard.pieceTypes.action_form.preview_hint', { n: pixels }) }}</p>
   </div>

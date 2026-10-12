@@ -586,6 +586,7 @@
         "preview_play": "▶ Reanudar",
         "preview_unsupported": "Esta animación no tiene previsualización.",
         "preview_hint": "Aproximación sobre {n} LED con los valores fijos (los dinámicos usan el valor por defecto); el reproductor es la referencia.",
+        "preview_scrub": "Arrastra para moverte en el tiempo",
         "no_parameters": "Esta acción no tiene parámetros. Añade uno si la función los necesita.",
         "parameter_n": "Parámetro {n}",
         "remove_parameter": "Quitar parámetro",

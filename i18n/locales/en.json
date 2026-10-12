@@ -586,6 +586,7 @@
         "preview_play": "▶ Resume",
         "preview_unsupported": "This animation has no preview.",
         "preview_hint": "Approximation on {n} LEDs with the fixed values (dynamic ones use their default); the player is the reference.",
+        "preview_scrub": "Drag to move through time",
         "no_parameters": "This action has no parameters. Add one if the function needs it.",
         "parameter_n": "Parameter {n}",
         "remove_parameter": "Remove parameter",

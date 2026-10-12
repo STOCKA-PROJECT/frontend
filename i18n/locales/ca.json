@@ -586,6 +586,7 @@
         "preview_play": "▶ Reprèn",
         "preview_unsupported": "Aquesta animació no té previsualització.",
         "preview_hint": "Aproximació sobre {n} LED amb els valors fixos (els dinàmics usen el valor per defecte); el reproductor és la referència.",
+        "preview_scrub": "Arrossega per moure't en el temps",
         "no_parameters": "Aquesta acció no té paràmetres. Afegeix-ne un si la funció els necessita.",
         "parameter_n": "Paràmetre {n}",
         "remove_parameter": "Treure paràmetre",
