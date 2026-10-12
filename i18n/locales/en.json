@@ -649,6 +649,7 @@
         "delete_action": "Couldn't delete the action.",
         "load_actions": "Couldn't load the actions.",
         "name_pattern": "Use lowercase letters, numbers, and underscore only. Must start with a letter.",
+        "action_name_pattern": "Must start with a lowercase letter and may only contain letters, digits and underscore (e.g. focoOn, hold_time).",
         "name_required": "Name is required.",
         "display_name_required": "Display label is required.",
         "options_required": "Add at least one option.",

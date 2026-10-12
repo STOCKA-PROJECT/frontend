@@ -8,7 +8,7 @@ import type {
 } from '~/types/api'
 import {
   ATTRIBUTE_TYPES,
-  NAME_PATTERN,
+  ACTION_NAME_PATTERN,
   ORG_ROLES,
   VALIDATOR_FIELDS,
   cleanValidators,
@@ -71,7 +71,7 @@ const staticValueMissing = computed(() =>
 
 const visibleValidators = computed(() => VALIDATOR_FIELDS[type.value])
 const showValidators = computed(() => visibleValidators.value.length > 0)
-const nameInvalid = computed(() => name.value.length > 0 && !NAME_PATTERN.test(name.value))
+const nameInvalid = computed(() => name.value.length > 0 && !ACTION_NAME_PATTERN.test(name.value))
 const optionsList = computed<string[]>(() => validators.value.options ?? [])
 const optionsRequired = computed(() => type.value === 'SELECT' || type.value === 'MULTI_SELECT')
 const eligibleRolesList = computed<OrganizationRole[]>(() => validators.value.eligibleRoles ?? [])
@@ -215,7 +215,7 @@ watch([displayName, name, type, required, validators, dynamic, staticValue, isDu
           class="field-input field-input-mono" :class="{ 'field-input-error': nameInvalid }"
           :placeholder="t('dashboard.pieceTypes.action_form.parameter_name_placeholder')"
           @input="onNameInput">
-        <p v-if="nameInvalid" class="field-error">{{ t('dashboard.pieceTypes.errors.name_pattern') }}</p>
+        <p v-if="nameInvalid" class="field-error">{{ t('dashboard.pieceTypes.errors.action_name_pattern') }}</p>
       </div>
     </div>
 

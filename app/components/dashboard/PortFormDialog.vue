@@ -6,7 +6,7 @@ import type {
   UpdatePortDto
 } from '~/types/api'
 import type { OutputKind } from '~/types/contract'
-import { NAME_PATTERN } from '~/utils/attributeValidators'
+import { ACTION_NAME_PATTERN } from '~/utils/attributeValidators'
 
 // Create/edit a port. The kind drives the rest of the form: which piece types can be chosen (those
 // of the same kind; none for infrastructure kinds), whether a GPIO pin is needed, and which config
@@ -165,7 +165,7 @@ const paramsValid = computed(() => {
   const seen = new Set<string>()
   for (const d of params.value) {
     const p = d.value
-    if (!NAME_PATTERN.test(p.name)) return false
+    if (!ACTION_NAME_PATTERN.test(p.name)) return false
     if (seen.has(p.name)) return false
     seen.add(p.name)
     if ((p.type === 'SELECT' || p.type === 'MULTI_SELECT') && !(p.validators?.options?.length)) return false

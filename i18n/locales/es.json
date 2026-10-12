@@ -649,6 +649,7 @@
         "delete_action": "No se ha podido eliminar la acción.",
         "load_actions": "No se han podido cargar las acciones.",
         "name_pattern": "Usa solo minúsculas, números y guion bajo. Debe empezar por una letra.",
+        "action_name_pattern": "Debe empezar por una letra minúscula y solo puede tener letras, números y guion bajo (p. ej. focoOn, hold_time).",
         "name_required": "El nombre es obligatorio.",
         "display_name_required": "La etiqueta visible es obligatoria.",
         "options_required": "Añade al menos una opción.",

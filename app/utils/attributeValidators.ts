@@ -32,8 +32,15 @@ export const VALIDATOR_FIELDS: Record<AttributeType, ValidatorKey[]> = {
   MEMBER: ['eligibleRoles']
 }
 
-/** Canonical technical-name shape shared by attributes, actions and parameters. */
+/** Canonical technical-name shape of attributes (the backend enforces the same rule). */
 export const NAME_PATTERN = /^[a-z][a-z0-9_]{0,79}$/
+
+/**
+ * Technical-name shape of actions and their parameters: like {@link NAME_PATTERN} but allowing
+ * uppercase letters after the first one, because catalog actions are the real controller methods
+ * (`focoOn`, `setBrightness`). The backend puts no pattern on action names.
+ */
+export const ACTION_NAME_PATTERN = /^[a-z][A-Za-z0-9_]{0,79}$/
 
 /** Derives a valid technical name (lowercase + underscores) from a free-text display name. */
 export function slugifyName(input: string): string {

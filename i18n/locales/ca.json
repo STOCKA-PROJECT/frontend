@@ -649,6 +649,7 @@
         "delete_action": "No s'ha pogut eliminar l'acció.",
         "load_actions": "No s'han pogut carregar les accions.",
         "name_pattern": "Utilitza només minúscules, números i guió baix. Ha de començar per una lletra.",
+        "action_name_pattern": "Ha de començar per una lletra minúscula i només pot tenir lletres, números i guió baix (p. ex. focoOn, hold_time).",
         "name_required": "El nom és obligatori.",
         "display_name_required": "L'etiqueta visible és obligatòria.",
         "options_required": "Afegeix almenys una opció.",

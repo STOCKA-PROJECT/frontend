@@ -6,7 +6,7 @@ import type {
   UpdatePieceTypeActionDto
 } from '~/types/api'
 import { attributeTypeFor, durationParamOf, type CatalogAction, type OutputKind } from '~/types/contract'
-import { NAME_PATTERN, slugifyName } from '~/utils/attributeValidators'
+import { ACTION_NAME_PATTERN, slugifyName } from '~/utils/attributeValidators'
 
 // Create/edit an action of a piece type. When the type has an output kind, the technical name is
 // chosen from the catalog of that kind and the parameters are pre-filled from the catalog action;
@@ -137,7 +137,7 @@ function onParamUpdate(uid: number, value: ActionParameterDto) {
   params.value = params.value.map(d => (d.uid === uid ? { ...d, value } : d))
 }
 
-const nameInvalid = computed(() => name.value.length > 0 && !NAME_PATTERN.test(name.value))
+const nameInvalid = computed(() => name.value.length > 0 && !ACTION_NAME_PATTERN.test(name.value))
 const nameNotInCatalog = computed(() => hasKind.value && name.value.length > 0 && !catalogActions.value.includes(name.value))
 
 /** Parameter names the catalog does not know for the chosen action (reported before the backend does). */
@@ -154,7 +154,7 @@ const paramsValid = computed(() => {
   let durations = 0
   for (const d of params.value) {
     const p = d.value
-    if (!NAME_PATTERN.test(p.name)) return false
+    if (!ACTION_NAME_PATTERN.test(p.name)) return false
     if (seen.has(p.name)) return false
     seen.add(p.name)
     if ((p.type === 'SELECT' || p.type === 'MULTI_SELECT') && !(p.validators?.options?.length)) return false
@@ -174,7 +174,7 @@ const paramsValid = computed(() => {
 const canSubmit = computed(() => {
   if (props.loading) return false
   if (!displayName.value.trim()) return false
-  if (!NAME_PATTERN.test(name.value)) return false
+  if (!ACTION_NAME_PATTERN.test(name.value)) return false
   if (nameNotInCatalog.value) return false
   return paramsValid.value
 })
@@ -251,7 +251,7 @@ function submit() {
                 :placeholder="t('dashboard.pieceTypes.action_form.field_name_placeholder')"
                 class="field-input field-input-code" :class="{ 'field-input-error': nameInvalid }"
                 @input="onNameInput">
-              <p v-if="nameInvalid" class="field-error">{{ t('dashboard.pieceTypes.errors.name_pattern') }}</p>
+              <p v-if="nameInvalid" class="field-error">{{ t('dashboard.pieceTypes.errors.action_name_pattern') }}</p>
               <p v-else-if="nameNotInCatalog" class="field-error">{{ t('dashboard.pieceTypes.action_form.name_not_in_catalog') }}</p>
               <p v-else-if="hasKind" class="field-help">{{ t('dashboard.pieceTypes.action_form.field_name_catalog_help') }}</p>
               <p v-else class="field-help">
