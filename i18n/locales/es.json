@@ -1370,7 +1370,8 @@
       "action_param_type_mismatch": "El parámetro «{param}» debe ser de tipo {expected}.",
       "action_param_options_invalid": "Las opciones de «{param}» deben estar entre: {values}.",
       "action_param_static_invalid": "El valor fijo de «{param}» no es válido para su tipo.",
-      "action_duration_param_mismatch": "El parámetro de duración debe ser «{expected}», no «{param}»."
+      "action_duration_param_mismatch": "El parámetro de duración debe ser «{expected}», no «{param}».",
+      "action_name_invalid": "El nombre técnico «{name}» no es válido: debe empezar por una letra minúscula y solo puede contener letras, dígitos y guion bajo."
     },
     "locations": {
       "not_found": "Ubicación no encontrada."

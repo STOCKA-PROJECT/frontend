@@ -1370,7 +1370,8 @@
       "action_param_type_mismatch": "El paràmetre «{param}» ha de ser de tipus {expected}.",
       "action_param_options_invalid": "Les opcions de «{param}» han de ser d’entre: {values}.",
       "action_param_static_invalid": "El valor fix de «{param}» no és vàlid per al seu tipus.",
-      "action_duration_param_mismatch": "El paràmetre de durada ha de ser «{expected}», no «{param}»."
+      "action_duration_param_mismatch": "El paràmetre de durada ha de ser «{expected}», no «{param}».",
+      "action_name_invalid": "El nom tècnic «{name}» no és vàlid: ha de començar per una lletra minúscula i només pot tenir lletres, dígits i guió baix."
     },
     "locations": {
       "not_found": "Ubicació no trobada."
