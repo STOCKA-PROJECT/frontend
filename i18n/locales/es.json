@@ -580,6 +580,7 @@
         "field_description_placeholder": "Qué hace esta acción…",
         "parameters_title": "Parámetros ({n})",
         "add_parameter": "Añadir parámetro",
+        "catalog_params_available": "Del catálogo puedes añadir:",
         "no_parameters": "Esta acción no tiene parámetros. Añade uno si la función los necesita.",
         "parameter_n": "Parámetro {n}",
         "remove_parameter": "Quitar parámetro",

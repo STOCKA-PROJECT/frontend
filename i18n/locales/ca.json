@@ -580,6 +580,7 @@
         "field_description_placeholder": "Què fa aquesta acció…",
         "parameters_title": "Paràmetres ({n})",
         "add_parameter": "Afegir paràmetre",
+        "catalog_params_available": "Del catàleg pots afegir:",
         "no_parameters": "Aquesta acció no té paràmetres. Afegeix-ne un si la funció els necessita.",
         "parameter_n": "Paràmetre {n}",
         "remove_parameter": "Treure paràmetre",

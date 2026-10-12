@@ -107,18 +107,50 @@ function catalogLabel(scope: 'catalogActions' | 'catalogParams', key: string): s
   return te(k) ? t(k) : key
 }
 
-/** Builds the parameter drafts a catalog action needs: every common parameter, typed and bound dynamically. */
-function paramsFromCatalog(action: CatalogAction): ParamDraft[] {
-  const duration = durationParamOf(action)
-  return Object.entries(action.params).map(([pname, spec]) => newParamDraft({
+/** A parameter draft for a catalog parameter: typed from the catalog and bound dynamically. */
+function draftFromCatalog(action: CatalogAction, pname: string, spec: CatalogParam): ParamDraft {
+  return newParamDraft({
     name: pname,
     displayName: catalogLabel('catalogParams', pname),
     type: attributeTypeFor(spec.type),
     required: spec.required === true,
     dynamic: true,
-    ...(pname === duration ? { isDuration: true } : {}),
+    ...(pname === durationParamOf(action) ? { isDuration: true } : {}),
     ...(spec.type === 'enum' ? { validators: { options: [...(spec.values ?? [])] } } : {})
-  }))
+  })
+}
+
+/** Builds the parameter drafts a catalog action needs: every common parameter. */
+function paramsFromCatalog(action: CatalogAction): ParamDraft[] {
+  return Object.entries(action.params).map(([pname, spec]) => draftFromCatalog(action, pname, spec))
+}
+
+/**
+ * Catalog parameters of the chosen action that are not in the form yet, offered as one-click
+ * chips (both when creating and when editing an action saved before a parameter existed). For
+ * `animate`, a fixed `animation_type` narrows them to that animation; a dynamic one offers the
+ * parameters of every animation.
+ */
+const missingCatalogParams = computed<Array<{ name: string, spec: CatalogParam }>>(() => {
+  const action = catalogAction.value
+  if (!action) return []
+  const present = new Set(params.value.map(d => d.value.name))
+  const anim = params.value.find(d => d.value.name === 'animation_type')?.value
+  const fixedAnimation = anim && !anim.dynamic && anim.staticValue ? anim.staticValue : null
+  const pool: Record<string, CatalogParam> = { ...action.params }
+  const animations = action.animations ?? {}
+  if (fixedAnimation) {
+    Object.assign(pool, animations[fixedAnimation]?.params ?? {})
+  } else {
+    for (const a of Object.values(animations)) Object.assign(pool, a.params)
+  }
+  return Object.entries(pool).filter(([n]) => !present.has(n)).map(([name, spec]) => ({ name, spec }))
+})
+
+function addCatalogParam(pname: string, spec: CatalogParam) {
+  const action = catalogAction.value
+  if (!action) return
+  params.value = [...params.value, draftFromCatalog(action, pname, spec)]
 }
 
 function onCatalogActionChange(e: Event) {
@@ -298,6 +330,20 @@ function submit() {
               <p v-if="unknownParams.length" class="field-error">
                 {{ t('dashboard.pieceTypes.action_form.params_not_in_catalog', { names: unknownParams.join(', ') }) }}
               </p>
+
+              <!-- Catalog parameters not in the form yet: one click adds them typed and bound dynamically -->
+              <div v-if="missingCatalogParams.length" class="flex flex-wrap items-center gap-1.5">
+                <span class="text-[12px] text-ink-muted">{{ t('dashboard.pieceTypes.action_form.catalog_params_available') }}</span>
+                <button
+                  v-for="mp in missingCatalogParams"
+                  :key="mp.name"
+                  type="button"
+                  class="rounded-[6px] border border-line bg-bg-card px-2 py-0.5 font-mono text-[12px] text-ink hover:border-accent hover:bg-accent-soft"
+                  :title="catalogLabel('catalogParams', mp.name) + (mp.spec.required ? ' *' : '')"
+                  @click="addCatalogParam(mp.name, mp.spec)">
+                  + {{ mp.name }}
+                </button>
+              </div>
 
               <p v-if="!params.length" class="empty-box">
                 {{ t('dashboard.pieceTypes.action_form.no_parameters') }}
