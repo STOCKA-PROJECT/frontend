@@ -13,9 +13,9 @@ export const useContractStore = defineStore('contract', () => {
   const kinds = computed<OutputKind[]>(() =>
     catalog.value ? (Object.keys(catalog.value.kinds) as OutputKind[]) : [])
 
-  /** Kinds a piece type can drive (everything but infrastructure). */
+  /** Kinds a piece type can drive: every kind with show actions (a strip is a piece too; the button is not). */
   const pieceKinds = computed<OutputKind[]>(() =>
-    kinds.value.filter(k => !catalog.value!.kinds[k].infrastructure))
+    kinds.value.filter(k => Object.keys(catalog.value!.kinds[k].actions).length > 0))
 
   async function load(): Promise<void> {
     if (catalog.value || loading.value) return

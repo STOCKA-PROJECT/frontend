@@ -721,7 +721,7 @@
         "field_kind_immutable": "The output kind of a port cannot be changed.",
         "field_type_help": "Only item types of the same output kind are listed.",
         "field_type_empty_for_kind": "There is no item type of kind “{kind}”. Create one or give an existing type this kind.",
-        "infrastructure_help": "Infrastructure port: it belongs to no item type.",
+        "infrastructure_help": "Infrastructure port: the item type is optional. A strip can be a piece (LED strip kind) or just the carrier of its segments.",
         "pin_reserved": "Reserved pin: {reason}.",
         "pin_not_ws281x": "This pin cannot drive a WS281x strip (use 12, 18, 13, 19, 10 or 21).",
         "pin_ws281x_channel": "{via} pin: the strip must use channel {channel}.",
@@ -732,7 +732,8 @@
         "strip_empty": "Create a “LED strip” port first.",
         "advanced_title": "Advanced: legacy parameters ({n})",
         "advanced_help": "Legacy typed parameters are kept for compatibility; the player only uses the configuration.",
-        "catalog_error": "The output catalog could not be loaded."
+        "catalog_error": "The output catalog could not be loaded.",
+        "field_type_none": "None (infrastructure port)"
       },
       "delete": {
         "confirm_title": "Delete port",

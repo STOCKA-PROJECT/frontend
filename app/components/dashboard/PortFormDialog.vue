@@ -85,7 +85,8 @@ watch(() => props.open, (open) => {
 
 // ----- kind-driven shape -----
 const kindSpec = computed(() => contract.kind(kind.value))
-const needsPieceType = computed(() => kindSpec.value !== null && !kindSpec.value.infrastructure)
+// Infrastructure kinds (strips, button) may exist without a piece type; the others require one.
+const pieceTypeOptional = computed(() => kindSpec.value?.infrastructure === true)
 const hasPin = computed(() => kindSpec.value?.pin === true)
 const configFields = computed(() => contract.configFieldsOf(kind.value))
 const board = computed(() => contract.catalog?.boards[DEFAULT_BOARD_ID] ?? null)
@@ -93,6 +94,8 @@ const DEFAULT_BOARD_ID = 'rpi4b'
 
 const pieceTypeOptions = computed(() =>
   props.pieceTypes.filter(pt => pt.kind === kind.value))
+const showPieceType = computed(() =>
+  kindSpec.value !== null && (!pieceTypeOptional.value || pieceTypeOptions.value.length > 0))
 
 function onKindChange(next: OutputKind | null) {
   if (next === kind.value) return
@@ -176,7 +179,7 @@ const paramsValid = computed(() => {
 const canSubmit = computed(() => {
   if (props.loading || !kindSpec.value) return false
   if (!name.value.trim()) return false
-  if (needsPieceType.value && pieceTypeId.value === null) return false
+  if (!pieceTypeOptional.value && pieceTypeId.value === null) return false
   return pinValid.value && configValid.value && paramsValid.value
 })
 
@@ -209,7 +212,7 @@ function submit() {
   const payload: CreatePortDto = {
     name: name.value.trim(),
     kind: kind.value,
-    pieceTypeId: needsPieceType.value ? pieceTypeId.value : null,
+    pieceTypeId: pieceTypeId.value,
     pin: hasPin.value ? pin.value : null,
     config: { ...config.value },
     parameters: buildParameters()
@@ -258,15 +261,17 @@ function submit() {
             </div>
 
             <div v-if="kindSpec" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div v-if="needsPieceType" class="flex flex-col gap-1">
+              <div v-if="showPieceType" class="flex flex-col gap-1">
                 <label for="port-type" class="field-label">{{ t('dashboard.ports.form.field_type') }}</label>
-                <select id="port-type" v-model="pieceTypeId" class="field-input" :disabled="!pieceTypeOptions.length">
-                  <option :value="null" disabled>{{ t('dashboard.ports.form.field_type_placeholder') }}</option>
+                <select id="port-type" v-model="pieceTypeId" class="field-input" :disabled="!pieceTypeOptions.length && !pieceTypeOptional">
+                  <option v-if="pieceTypeOptional" :value="null">{{ t('dashboard.ports.form.field_type_none') }}</option>
+                  <option v-else :value="null" disabled>{{ t('dashboard.ports.form.field_type_placeholder') }}</option>
                   <option v-for="pt in pieceTypeOptions" :key="pt.id" :value="pt.id">{{ pt.name }}</option>
                 </select>
-                <p v-if="!pieceTypeOptions.length" class="field-help text-danger">
+                <p v-if="!pieceTypeOptions.length && !pieceTypeOptional" class="field-help text-danger">
                   {{ t('dashboard.ports.form.field_type_empty_for_kind', { kind: kindLabel(kind!) }) }}
                 </p>
+                <p v-else-if="pieceTypeOptional" class="field-help">{{ t('dashboard.ports.form.infrastructure_help') }}</p>
                 <p v-else class="field-help">{{ t('dashboard.ports.form.field_type_help') }}</p>
               </div>
               <p v-else class="field-help self-end pb-2 sm:col-span-1">

@@ -721,7 +721,7 @@
         "field_kind_immutable": "El tipus de sortida d’un port no es pot canviar.",
         "field_type_help": "Només es mostren els tipus d’article del mateix tipus de sortida.",
         "field_type_empty_for_kind": "No hi ha cap tipus d’article de sortida «{kind}». Crea’n un o assigna-li aquest tipus de sortida.",
-        "infrastructure_help": "Port d’infraestructura: no pertany a cap tipus d’article.",
+        "infrastructure_help": "Port d’infraestructura: el tipus d’article és opcional. Una tira pot ser una peça (tipus de sortida Tira LED) o només el suport dels seus segments.",
         "pin_reserved": "Pin reservat: {reason}.",
         "pin_not_ws281x": "Aquest pin no pot controlar una tira WS281x (usa 12, 18, 13, 19, 10 o 21).",
         "pin_ws281x_channel": "Pin {via}: la tira ha d’usar el canal {channel}.",
@@ -732,7 +732,8 @@
         "strip_empty": "Crea primer un port de tipus «Tira LED».",
         "advanced_title": "Avançat: paràmetres antics ({n})",
         "advanced_help": "Els paràmetres tipats antics es conserven per compatibilitat; el reproductor només fa servir la configuració.",
-        "catalog_error": "No s’ha pogut carregar el catàleg de sortides."
+        "catalog_error": "No s’ha pogut carregar el catàleg de sortides.",
+        "field_type_none": "Cap (port d’infraestructura)"
       },
       "delete": {
         "confirm_title": "Eliminar port",
