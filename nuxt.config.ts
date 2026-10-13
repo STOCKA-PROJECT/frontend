@@ -44,6 +44,10 @@ export default defineNuxtConfig({
       siteUrl: SITE_URL,
       siteName: SITE_NAME,
       editorUrl: EDITOR_URL,
+      // Sentry only reports when a DSN is set: production gets it from the worker vars below;
+      // local runs have none, so local errors never reach Sentry.
+      sentryDsn: process.env.NUXT_PUBLIC_SENTRY_DSN ?? "",
+      sentryEnvironment: process.env.NUXT_PUBLIC_SENTRY_ENVIRONMENT ?? "local",
     },
   },
 
@@ -121,6 +125,8 @@ export default defineNuxtConfig({
         vars: {
           NUXT_API_BASE_URL: "https://stocka.xeye.es",
           NUXT_PUBLIC_EDITOR_URL: "https://timeline.joanmartorellcoll03.workers.dev",
+          NUXT_PUBLIC_SENTRY_DSN: "https://cdfe5037e8b45c2c960a7b4f539ca5b7@o4511302617464832.ingest.de.sentry.io/4511302622511184",
+          NUXT_PUBLIC_SENTRY_ENVIRONMENT: "production",
         },
       },
     },

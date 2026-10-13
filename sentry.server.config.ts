@@ -1,7 +1,12 @@
 import * as Sentry from "@sentry/nuxt";
- 
+
+// Same source as the client config: the worker vars in production, nothing in local development.
+const dsn = process.env.NUXT_PUBLIC_SENTRY_DSN;
+
 Sentry.init({
-  dsn: "https://cdfe5037e8b45c2c960a7b4f539ca5b7@o4511302617464832.ingest.de.sentry.io/4511302622511184",
+  dsn: dsn || undefined,
+  enabled: !!dsn,
+  environment: process.env.NUXT_PUBLIC_SENTRY_ENVIRONMENT ?? "local",
 
   // We recommend adjusting this value in production, or using tracesSampler
   // for finer control

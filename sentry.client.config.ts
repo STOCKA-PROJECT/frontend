@@ -1,9 +1,14 @@
 import * as Sentry from "@sentry/nuxt";
+import { useRuntimeConfig } from "#imports";
+
+// The DSN comes from NUXT_PUBLIC_SENTRY_DSN (see nuxt.config.ts): set on the production worker,
+// absent in local development, where Sentry stays disabled.
+const { sentryDsn, sentryEnvironment } = useRuntimeConfig().public;
 
 Sentry.init({
-  // If set up, you can use your runtime config here
-  // dsn: useRuntimeConfig().public.sentry.dsn,
-  dsn: "https://cdfe5037e8b45c2c960a7b4f539ca5b7@o4511302617464832.ingest.de.sentry.io/4511302622511184",
+  dsn: sentryDsn || undefined,
+  enabled: !!sentryDsn,
+  environment: sentryEnvironment,
 
   // We recommend adjusting this value in production, or using tracesSampler
   // for finer control
