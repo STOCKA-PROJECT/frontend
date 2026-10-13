@@ -10,8 +10,15 @@ export const useContractStore = defineStore('contract', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
+  /**
+   * Kinds the forms do not offer: pieces with LEDs use a `led_strip` type and share the strip
+   * port; the timeline editor derives each piece's segment from its length and order on the
+   * strip, so nobody needs to create `led_segment` ports or types by hand.
+   */
+  const HIDDEN_KINDS: OutputKind[] = ['led_segment']
+
   const kinds = computed<OutputKind[]>(() =>
-    catalog.value ? (Object.keys(catalog.value.kinds) as OutputKind[]) : [])
+    catalog.value ? (Object.keys(catalog.value.kinds) as OutputKind[]).filter(k => !HIDDEN_KINDS.includes(k)) : [])
 
   /** Kinds a piece type can drive: every kind with show actions (a strip is a piece too; the button is not). */
   const pieceKinds = computed<OutputKind[]>(() =>
