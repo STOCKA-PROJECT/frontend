@@ -283,6 +283,12 @@ async function submitPassword() {
     <!-- Connected devices (full width) -->
     <AccountSessionsSection v-if="auth.user" />
 
+    <!-- Assistants: how to connect (full width) -->
+    <AccountAssistantConnectSection v-if="auth.user" />
+
+    <!-- Connected apps (full width) -->
+    <AccountConnectedAppsSection v-if="auth.user" />
+
     <!-- Security activity (full width) -->
     <AccountSecurityActivitySection v-if="auth.user" />
   </div>

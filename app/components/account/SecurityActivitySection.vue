@@ -93,7 +93,9 @@ const EVENT_TONE: Record<SecurityEventType, 'ok' | 'warn' | 'danger' | 'info'> =
   OAUTH_UNLINKED: 'info',
   REFRESH_REUSE_DETECTED: 'danger',
   NEW_DEVICE_LOGIN: 'warn',
-  SESSION_REVOKED: 'info'
+  SESSION_REVOKED: 'info',
+  OAUTH_APP_AUTHORIZED: 'info',
+  OAUTH_APP_REVOKED: 'info'
 }
 
 function toneClasses(tone: 'ok' | 'warn' | 'danger' | 'info'): string {

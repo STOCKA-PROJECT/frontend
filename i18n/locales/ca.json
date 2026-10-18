@@ -926,8 +926,52 @@
           "OAUTH_UNLINKED": "Compte extern desvinculat",
           "REFRESH_REUSE_DETECTED": "Sessió revocada per seguretat",
           "NEW_DEVICE_LOGIN": "Accés des d'un dispositiu nou",
-          "SESSION_REVOKED": "Sessió revocada"
+          "SESSION_REVOKED": "Sessió revocada",
+          "OAUTH_APP_AUTHORIZED": "Aplicació autoritzada",
+          "OAUTH_APP_REVOKED": "Aplicació revocada"
         }
+      },
+      "connected_apps": {
+        "section_title": "Aplicacions connectades",
+        "subtitle": "Assistents i eines que has autoritzat a actuar amb el teu compte. Revoca l'accés quan vulguis.",
+        "loading": "Carregant…",
+        "empty": "Encara no has connectat cap aplicació.",
+        "trusted": "Verificada",
+        "untrusted": "No verificada",
+        "granted_at": "Autoritzada {date}",
+        "last_used": "Últim ús {date}",
+        "never_used": "Sense ús encara",
+        "permissions": "Permisos",
+        "revoke": "Revocar",
+        "confirm": "Sí, revocar",
+        "cancel": "Cancel·lar",
+        "revoked": "Accés revocat. L'aplicació haurà de tornar a demanar permís.",
+        "errors": {
+          "load_failed": "No s'han pogut carregar les aplicacions connectades.",
+          "revoke_failed": "No s'ha pogut revocar l'accés."
+        },
+        "scope": {
+          "read": "Llegir",
+          "inventory:write": "Editar inventari",
+          "timelines:write": "Editar timelines",
+          "hardware:write": "Gestionar maquinari",
+          "org:manage": "Administrar organització",
+          "delete": "Eliminar",
+          "offline_access": "Mantenir la connexió"
+        }
+      },
+      "assistant": {
+        "section_title": "Connecta un assistent (MCP)",
+        "subtitle": "Claude i altres assistents poden consultar i editar els teus articles i timelines a través del protocol MCP. Cadascú inicia sessió amb el seu compte i tria què permet.",
+        "url_label": "URL del servidor MCP",
+        "copy": "Copiar",
+        "copied": "Copiat",
+        "steps_title": "Com connectar-lo",
+        "step_claude_web": "A claude.ai: Configuració › Connectors › Afegir connector personalitzat, enganxa la URL i autoritza amb el teu compte de Stocka.",
+        "step_claude_code": "A Claude Code (terminal):",
+        "step_claude_desktop": "A Claude Desktop: Configuració › Connectors › Afegir connector personalitzat amb la mateixa URL.",
+        "scopes_hint": "A la pantalla d'autorització pots desmarcar els permisos que no vulguis concedir; eliminar i administrar l'organització van desmarcats per defecte.",
+        "revoke_hint": "Pots revocar l'accés en qualsevol moment des d'Aplicacions connectades."
       }
     },
     "org_settings": {
@@ -1471,6 +1515,9 @@
       "segment_out_of_range": "El segment {first}–{last} surt de la tira (0–{max}).",
       "strip_shrink_breaks_segment": "No es pot escurçar la tira: el segment «{segment}» ({first}–{last}) en quedaria fora.",
       "strip_in_use": "La tira té segments que en depenen: {segments}."
+    },
+    "oauth": {
+      "app_not_found": "Aquesta aplicació no està connectada al teu compte."
     }
   }
 }

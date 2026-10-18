@@ -792,3 +792,17 @@ export interface SearchStatusDto {
   /** ISO date-time of the last training launch, or null. */
   lastTrainingLaunchedAt: string | null
 }
+
+/** An OAuth client (MCP connector) the user has authorized. */
+export interface ConnectedApp {
+  clientId: string
+  name: string
+  clientUri: string | null
+  logoUri: string | null
+  trusted: boolean
+  registeredVia: 'CIMD' | 'DCR' | 'MANUAL' | 'UNKNOWN'
+  scopes: string[]
+  grantedAt: string | null
+  lastUsedAt: string | null
+  expiresAt: string | null
+}

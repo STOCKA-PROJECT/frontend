@@ -926,8 +926,52 @@
           "OAUTH_UNLINKED": "Cuenta externa desvinculada",
           "REFRESH_REUSE_DETECTED": "Sesión revocada por seguridad",
           "NEW_DEVICE_LOGIN": "Acceso desde un dispositivo nuevo",
-          "SESSION_REVOKED": "Sesión revocada"
+          "SESSION_REVOKED": "Sesión revocada",
+          "OAUTH_APP_AUTHORIZED": "Aplicación autorizada",
+          "OAUTH_APP_REVOKED": "Aplicación revocada"
         }
+      },
+      "connected_apps": {
+        "section_title": "Aplicaciones conectadas",
+        "subtitle": "Asistentes y herramientas que has autorizado a actuar con tu cuenta. Revoca el acceso cuando quieras.",
+        "loading": "Cargando…",
+        "empty": "Todavía no has conectado ninguna aplicación.",
+        "trusted": "Verificada",
+        "untrusted": "No verificada",
+        "granted_at": "Autorizada {date}",
+        "last_used": "Último uso {date}",
+        "never_used": "Sin uso todavía",
+        "permissions": "Permisos",
+        "revoke": "Revocar",
+        "confirm": "Sí, revocar",
+        "cancel": "Cancelar",
+        "revoked": "Acceso revocado. La aplicación tendrá que volver a pedir permiso.",
+        "errors": {
+          "load_failed": "No se han podido cargar las aplicaciones conectadas.",
+          "revoke_failed": "No se ha podido revocar el acceso."
+        },
+        "scope": {
+          "read": "Leer",
+          "inventory:write": "Editar inventario",
+          "timelines:write": "Editar timelines",
+          "hardware:write": "Gestionar hardware",
+          "org:manage": "Administrar organización",
+          "delete": "Eliminar",
+          "offline_access": "Mantener la conexión"
+        }
+      },
+      "assistant": {
+        "section_title": "Conecta un asistente (MCP)",
+        "subtitle": "Claude y otros asistentes pueden consultar y editar tus artículos y timelines mediante el protocolo MCP. Cada persona inicia sesión con su cuenta y elige qué permite.",
+        "url_label": "URL del servidor MCP",
+        "copy": "Copiar",
+        "copied": "Copiado",
+        "steps_title": "Cómo conectarlo",
+        "step_claude_web": "En claude.ai: Configuración › Conectores › Añadir conector personalizado, pega la URL y autoriza con tu cuenta de Stocka.",
+        "step_claude_code": "En Claude Code (terminal):",
+        "step_claude_desktop": "En Claude Desktop: Configuración › Conectores › Añadir conector personalizado con la misma URL.",
+        "scopes_hint": "En la pantalla de autorización puedes desmarcar los permisos que no quieras conceder; eliminar y administrar la organización van desmarcados por defecto.",
+        "revoke_hint": "Puedes revocar el acceso en cualquier momento desde Aplicaciones conectadas."
       }
     },
     "org_settings": {
@@ -1471,6 +1515,9 @@
       "segment_out_of_range": "El segmento {first}–{last} se sale de la tira (0–{max}).",
       "strip_shrink_breaks_segment": "No se puede acortar la tira: el segmento «{segment}» ({first}–{last}) quedaría fuera.",
       "strip_in_use": "La tira tiene segmentos que dependen de ella: {segments}."
+    },
+    "oauth": {
+      "app_not_found": "Esta aplicación no está conectada a tu cuenta."
     }
   }
 }

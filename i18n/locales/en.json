@@ -926,8 +926,52 @@
           "OAUTH_UNLINKED": "External account unlinked",
           "REFRESH_REUSE_DETECTED": "Session revoked for security",
           "NEW_DEVICE_LOGIN": "Sign-in from a new device",
-          "SESSION_REVOKED": "Session revoked"
+          "SESSION_REVOKED": "Session revoked",
+          "OAUTH_APP_AUTHORIZED": "Application authorized",
+          "OAUTH_APP_REVOKED": "Application revoked"
         }
+      },
+      "connected_apps": {
+        "section_title": "Connected apps",
+        "subtitle": "Assistants and tools you authorized to act with your account. Revoke access whenever you want.",
+        "loading": "Loading…",
+        "empty": "You have not connected any application yet.",
+        "trusted": "Verified",
+        "untrusted": "Unverified",
+        "granted_at": "Authorized {date}",
+        "last_used": "Last used {date}",
+        "never_used": "Not used yet",
+        "permissions": "Permissions",
+        "revoke": "Revoke",
+        "confirm": "Yes, revoke",
+        "cancel": "Cancel",
+        "revoked": "Access revoked. The application will have to ask for permission again.",
+        "errors": {
+          "load_failed": "Could not load the connected apps.",
+          "revoke_failed": "Could not revoke access."
+        },
+        "scope": {
+          "read": "Read",
+          "inventory:write": "Edit inventory",
+          "timelines:write": "Edit timelines",
+          "hardware:write": "Manage hardware",
+          "org:manage": "Manage organization",
+          "delete": "Delete",
+          "offline_access": "Keep the connection"
+        }
+      },
+      "assistant": {
+        "section_title": "Connect an assistant (MCP)",
+        "subtitle": "Claude and other assistants can read and edit your pieces and timelines through the MCP protocol. Each person signs in with their own account and chooses what to allow.",
+        "url_label": "MCP server URL",
+        "copy": "Copy",
+        "copied": "Copied",
+        "steps_title": "How to connect it",
+        "step_claude_web": "In claude.ai: Settings › Connectors › Add custom connector, paste the URL and authorize with your Stocka account.",
+        "step_claude_code": "In Claude Code (terminal):",
+        "step_claude_desktop": "In Claude Desktop: Settings › Connectors › Add custom connector with the same URL.",
+        "scopes_hint": "On the authorization screen you can untick the permissions you do not want to grant; delete and manage organization are unticked by default.",
+        "revoke_hint": "You can revoke access at any time from Connected apps."
       }
     },
     "org_settings": {
@@ -1471,6 +1515,9 @@
       "segment_out_of_range": "Segment {first}–{last} falls outside the strip (0–{max}).",
       "strip_shrink_breaks_segment": "Cannot shorten the strip: segment “{segment}” ({first}–{last}) would fall outside.",
       "strip_in_use": "The strip has segments that depend on it: {segments}."
+    },
+    "oauth": {
+      "app_not_found": "This application is not connected to your account."
     }
   }
 }

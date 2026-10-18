@@ -42,6 +42,8 @@ export default defineNuxtConfig({
     apiBaseUrl: API_BASE_URL,
     public: {
       siteUrl: SITE_URL,
+      // Public URL of the MCP endpoint shown on "Mi cuenta" so people can connect an assistant.
+      mcpUrl: process.env.NUXT_PUBLIC_MCP_URL ?? `${API_BASE_URL}/mcp`,
       siteName: SITE_NAME,
       editorUrl: EDITOR_URL,
       // Sentry only reports when a DSN is set: production gets it from the worker vars below;
