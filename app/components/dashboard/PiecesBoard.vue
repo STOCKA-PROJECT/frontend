@@ -93,6 +93,7 @@ async function loadAll() {
       team.fetchMembers(props.orgSlug).catch(() => undefined),
       orgAttributes.fetchAll(props.orgSlug).catch(() => undefined),
       contacts.fetchContacts(props.orgSlug).catch(() => undefined),
+      pieces.fetchSearchStatus(props.orgSlug).catch(() => undefined),
       pieces.fetchList(props.orgSlug)
     ])
   } catch (e) {
@@ -245,6 +246,7 @@ function pieceLink(piece: PieceListItemDto) {
         :members="team.getMembers(orgSlug) ?? []"
         :contacts="contacts.getContacts(orgSlug) ?? []"
         :loading="pieces.loadingList"
+        :semantic="pieces.semanticSearchFor(orgSlug)"
         @change="onFilterChange"
         @clear="onClearFilters"
       />

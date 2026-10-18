@@ -15,6 +15,9 @@ const orgs = useOrganizationsStore()
 const { slug: orgSlug, org } = useCurrentOrg()
 
 const isOwner = computed(() => org.value?.currentUserRole === 'OWNER')
+const canManageSearch = computed(() =>
+  org.value?.currentUserRole === 'OWNER' || org.value?.currentUserRole === 'MANAGER'
+)
 
 useSeoMeta({
   title: () => t('dashboard.org_settings.title'),
@@ -228,6 +231,11 @@ async function submit() {
       v-if="orgSlug"
       :org-slug="orgSlug"
       :can-write="isOwner" />
+
+    <DashboardSemanticSearchCard
+      v-if="orgSlug"
+      :org-slug="orgSlug"
+      :can-manage="canManageSearch" />
 
     <section v-if="isOwner"
       class="rounded-[14px] border border-danger/30 bg-danger-soft/40 p-6 max-md:p-5">

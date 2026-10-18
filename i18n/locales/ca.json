@@ -970,6 +970,28 @@
         "errors": {
           "generic": "No s'ha pogut eliminar l'organització. Torna-ho a provar."
         }
+      },
+      "search": {
+        "title": "Cerca intel·ligent",
+        "subtitle": "Els articles s'indexen a XEYE perquè es puguin trobar descrivint-los. Els canvis s'entrenen sols al cap d'uns minuts.",
+        "disabled": "Aquest servidor no té la cerca intel·ligent activada.",
+        "state": "Estat",
+        "status_indexed": "Indexada",
+        "status_not_indexed": "Sense indexar",
+        "indexed_count": "Articles indexats",
+        "last_training": "Darrer entrenament",
+        "never": "Mai",
+        "pending": "Canvis pendents",
+        "reindex": "Reindexar",
+        "reindexing": "Reindexant…",
+        "reindexed": "Índex reconstruït. L'entrenament s'executarà en uns minuts.",
+        "loading": "Carregant l'estat…",
+        "errors": {
+          "load": "No s'ha pogut carregar l'estat de la cerca.",
+          "not_configured": "La cerca intel·ligent no està configurada en aquest servidor.",
+          "forbidden": "No tens permisos per reindexar aquesta organització.",
+          "generic": "No s'ha pogut reindexar. Torna-ho a provar més tard."
+        }
       }
     },
     "create_org": {
@@ -1179,7 +1201,10 @@
         "active_filters": "Filtres actius",
         "remove_filter": "Treu el filtre",
         "clear_advanced": "Neteja avançats",
-        "no_attributes": "No hi ha atributs filtrables"
+        "no_attributes": "No hi ha atributs filtrables",
+        "search_placeholder_semantic": "Descriu l'article que busques…",
+        "semantic_badge": "Cerca intel·ligent",
+        "semantic_hint": "Pots descriure l'article amb les teves paraules: la cerca entén sinònims i errors d'escriptura."
       },
       "form": {
         "title_create": "Nou article",

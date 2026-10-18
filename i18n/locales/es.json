@@ -970,6 +970,28 @@
         "errors": {
           "generic": "No se ha podido eliminar la organización. Inténtalo de nuevo."
         }
+      },
+      "search": {
+        "title": "Búsqueda inteligente",
+        "subtitle": "Los artículos se indexan en XEYE para poder encontrarlos describiéndolos. Los cambios se entrenan solos al cabo de unos minutos.",
+        "disabled": "Este servidor no tiene la búsqueda inteligente activada.",
+        "state": "Estado",
+        "status_indexed": "Indexada",
+        "status_not_indexed": "Sin indexar",
+        "indexed_count": "Artículos indexados",
+        "last_training": "Último entrenamiento",
+        "never": "Nunca",
+        "pending": "Cambios pendientes",
+        "reindex": "Reindexar",
+        "reindexing": "Reindexando…",
+        "reindexed": "Índice reconstruido. El entrenamiento se ejecutará en unos minutos.",
+        "loading": "Cargando el estado…",
+        "errors": {
+          "load": "No se ha podido cargar el estado de la búsqueda.",
+          "not_configured": "La búsqueda inteligente no está configurada en este servidor.",
+          "forbidden": "No tienes permisos para reindexar esta organización.",
+          "generic": "No se ha podido reindexar. Inténtalo más tarde."
+        }
       }
     },
     "create_org": {
@@ -1179,7 +1201,10 @@
         "active_filters": "Filtros activos",
         "remove_filter": "Quitar filtro",
         "clear_advanced": "Limpiar avanzados",
-        "no_attributes": "No hay atributos filtrables"
+        "no_attributes": "No hay atributos filtrables",
+        "search_placeholder_semantic": "Describe el artículo que buscas…",
+        "semantic_badge": "Búsqueda inteligente",
+        "semantic_hint": "Puedes describir el artículo con tus palabras: la búsqueda entiende sinónimos y errores de escritura."
       },
       "form": {
         "title_create": "Nuevo artículo",

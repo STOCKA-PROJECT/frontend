@@ -12,7 +12,9 @@ const props = withDefaults(defineProps<{
   members: MemberResponseDto[]
   contacts?: ContactResponseDto[]
   loading?: boolean
-}>(), { contacts: () => [] })
+  /** Whether the text box ranks through the semantic index instead of a plain name/description match. */
+  semantic?: boolean
+}>(), { contacts: () => [], semantic: false })
 
 const emit = defineEmits<{
   change: [patch: Partial<PieceListFilters>]
@@ -76,14 +78,26 @@ const hasAnyFilter = computed(() =>
 <template>
   <div class="grid grid-cols-1 items-end gap-2.5 border-b border-line bg-bg-soft/40 px-4 py-3.5 sm:grid-cols-2 sm:px-5 lg:grid-cols-[1.5fr_1fr_1fr_1fr_auto] lg:gap-3">
     <div class="flex flex-col gap-1">
-      <label for="filter-q" class="filter-label">
+      <label for="filter-q" class="filter-label flex items-center gap-1.5">
         {{ t('dashboard.pieces.filters.search') }}
+        <span
+          v-if="semantic"
+          class="semantic-badge"
+          :title="t('dashboard.pieces.filters.semantic_hint')"
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8L12 2zm7 11l.9 2.6L22.5 16.5l-2.6.9L19 20l-.9-2.6-2.6-.9 2.6-.9L19 13zM5 14l.7 2 2 .7-2 .7L5 19.4l-.7-2-2-.7 2-.7L5 14z" />
+          </svg>
+          {{ t('dashboard.pieces.filters.semantic_badge') }}
+        </span>
       </label>
       <input
         id="filter-q"
         type="text"
         :value="qLocal"
-        :placeholder="t('dashboard.pieces.filters.search_placeholder')"
+        :placeholder="t(semantic
+          ? 'dashboard.pieces.filters.search_placeholder_semantic'
+          : 'dashboard.pieces.filters.search_placeholder')"
         class="filter-input w-full"
         @input="onQInput"
       >
@@ -145,6 +159,19 @@ const hasAnyFilter = computed(() =>
   color: var(--c-ink-muted);
   letter-spacing: .03em;
   text-transform: uppercase;
+}
+.semantic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-accent-soft);
+  color: var(--c-accent-ink);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: .01em;
+  text-transform: none;
 }
 .filter-input,
 .filter-select {

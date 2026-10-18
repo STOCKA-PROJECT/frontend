@@ -970,6 +970,28 @@
         "errors": {
           "generic": "Couldn't delete the organization. Please try again."
         }
+      },
+      "search": {
+        "title": "Smart search",
+        "subtitle": "Items are indexed in XEYE so they can be found by describing them. Changes are trained automatically after a few minutes.",
+        "disabled": "Smart search is not enabled on this server.",
+        "state": "State",
+        "status_indexed": "Indexed",
+        "status_not_indexed": "Not indexed",
+        "indexed_count": "Indexed items",
+        "last_training": "Last training",
+        "never": "Never",
+        "pending": "Pending changes",
+        "reindex": "Rebuild index",
+        "reindexing": "Rebuilding…",
+        "reindexed": "Index rebuilt. Training will run in a few minutes.",
+        "loading": "Loading status…",
+        "errors": {
+          "load": "Could not load the search status.",
+          "not_configured": "Smart search is not configured on this server.",
+          "forbidden": "You are not allowed to rebuild this organization's index.",
+          "generic": "Could not rebuild the index. Try again later."
+        }
       }
     },
     "create_org": {
@@ -1179,7 +1201,10 @@
         "active_filters": "Active filters",
         "remove_filter": "Remove filter",
         "clear_advanced": "Clear advanced",
-        "no_attributes": "No filterable attributes"
+        "no_attributes": "No filterable attributes",
+        "search_placeholder_semantic": "Describe the item you are looking for…",
+        "semantic_badge": "Smart search",
+        "semantic_hint": "Describe the item in your own words: the search understands synonyms and typos."
       },
       "form": {
         "title_create": "New item",

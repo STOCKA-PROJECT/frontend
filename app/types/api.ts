@@ -778,3 +778,17 @@ export interface PieceImportReportDto {
   rows: ImportRowResultDto[]
   warnings: string[]
 }
+
+/** State of the semantic (XEYE) index of an organization: `GET /organizations/{slug}/search/status`. */
+export interface SearchStatusDto {
+  organizationId: number
+  /** Whether the server has the XEYE integration configured. */
+  enabled: boolean
+  /** Whether the organization already has its XEYE list. */
+  indexed: boolean
+  indexedPieces: number
+  totalPieces: number
+  trainingPending: boolean
+  /** ISO date-time of the last training launch, or null. */
+  lastTrainingLaunchedAt: string | null
+}

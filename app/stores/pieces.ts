@@ -12,6 +12,7 @@ import type {
   PieceListFilters,
   PieceListItemDto,
   PieceResponseDto,
+  SearchStatusDto,
   SpreadsheetFormat,
   UpdatePieceDto,
   UpdatePieceLocationDto
@@ -35,6 +36,10 @@ export const usePiecesStore = defineStore('pieces', () => {
   const pageMeta = ref<Page<PieceListItemDto> | null>(null)
   const filters = ref<PieceListFilters>({ ...DEFAULT_FILTERS })
   const loadingList = ref(false)
+
+  // Estat de l'índex semàntic (XEYE) per organització: decideix si el quadre de
+  // cerca es presenta com a cerca intel·ligent i alimenta la targeta d'ajustos.
+  const searchStatusByOrg = ref<Record<string, SearchStatusDto>>({})
 
   // Detalle por id
   const detailById = ref<Record<number, PieceResponseDto>>({})
@@ -464,6 +469,31 @@ export const usePiecesStore = defineStore('pieces', () => {
     attachmentBlobInFlight.value = {}
   }
 
+  function searchStatusFor(orgSlug: string): SearchStatusDto | null {
+    return searchStatusByOrg.value[orgSlug] ?? null
+  }
+
+  /** Cerca intel·ligent disponible: el servidor té XEYE i l'organització ja té articles indexats. */
+  function semanticSearchFor(orgSlug: string): boolean {
+    const s = searchStatusByOrg.value[orgSlug]
+    return Boolean(s?.enabled && s.indexed && s.indexedPieces > 0)
+  }
+
+  async function fetchSearchStatus(orgSlug: string): Promise<SearchStatusDto> {
+    const api = useApi()
+    const status = await api<SearchStatusDto>(`/organizations/${orgSlug}/search/status`)
+    searchStatusByOrg.value = { ...searchStatusByOrg.value, [orgSlug]: status }
+    return status
+  }
+
+  /** Reconstrueix l'índex de l'organització (OWNER/MANAGER) i refresca l'estat. */
+  async function reindexSearch(orgSlug: string): Promise<SearchStatusDto> {
+    const api = useApi()
+    const status = await api<SearchStatusDto>(`/organizations/${orgSlug}/search/reindex`, { method: 'POST' })
+    searchStatusByOrg.value = { ...searchStatusByOrg.value, [orgSlug]: status }
+    return status
+  }
+
   return {
     byLocation,
     loadingFor,
@@ -481,6 +511,12 @@ export const usePiecesStore = defineStore('pieces', () => {
     setFilters,
     setAttributeFilter,
     resetFilters,
+
+    searchStatusByOrg,
+    searchStatusFor,
+    semanticSearchFor,
+    fetchSearchStatus,
+    reindexSearch,
 
     detailById,
     loadingDetail,
