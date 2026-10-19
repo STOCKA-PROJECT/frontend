@@ -358,6 +358,7 @@
       "types": "Tipus d'article",
       "timelines": "Timelines",
       "ports": "Ports",
+      "devices": "Dispositius",
       "team": "Equip",
       "settings": "Configuració"
     },
@@ -791,6 +792,85 @@
         "first": "Els segments poden anar al revés (primer > últim).",
         "last": "Dins de 0 i el nombre de LED de la tira menys 1.",
         "strip": "Nom d’un port de tipus Tira LED."
+      }
+    },
+    "devices": {
+      "page_title": "Dispositius",
+      "page_subtitle": "Les Raspberry Pi del pessebre registrades a l’organització i l’últim estat que han comunicat: show actiu, ports tallats, versió i errors.",
+      "list": {
+        "count": "{n} dispositius | {n} dispositiu | {n} dispositius",
+        "new": "Registra un dispositiu",
+        "loading": "Carregant dispositius…",
+        "empty_title": "Encara no hi ha cap dispositiu",
+        "empty": "Un dispositiu és una Raspberry Pi que fa de reproductor del pessebre. Quan té Internet envia una pulsació cada minut, i aquí veus quin show té actiu i com està.",
+        "online": "En línia",
+        "offline": "Fora de línia",
+        "just_now": "ara mateix",
+        "never_seen": "Encara no ha enviat cap pulsació",
+        "last_seen_title": "Última pulsació: {date}",
+        "show_label": "Show",
+        "no_show": "Cap show actiu",
+        "overrides_label": "Ports tallats",
+        "version": "Versió",
+        "ip": "IP",
+        "token": "Token",
+        "board": "Placa",
+        "device_id": "Id",
+        "last_error": "Últim error",
+        "rename": "Reanomena",
+        "rotate": "Rota el token",
+        "delete": "Elimina",
+        "refresh_failed": "No s’ha pogut actualitzar la llista. Es tornarà a intentar automàticament."
+      },
+      "state": {
+        "BOOT": "Arrencant",
+        "SAFE": "En segur",
+        "IDLE": "A punt",
+        "PLAYING": "Reproduint",
+        "TEST": "Mode prova",
+        "ERROR": "Error",
+        "unknown": "Sense estat"
+      },
+      "form": {
+        "register_title": "Registra un dispositiu",
+        "rename_title": "Reanomena «{name}»",
+        "field_name": "Nom",
+        "field_name_placeholder": "Pessebre de l’església",
+        "field_name_help": "Com l’identificareu a Stocka; ha de ser únic a l’organització.",
+        "register": "Registra",
+        "save": "Desa els canvis"
+      },
+      "token": {
+        "register_title": "Dispositiu registrat",
+        "rotate_title": "Token rotat",
+        "register_intro": "«{name}» ja existeix a Stocka. Perquè la Raspberry hi enviï les pulsacions, copia aquestes dades a la seva pàgina.",
+        "rotate_intro": "«{name}» té un token nou; l’anterior ha deixat de funcionar. Actualitza’l a la pàgina de la Raspberry.",
+        "url_label": "URL de pulsació",
+        "token_label": "Token",
+        "copy": "Copia",
+        "copied": "Copiat",
+        "copy_url_aria": "Copia l’URL de pulsació",
+        "copy_token_aria": "Copia el token",
+        "copied_url": "URL de pulsació copiat al porta-retalls.",
+        "copied_token": "Token copiat al porta-retalls.",
+        "once_warning": "El token només es mostra ara. Si el perds, rota’l des d’aquesta pàgina.",
+        "instructions": "Enganxa l’URL i el token a la pàgina de la Raspberry, al panell Sistema → «Enllaç amb Stocka», i desa.",
+        "done": "Fet"
+      },
+      "confirm": {
+        "rotate_title": "Rotar el token",
+        "rotate_message": "Segur que vols rotar el token de «{name}»? El token actual deixarà de funcionar de seguida i hauràs d’enganxar el nou a la Raspberry.",
+        "rotate_label": "Rota el token",
+        "delete_title": "Eliminar dispositiu",
+        "delete_message": "Segur que vols eliminar «{name}»? Les seves pulsacions es rebutjaran a partir d’ara.",
+        "delete_label": "Elimina"
+      },
+      "toasts": {
+        "deleted": "Dispositiu eliminat."
+      },
+      "not_available": {
+        "title": "Funció no disponible",
+        "body": "Els dispositius només estan disponibles per a organitzacions habilitades. Contacta amb un administrador si creus que hi hauries de tenir accés."
       }
     },
     "account": {
@@ -1527,6 +1607,10 @@
       "segment_out_of_range": "El segment {first}–{last} surt de la tira (0–{max}).",
       "strip_shrink_breaks_segment": "No es pot escurçar la tira: el segment «{segment}» ({first}–{last}) en quedaria fora.",
       "strip_in_use": "La tira té segments que en depenen: {segments}."
+    },
+    "devices": {
+      "name_taken": "Ja existeix un dispositiu amb aquest nom a l’organització.",
+      "not_found": "Dispositiu no trobat."
     },
     "oauth": {
       "app_not_found": "Aquesta aplicació no està connectada al teu compte."

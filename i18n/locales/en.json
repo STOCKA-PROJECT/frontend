@@ -358,6 +358,7 @@
       "types": "Item types",
       "timelines": "Timelines",
       "ports": "Ports",
+      "devices": "Devices",
       "team": "Team",
       "settings": "Settings"
     },
@@ -791,6 +792,85 @@
         "first": "Segments may run backwards (first > last).",
         "last": "Between 0 and the strip LED count minus 1.",
         "strip": "Name of a LED strip port."
+      }
+    },
+    "devices": {
+      "page_title": "Devices",
+      "page_subtitle": "The Raspberry Pi players of the nativity scene registered in the organization and the last state they reported: active show, cut ports, version and errors.",
+      "list": {
+        "count": "{n} devices | {n} device | {n} devices",
+        "new": "Register a device",
+        "loading": "Loading devices…",
+        "empty_title": "No devices yet",
+        "empty": "A device is a Raspberry Pi acting as the nativity scene player. When it has Internet it sends a heartbeat every minute, and here you see which show it has active and how it is doing.",
+        "online": "Online",
+        "offline": "Offline",
+        "just_now": "just now",
+        "never_seen": "No heartbeat received yet",
+        "last_seen_title": "Last heartbeat: {date}",
+        "show_label": "Show",
+        "no_show": "No active show",
+        "overrides_label": "Cut ports",
+        "version": "Version",
+        "ip": "IP",
+        "token": "Token",
+        "board": "Board",
+        "device_id": "Id",
+        "last_error": "Last error",
+        "rename": "Rename",
+        "rotate": "Rotate token",
+        "delete": "Delete",
+        "refresh_failed": "The list could not be refreshed. It will retry automatically."
+      },
+      "state": {
+        "BOOT": "Booting",
+        "SAFE": "Safe mode",
+        "IDLE": "Ready",
+        "PLAYING": "Playing",
+        "TEST": "Test mode",
+        "ERROR": "Error",
+        "unknown": "No state"
+      },
+      "form": {
+        "register_title": "Register a device",
+        "rename_title": "Rename “{name}”",
+        "field_name": "Name",
+        "field_name_placeholder": "Church nativity scene",
+        "field_name_help": "How you will identify it in Stocka; it must be unique in the organization.",
+        "register": "Register",
+        "save": "Save changes"
+      },
+      "token": {
+        "register_title": "Device registered",
+        "rotate_title": "Token rotated",
+        "register_intro": "“{name}” now exists in Stocka. For the Raspberry to send its heartbeats, copy these details into its page.",
+        "rotate_intro": "“{name}” has a new token; the previous one has stopped working. Update it in the Raspberry’s page.",
+        "url_label": "Heartbeat URL",
+        "token_label": "Token",
+        "copy": "Copy",
+        "copied": "Copied",
+        "copy_url_aria": "Copy the heartbeat URL",
+        "copy_token_aria": "Copy the token",
+        "copied_url": "Heartbeat URL copied to the clipboard.",
+        "copied_token": "Token copied to the clipboard.",
+        "once_warning": "The token is shown only now. If you lose it, rotate it from this page.",
+        "instructions": "Paste the URL and the token into the Raspberry’s page, in the System → “Enllaç amb Stocka” (Stocka link) panel, and save.",
+        "done": "Done"
+      },
+      "confirm": {
+        "rotate_title": "Rotate token",
+        "rotate_message": "Rotate the token of “{name}”? The current token will stop working right away and you will have to paste the new one into the Raspberry.",
+        "rotate_label": "Rotate token",
+        "delete_title": "Delete device",
+        "delete_message": "Delete “{name}”? Its heartbeats will be rejected from now on.",
+        "delete_label": "Delete"
+      },
+      "toasts": {
+        "deleted": "Device deleted."
+      },
+      "not_available": {
+        "title": "Feature not available",
+        "body": "Devices are only available for enabled organizations. Contact an administrator if you think you should have access."
       }
     },
     "account": {
@@ -1527,6 +1607,10 @@
       "segment_out_of_range": "Segment {first}–{last} falls outside the strip (0–{max}).",
       "strip_shrink_breaks_segment": "Cannot shorten the strip: segment “{segment}” ({first}–{last}) would fall outside.",
       "strip_in_use": "The strip has segments that depend on it: {segments}."
+    },
+    "devices": {
+      "name_taken": "A device with this name already exists in the organization.",
+      "not_found": "Device not found."
     },
     "oauth": {
       "app_not_found": "This application is not connected to your account."

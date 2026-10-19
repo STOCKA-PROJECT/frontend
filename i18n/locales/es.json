@@ -358,6 +358,7 @@
       "types": "Tipos de artículo",
       "timelines": "Timelines",
       "ports": "Puertos",
+      "devices": "Dispositivos",
       "team": "Equipo",
       "settings": "Ajustes"
     },
@@ -791,6 +792,85 @@
         "first": "Los segmentos pueden ir al revés (primero > último).",
         "last": "Entre 0 y el número de LED de la tira menos 1.",
         "strip": "Nombre de un puerto de tipo Tira LED."
+      }
+    },
+    "devices": {
+      "page_title": "Dispositivos",
+      "page_subtitle": "Las Raspberry Pi del belén registradas en la organización y el último estado que han comunicado: show activo, puertos cortados, versión y errores.",
+      "list": {
+        "count": "{n} dispositivos | {n} dispositivo | {n} dispositivos",
+        "new": "Registrar un dispositivo",
+        "loading": "Cargando dispositivos…",
+        "empty_title": "Todavía no hay ningún dispositivo",
+        "empty": "Un dispositivo es una Raspberry Pi que hace de reproductor del belén. Cuando tiene Internet envía un latido cada minuto, y aquí ves qué show tiene activo y cómo está.",
+        "online": "En línea",
+        "offline": "Sin conexión",
+        "just_now": "ahora mismo",
+        "never_seen": "Todavía no ha enviado ningún latido",
+        "last_seen_title": "Último latido: {date}",
+        "show_label": "Show",
+        "no_show": "Ningún show activo",
+        "overrides_label": "Puertos cortados",
+        "version": "Versión",
+        "ip": "IP",
+        "token": "Token",
+        "board": "Placa",
+        "device_id": "Id",
+        "last_error": "Último error",
+        "rename": "Renombrar",
+        "rotate": "Rotar el token",
+        "delete": "Eliminar",
+        "refresh_failed": "No se ha podido actualizar la lista. Se volverá a intentar automáticamente."
+      },
+      "state": {
+        "BOOT": "Arrancando",
+        "SAFE": "En seguro",
+        "IDLE": "Listo",
+        "PLAYING": "Reproduciendo",
+        "TEST": "Modo prueba",
+        "ERROR": "Error",
+        "unknown": "Sin estado"
+      },
+      "form": {
+        "register_title": "Registrar un dispositivo",
+        "rename_title": "Renombrar «{name}»",
+        "field_name": "Nombre",
+        "field_name_placeholder": "Belén de la iglesia",
+        "field_name_help": "Cómo lo identificaréis en Stocka; debe ser único en la organización.",
+        "register": "Registrar",
+        "save": "Guardar los cambios"
+      },
+      "token": {
+        "register_title": "Dispositivo registrado",
+        "rotate_title": "Token rotado",
+        "register_intro": "«{name}» ya existe en Stocka. Para que la Raspberry le envíe los latidos, copia estos datos en su página.",
+        "rotate_intro": "«{name}» tiene un token nuevo; el anterior ha dejado de funcionar. Actualízalo en la página de la Raspberry.",
+        "url_label": "URL de latido",
+        "token_label": "Token",
+        "copy": "Copiar",
+        "copied": "Copiado",
+        "copy_url_aria": "Copiar la URL de latido",
+        "copy_token_aria": "Copiar el token",
+        "copied_url": "URL de latido copiada al portapapeles.",
+        "copied_token": "Token copiado al portapapeles.",
+        "once_warning": "El token solo se muestra ahora. Si lo pierdes, rótalo desde esta página.",
+        "instructions": "Pega la URL y el token en la página de la Raspberry, en el panel Sistema → «Enlace con Stocka», y guarda.",
+        "done": "Hecho"
+      },
+      "confirm": {
+        "rotate_title": "Rotar el token",
+        "rotate_message": "¿Seguro que quieres rotar el token de «{name}»? El token actual dejará de funcionar enseguida y tendrás que pegar el nuevo en la Raspberry.",
+        "rotate_label": "Rotar el token",
+        "delete_title": "Eliminar dispositivo",
+        "delete_message": "¿Seguro que quieres eliminar «{name}»? Sus latidos se rechazarán a partir de ahora.",
+        "delete_label": "Eliminar"
+      },
+      "toasts": {
+        "deleted": "Dispositivo eliminado."
+      },
+      "not_available": {
+        "title": "Función no disponible",
+        "body": "Los dispositivos solo están disponibles para organizaciones habilitadas. Contacta con un administrador si crees que deberías tener acceso."
       }
     },
     "account": {
@@ -1527,6 +1607,10 @@
       "segment_out_of_range": "El segmento {first}–{last} se sale de la tira (0–{max}).",
       "strip_shrink_breaks_segment": "No se puede acortar la tira: el segmento «{segment}» ({first}–{last}) quedaría fuera.",
       "strip_in_use": "La tira tiene segmentos que dependen de ella: {segments}."
+    },
+    "devices": {
+      "name_taken": "Ya existe un dispositivo con este nombre en la organización.",
+      "not_found": "Dispositivo no encontrado."
     },
     "oauth": {
       "app_not_found": "Esta aplicación no está conectada a tu cuenta."

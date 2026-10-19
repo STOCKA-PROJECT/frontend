@@ -583,6 +583,55 @@ export interface UpdatePortDto {
   parameters?: ActionParameterDto[]
 }
 
+/** Player states reported by the Raspberry Pi in its heartbeat (`rpi4-system`). */
+export type DeviceState = 'BOOT' | 'SAFE' | 'IDLE' | 'PLAYING' | 'TEST' | 'ERROR'
+
+/**
+ * A Raspberry Pi player registered in an organization, with the last state it reported through
+ * its heartbeat. {@link online} is true while the last heartbeat is less than five minutes old.
+ * Private, organization-gated feature like ports — see {@link OrganizationResponseDto.portsEnabled}.
+ */
+export interface DeviceResponseDto {
+  id: number
+  /** Identifier the player reports about itself; null until its first heartbeat. */
+  deviceId: string | null
+  name: string
+  board: string
+  online: boolean
+  lastSeenAt: string | null
+  /** One of {@link DeviceState}; kept as a string so a state added later still renders. */
+  lastState: string | null
+  /** `sha256:…` hash of the show active on the player. */
+  lastShowHash: string | null
+  lastShowName: string | null
+  /** Names of the ports the player currently has cut (overrides). */
+  lastOverrides: string[]
+  lastVersion: string | null
+  lastIp: string | null
+  lastError: string | null
+  /** First characters of the heartbeat token, to tell tokens apart after a rotation. */
+  tokenPrefix: string
+  createdAt: string
+}
+
+/**
+ * Result of registering a device or rotating its token. {@link heartbeatToken} is returned here
+ * and never again: the UI shows it once with a copy button.
+ */
+export interface DeviceCreatedDto {
+  device: DeviceResponseDto
+  heartbeatToken: string
+  heartbeatUrl: string
+}
+
+export interface CreateDeviceDto {
+  name: string
+}
+
+export interface UpdateDeviceDto {
+  name: string
+}
+
 /**
  * A timeline (línea de tiempo) belonging to an organization. Identified by a {@link name} that is
  * unique within its organization; {@link createdAt}/{@link updatedAt} are managed automatically.

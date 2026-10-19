@@ -16,8 +16,8 @@ const hasOrgs = computed(() => orgs.list.length >= 1)
 const navOrgSlug = computed(() => currentOrgSlug.value ?? orgs.lastSlug ?? orgs.list[0]?.slug ?? null)
 const hasOrgScope = computed(() => navOrgSlug.value != null)
 
-// The "Puertos" section is a private, org-gated feature: only show its nav link when the
-// organization in scope has it enabled (its owner is a global admin).
+// "Puertos" and "Dispositivos" are a private, org-gated feature: only show their nav links when
+// the organization in scope has it enabled (its owner is a global admin).
 const navOrg = computed(() => navOrgSlug.value
   ? (orgs.list.find(o => o.slug === navOrgSlug.value) ?? null)
   : null)
@@ -114,6 +114,12 @@ async function handleLogout() {
         class="nav-item">
         <DashboardIcon name="cpu" />
         <span>{{ t('dashboard.nav.ports') }}</span>
+      </NuxtLink>
+
+      <NuxtLink v-if="hasOrgs && portsEnabled" :to="orgPath('/dispositivos', navOrgSlug)" exact-active-class="is-active"
+        class="nav-item">
+        <DashboardIcon name="radio" />
+        <span>{{ t('dashboard.nav.devices') }}</span>
       </NuxtLink>
 
       <button v-for="item in inactiveItems" :key="item.label" type="button" class="nav-item is-disabled"
@@ -265,6 +271,12 @@ async function handleLogout() {
             class="nav-item" @click="close">
             <DashboardIcon name="cpu" />
             <span>{{ t('dashboard.nav.ports') }}</span>
+          </NuxtLink>
+
+          <NuxtLink v-if="hasOrgs && portsEnabled" :to="orgPath('/dispositivos', navOrgSlug)" exact-active-class="is-active"
+            class="nav-item" @click="close">
+            <DashboardIcon name="radio" />
+            <span>{{ t('dashboard.nav.devices') }}</span>
           </NuxtLink>
         </nav>
 
