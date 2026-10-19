@@ -1,9 +1,44 @@
 import { defineStore } from 'pinia'
+import { FetchError } from 'ofetch'
 import type {
   CreateTimelineDto,
   TimelineResponseDto,
   UpdateTimelineDto
 } from '~/types/api'
+import { slugifyOrgName } from '~/composables/useSlugify'
+import { filenameFromContentDisposition } from '~/utils/download'
+
+/** Bytes of a file served by the backend plus the name it should be saved under. */
+export interface DownloadedFile {
+  blob: Blob
+  filename: string
+}
+
+const BUNDLE_ACCEPT = 'application/zip, application/problem+json, application/json'
+const SHOW_ACCEPT = 'application/json, application/problem+json'
+
+/**
+ * With `responseType: 'blob'` ofetch also parses error bodies as a `Blob`. Put the
+ * ProblemDetail JSON back in place so `useApiError()` can read `code`, `detail` and
+ * `issues` exactly as for any other request. `FetchError.data` is a getter over
+ * `response._data`, so only the latter is assigned.
+ */
+async function restoreJsonErrorBody(err: unknown): Promise<void> {
+  if (!(err instanceof FetchError) || !err.response) return
+  const data: unknown = err.response._data
+  if (!(data instanceof Blob)) return
+  const contentType = err.response.headers.get('content-type') ?? ''
+  if (!/json/i.test(contentType)) return
+  try {
+    err.response._data = JSON.parse(await data.text())
+  } catch {
+    // not JSON after all: useApiError falls back to its generic message
+  }
+}
+
+function fileBaseName(timeline: TimelineResponseDto): string {
+  return slugifyOrgName(timeline.name, 48) || `timeline-${timeline.id}`
+}
 
 export const useTimelinesStore = defineStore('timelines', () => {
   const list = ref<TimelineResponseDto[]>([])
@@ -46,6 +81,54 @@ export const useTimelinesStore = defineStore('timelines', () => {
     await fetchList(orgSlug)
   }
 
+  /**
+   * Fetches a file through the BFF (`/api/...`), so the httpOnly session cookie is
+   * exchanged for the backend `Authorization` header by the proxy and the usual
+   * 401 → refresh → retry flow of `useApi()` applies. The name comes from the
+   * `Content-Disposition` header when the backend sends one.
+   */
+  async function fetchFile(path: string, accept: string, fallbackName: string): Promise<DownloadedFile> {
+    if (import.meta.server) throw new Error('download_unavailable_on_server')
+    const api = useApi()
+    let filename = fallbackName
+    try {
+      const blob = await api<Blob>(path, {
+        responseType: 'blob',
+        headers: { Accept: accept },
+        onResponse({ response }) {
+          if (!response.ok) return
+          filename = filenameFromContentDisposition(response.headers.get('content-disposition')) ?? fallbackName
+        }
+      })
+      return { blob, filename }
+    } catch (err) {
+      await restoreJsonErrorBody(err)
+      throw err
+    }
+  }
+
+  /**
+   * Downloads the self-contained `.belen.zip` bundle of a timeline (show + assets).
+   * Rejects with a `FetchError` carrying the ProblemDetail body: 404 when the timeline
+   * has no scene, 422 (with `issues`) when the scene has blocking errors.
+   */
+  function downloadBundle(orgSlug: string, timeline: TimelineResponseDto): Promise<DownloadedFile> {
+    return fetchFile(
+      `/organizations/${orgSlug}/timelines/${timeline.id}/bundle`,
+      BUNDLE_ACCEPT,
+      `${fileBaseName(timeline)}.belen.zip`
+    )
+  }
+
+  /** Downloads the generated `show.json` of a timeline, byte-for-byte as the backend serves it. */
+  function downloadShow(orgSlug: string, timeline: TimelineResponseDto): Promise<DownloadedFile> {
+    return fetchFile(
+      `/organizations/${orgSlug}/timelines/${timeline.id}/show`,
+      SHOW_ACCEPT,
+      `${fileBaseName(timeline)}.show.json`
+    )
+  }
+
   function reset() {
     list.value = []
   }
@@ -57,6 +140,8 @@ export const useTimelinesStore = defineStore('timelines', () => {
     create,
     update,
     softDelete,
+    downloadBundle,
+    downloadShow,
     reset
   }
 })

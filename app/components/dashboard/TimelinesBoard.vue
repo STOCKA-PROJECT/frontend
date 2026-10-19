@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FetchError } from 'ofetch'
 import type { OrganizationRole, TimelineResponseDto } from '~/types/api'
+import type { TimelineDownloadFailure } from '~/composables/useTimelineDownload'
 
 const props = defineProps<{
   orgSlug: string
@@ -13,14 +14,32 @@ const timelines = useTimelinesStore()
 const canWrite = computed(() =>
   props.role === 'OWNER' || props.role === 'MANAGER' || props.role === 'USER')
 
+// Every member, SPECTATOR included, may download the bundle/show of a timeline
+// (plan «paquete offline», §2.3). Editing stays restricted to `canWrite`.
+const canDownload = computed(() => props.role !== null)
+const showActions = computed(() => canWrite.value || canDownload.value)
+
 // ---- error toast ----
+const ERROR_TIMEOUT_MS = 6000
+// Scene issues take longer to read than a one-liner.
+const ERROR_WITH_ISSUES_TIMEOUT_MS = 12000
+
 const errorMsg = ref<string | null>(null)
+const errorIssues = shallowRef<string[]>([])
 let errorTimer: ReturnType<typeof setTimeout> | null = null
 
-function showError(msg: string) {
+function showError(msg: string, issues: string[] = []) {
   errorMsg.value = msg
+  errorIssues.value = issues
   if (errorTimer) clearTimeout(errorTimer)
-  errorTimer = setTimeout(() => { errorMsg.value = null }, 6000)
+  errorTimer = setTimeout(() => {
+    errorMsg.value = null
+    errorIssues.value = []
+  }, issues.length > 0 ? ERROR_WITH_ISSUES_TIMEOUT_MS : ERROR_TIMEOUT_MS)
+}
+
+function onDownloadError(failure: TimelineDownloadFailure) {
+  showError(failure.message, failure.issues)
 }
 
 onBeforeUnmount(() => {
@@ -185,7 +204,10 @@ async function confirmDelete() {
   <div class="board flex h-full flex-col gap-3">
     <div v-if="errorMsg" role="alert"
       class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger">
-      {{ errorMsg }}
+      <p>{{ errorMsg }}</p>
+      <ul v-if="errorIssues.length > 0" class="mt-1 list-disc space-y-0.5 pl-5">
+        <li v-for="(issue, i) in errorIssues" :key="i">{{ issue }}</li>
+      </ul>
     </div>
 
     <div class="flex items-center justify-between gap-3">
@@ -211,7 +233,7 @@ async function confirmDelete() {
             <th class="px-4 py-3 font-medium">{{ t('dashboard.timelines.columns.name') }}</th>
             <th class="px-4 py-3 font-medium">{{ t('dashboard.timelines.columns.created') }}</th>
             <th class="px-4 py-3 font-medium">{{ t('dashboard.timelines.columns.updated') }}</th>
-            <th v-if="canWrite" class="px-4 py-3 text-right font-medium">{{ t('dashboard.timelines.columns.actions') }}</th>
+            <th v-if="showActions" class="px-4 py-3 text-right font-medium">{{ t('dashboard.timelines.columns.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -219,20 +241,28 @@ async function confirmDelete() {
             <td class="px-4 py-3 font-medium text-ink">{{ tl.name }}</td>
             <td class="px-4 py-3 text-ink-soft">{{ fmtDate(tl.createdAt) }}</td>
             <td class="px-4 py-3 text-ink-soft">{{ fmtDate(tl.updatedAt) }}</td>
-            <td v-if="canWrite" class="px-4 py-3">
+            <td v-if="showActions" class="px-4 py-3">
               <div class="flex items-center justify-end gap-2">
-                <button type="button" class="row-btn" @click="onModify(tl)">
-                  <DashboardIcon name="external" :size="14" />
-                  {{ t('dashboard.timelines.actions.modify') }}
-                </button>
-                <button type="button" class="row-btn" @click="onRename(tl)">
-                  <DashboardIcon name="edit" :size="14" />
-                  {{ t('dashboard.timelines.actions.rename') }}
-                </button>
-                <button type="button" class="row-btn row-btn-danger" @click="openDelete(tl)">
-                  <DashboardIcon name="trash" :size="14" />
-                  {{ t('dashboard.timelines.actions.delete') }}
-                </button>
+                <DashboardTimelineDownloadMenu
+                  v-if="canDownload"
+                  :org-slug="orgSlug"
+                  :timeline="tl"
+                  @error="onDownloadError"
+                />
+                <template v-if="canWrite">
+                  <button type="button" class="row-btn" @click="onModify(tl)">
+                    <DashboardIcon name="external" :size="14" />
+                    {{ t('dashboard.timelines.actions.modify') }}
+                  </button>
+                  <button type="button" class="row-btn" @click="onRename(tl)">
+                    <DashboardIcon name="edit" :size="14" />
+                    {{ t('dashboard.timelines.actions.rename') }}
+                  </button>
+                  <button type="button" class="row-btn row-btn-danger" @click="openDelete(tl)">
+                    <DashboardIcon name="trash" :size="14" />
+                    {{ t('dashboard.timelines.actions.delete') }}
+                  </button>
+                </template>
               </div>
             </td>
           </tr>

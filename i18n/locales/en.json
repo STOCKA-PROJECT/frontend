@@ -376,7 +376,11 @@
         "new": "New timeline",
         "modify": "Modify",
         "rename": "Rename",
-        "delete": "Delete"
+        "delete": "Delete",
+        "download": "Download",
+        "downloading": "Downloading…",
+        "download_bundle": "Download bundle",
+        "download_show": "Download show (JSON)"
       },
       "dialog": {
         "title": "New timeline",
@@ -391,11 +395,19 @@
         "delete_title": "Delete timeline",
         "delete_body": "Are you sure you want to delete “{name}”? This action cannot be undone."
       },
+      "download": {
+        "menu_label": "Downloads for “{name}”",
+        "bundle_hint": ".belen.zip file with the show and its audio, ready for the nativity player.",
+        "show_hint": "Only the show.json, without audio files.",
+        "issues_more": "…and {n} more"
+      },
       "errors": {
         "load_list": "Could not load timelines.",
         "save": "Could not save the timeline.",
         "delete": "Could not delete the timeline.",
-        "open_editor": "Could not open the editor."
+        "open_editor": "Could not open the editor.",
+        "download_bundle": "Could not download the bundle.",
+        "download_show": "Could not download the show."
       }
     },
     "header": {

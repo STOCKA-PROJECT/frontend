@@ -376,7 +376,11 @@
         "new": "Nova timeline",
         "modify": "Modificar",
         "rename": "Reanomenar",
-        "delete": "Eliminar"
+        "delete": "Eliminar",
+        "download": "Descarrega",
+        "downloading": "Descarregant…",
+        "download_bundle": "Descarrega el paquet",
+        "download_show": "Descarrega el show (JSON)"
       },
       "dialog": {
         "title": "Nova timeline",
@@ -391,11 +395,19 @@
         "delete_title": "Eliminar timeline",
         "delete_body": "Segur que vols eliminar «{name}»? Aquesta acció no es pot desfer."
       },
+      "download": {
+        "menu_label": "Descàrregues de «{name}»",
+        "bundle_hint": "Fitxer .belen.zip amb el show i els àudios, llest per al pessebre.",
+        "show_hint": "Només el show.json, sense fitxers d’àudio.",
+        "issues_more": "…i {n} més"
+      },
       "errors": {
         "load_list": "No s'han pogut carregar les línies de temps.",
         "save": "No s'ha pogut desar la línia de temps.",
         "delete": "No s'ha pogut eliminar la línia de temps.",
-        "open_editor": "No s'ha pogut obrir l'editor."
+        "open_editor": "No s'ha pogut obrir l'editor.",
+        "download_bundle": "No s’ha pogut descarregar el paquet.",
+        "download_show": "No s’ha pogut descarregar el show."
       }
     },
     "header": {

@@ -376,7 +376,11 @@
         "new": "Nueva timeline",
         "modify": "Modificar",
         "rename": "Renombrar",
-        "delete": "Eliminar"
+        "delete": "Eliminar",
+        "download": "Descargar",
+        "downloading": "Descargando…",
+        "download_bundle": "Descargar paquete",
+        "download_show": "Descargar show (JSON)"
       },
       "dialog": {
         "title": "Nueva timeline",
@@ -391,11 +395,19 @@
         "delete_title": "Eliminar timeline",
         "delete_body": "¿Seguro que quieres eliminar «{name}»? Esta acción no se puede deshacer."
       },
+      "download": {
+        "menu_label": "Descargas de «{name}»",
+        "bundle_hint": "Archivo .belen.zip con el show y los audios, listo para el belén.",
+        "show_hint": "Solo el show.json, sin archivos de audio.",
+        "issues_more": "…y {n} más"
+      },
       "errors": {
         "load_list": "No se han podido cargar las líneas de tiempo.",
         "save": "No se ha podido guardar la línea de tiempo.",
         "delete": "No se ha podido eliminar la línea de tiempo.",
-        "open_editor": "No se ha podido abrir el editor."
+        "open_editor": "No se ha podido abrir el editor.",
+        "download_bundle": "No se ha podido descargar el paquete.",
+        "download_show": "No se ha podido descargar el show."
       }
     },
     "header": {
