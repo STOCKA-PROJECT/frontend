@@ -15,16 +15,23 @@ const { t } = useI18n()
 
 const kindLabel = computed(() => t(`dashboard.kinds.${props.port.kind}`))
 
-/** Short, monospace summary of what the kind needs: GPIO, segment range or motor pins. */
+/** Short, monospace summary of what the kind needs: GPIO or expander channel, segment range, motor pins, I2C or DMX address. */
 const address = computed<string | null>(() => {
   const c = props.port.config ?? {}
   switch (props.port.kind) {
     case 'led_segment':
       return `${String(c.strip ?? '?')} · ${String(c.first ?? '?')}–${String(c.last ?? '?')}`
     case 'motor':
-      return `R ${String(c.pinR ?? '?')} · L ${String(c.pinL ?? '?')} · S ${String(c.sensorPin ?? '?')}`
+      return `R ${String(c.pinR ?? '?')} · L ${String(c.pinL ?? '?')} · S ${String(c.sensorPin ?? '?')} · ↓ ${String(c.downTime ?? '?')} s · ↑ max ${String(c.maxUpTime ?? '?')} s`
     case 'led_strip':
       return props.port.pin == null ? null : `GPIO ${props.port.pin} · ${String(c.length ?? '?')} LED · DMA ${String(c.dma ?? '?')}/${String(c.channel ?? '?')}`
+    case 'relay':
+      if (typeof c.expander === 'string') return `${c.expander} · ${t('dashboard.ports.list.channel')} ${String(c.channel ?? '?')}`
+      return props.port.pin == null ? null : `GPIO ${props.port.pin}${c.activeLow ? ` · ${t('dashboard.ports.list.active_low')}` : ''}`
+    case 'gpio_expander':
+      return `${String(c.chip ?? 'mcp23017')} · I2C 0x${typeof c.address === 'number' ? c.address.toString(16) : '?'} · bus ${String(c.bus ?? 1)}${c.activeLow ? ` · ${t('dashboard.ports.list.active_low')}` : ''}`
+    case 'moving_head':
+      return `DMX ${String(c.address ?? '?')} · ${String(c.profile ?? '?')}`
     default:
       return props.port.pin == null ? null : `GPIO ${props.port.pin}`
   }

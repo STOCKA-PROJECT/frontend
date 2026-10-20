@@ -687,8 +687,9 @@
       "catalogActions": {
         "turn_on": "Turn on",
         "turn_off": "Turn off",
-        "focoOn": "Spotlight on",
-        "focoOff": "Spotlight off",
+        "pulse": "Pulse (close and open)",
+        "set": "Moving head cue",
+        "blackout": "Moving head blackout",
         "setBrightness": "Strip brightness",
         "clear": "Clear LEDs",
         "fill": "Fill with colour",
@@ -710,7 +711,11 @@
         "duration": "Duration (s)",
         "from_color": "Start colour",
         "audio_name": "Audio file",
-        "video_name": "Video file"
+        "white": "White (0–255)",
+        "intensity": "Intensity (%)",
+        "pan": "Pan (degrees)",
+        "tilt": "Tilt (degrees)",
+        "zoom": "Zoom (degrees)"
       }
     },
     "ports": {
@@ -725,7 +730,9 @@
         "unknown_type": "Deleted type",
         "edit": "Edit",
         "delete": "Delete",
-        "infrastructure": "Infrastructure"
+        "infrastructure": "Infrastructure",
+        "channel": "channel",
+        "active_low": "active-low"
       },
       "form": {
         "new_title": "New port",
@@ -759,6 +766,14 @@
         "config_enabled": "Enabled",
         "strip_placeholder": "Pick the strip",
         "strip_empty": "Create a “LED strip” port first.",
+        "ref_placeholder": { "led_strip": "Pick the strip", "gpio_expander": "Pick the expander" },
+        "ref_empty": { "led_strip": "Create a “LED strip” port first.", "gpio_expander": "Create a “Relay expander” port first." },
+        "enum_placeholder": "Pick a value",
+        "field_connection": "Connection",
+        "connection_gpio": "Raspberry Pi GPIO",
+        "connection_expander": "Expander channel",
+        "connection_help": "A relay sits on a Raspberry Pi GPIO or on a channel (0–15) of an MCP23017 expander, never both.",
+        "connection_no_expanders": "No expanders in the organization: the relay goes on a GPIO. Create a “Relay expander” port for more outputs.",
         "advanced_title": "Advanced: legacy parameters ({n})",
         "advanced_help": "Legacy typed parameters are kept for compatibility; the player only uses the configuration.",
         "catalog_error": "The output catalog could not be loaded.",
@@ -786,12 +801,28 @@
         "pinR": "Motor pin R (lower)",
         "pinL": "Motor pin L (raise)",
         "sensorPin": "IR sensor pin",
-        "downTime": "Lowering time (s)"
+        "downTime": "Lowering time (s)",
+        "maxUpTime": "Maximum raising time (s)",
+        "expander": "Expander",
+        "activeLow": "Active-low board",
+        "chip": "Chip",
+        "bus": "I2C bus",
+        "address": "Address",
+        "profile": "Fixture profile",
+        "relay": { "channel": "Expander channel (0–15)" },
+        "gpio_expander": { "address": "I2C address (32–39 = 0x20–0x27)" },
+        "moving_head": { "address": "DMX address (first channel)" }
       },
       "config_help": {
         "first": "Segments may run backwards (first > last).",
         "last": "Between 0 and the strip LED count minus 1.",
-        "strip": "Name of a LED strip port."
+        "strip": "Name of a LED strip port.",
+        "maxUpTime": "Hard safety cut: the motor never raises longer than this even if the sensor fails. Measure the slowest rise on the bench and use 1.3 times it.",
+        "activeLow": "The output switches on at low level (opto-isolated relay boards).",
+        "expander": "Expander port the relay hangs from.",
+        "address": "First DMX channel of the fixture (DMX Address menu); it takes 15 channels and cannot overlap another head.",
+        "gpio_expander": { "address": "Unique per bus. With an expander, GPIO 2 and 3 (I2C) are reserved.", "activeLow": "Polarity of the whole relay board wired to the expander." },
+        "moving_head": { "profile": "Fixture model: channels, pan/tilt/zoom ranges and DMX conversion." }
       }
     },
     "devices": {
@@ -1482,11 +1513,12 @@
     },
     "kinds": {
       "relay": "Relay",
+      "gpio_expander": "Relay expander (MCP23017)",
       "led_strip": "LED strip",
       "led_segment": "LED segment",
       "motor": "Motor",
       "audio": "Audio",
-      "video": "Video",
+      "moving_head": "Moving head (DMX)",
       "button": "Button"
     }
   },
@@ -1606,7 +1638,18 @@
       "segment_strip_not_found": "Strip “{strip}” does not exist as a LED strip port in the organization.",
       "segment_out_of_range": "Segment {first}–{last} falls outside the strip (0–{max}).",
       "strip_shrink_breaks_segment": "Cannot shorten the strip: segment “{segment}” ({first}–{last}) would fall outside.",
-      "strip_in_use": "The strip has segments that depend on it: {segments}."
+      "strip_in_use": "The strip has segments that depend on it: {segments}.",
+      "relay_pin_or_expander": "A relay takes either a Raspberry Pi pin or an expander with a channel, never both.",
+      "relay_channel_required": "A relay on an expander needs its channel (0–15).",
+      "relay_channel_without_expander": "The channel only makes sense when the relay hangs from an expander.",
+      "relay_active_low_on_expander": "Polarity (activeLow) is declared on the expander, not on the relay.",
+      "expander_not_found": "Expander “{expander}” does not exist as a port of the organization.",
+      "expander_channel_conflict": "Channel {channel} of “{expander}” is already used by port “{port}”.",
+      "expander_address_conflict": "I2C address {address} on bus {bus} is already used by expander “{port}”.",
+      "expander_in_use": "The expander has relays that depend on it: {relays}.",
+      "i2c_pin_reserved": "GPIO {pin} belongs to the I2C bus and is reserved while an expander exists.",
+      "dmx_address_range": "The head at address {address} needs {channels} channels and leaves the DMX universe (up to {last}).",
+      "dmx_address_conflict": "DMX channels overlap with head “{port}” ({first}–{last})."
     },
     "devices": {
       "name_taken": "A device with this name already exists in the organization.",

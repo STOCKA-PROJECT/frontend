@@ -687,8 +687,9 @@
       "catalogActions": {
         "turn_on": "Encender",
         "turn_off": "Apagar",
-        "focoOn": "Encender el foco",
-        "focoOff": "Apagar el foco",
+        "pulse": "Pulso (cerrar y abrir)",
+        "set": "Cue del cabezal",
+        "blackout": "Apagar el cabezal",
         "setBrightness": "Brillo de la tira",
         "clear": "Apagar los LED",
         "fill": "Rellenar de color",
@@ -710,7 +711,11 @@
         "duration": "Duración (s)",
         "from_color": "Color inicial",
         "audio_name": "Archivo de audio",
-        "video_name": "Archivo de vídeo"
+        "white": "Blanco (0–255)",
+        "intensity": "Intensidad (%)",
+        "pan": "Pan (grados)",
+        "tilt": "Tilt (grados)",
+        "zoom": "Zoom (grados)"
       }
     },
     "ports": {
@@ -725,7 +730,9 @@
         "unknown_type": "Tipo eliminado",
         "edit": "Editar",
         "delete": "Eliminar",
-        "infrastructure": "Infraestructura"
+        "infrastructure": "Infraestructura",
+        "channel": "canal",
+        "active_low": "activo a nivel bajo"
       },
       "form": {
         "new_title": "Nuevo puerto",
@@ -759,6 +766,14 @@
         "config_enabled": "Activado",
         "strip_placeholder": "Elige la tira",
         "strip_empty": "Crea primero un puerto de tipo «Tira LED».",
+        "ref_placeholder": { "led_strip": "Elige la tira", "gpio_expander": "Elige el expansor" },
+        "ref_empty": { "led_strip": "Crea primero un puerto de tipo «Tira LED».", "gpio_expander": "Crea primero un puerto de tipo «Expansor de relés»." },
+        "enum_placeholder": "Elige un valor",
+        "field_connection": "Conexión",
+        "connection_gpio": "GPIO de la Raspberry",
+        "connection_expander": "Canal de un expansor",
+        "connection_help": "Un relé va a un GPIO de la Raspberry o a un canal (0–15) de un expansor MCP23017, nunca a los dos.",
+        "connection_no_expanders": "Sin expansores en la organización: el relé va a un GPIO. Crea un puerto «Expansor de relés» para tener más salidas.",
         "advanced_title": "Avanzado: parámetros antiguos ({n})",
         "advanced_help": "Los parámetros tipados antiguos se conservan por compatibilidad; el reproductor solo usa la configuración.",
         "catalog_error": "No se ha podido cargar el catálogo de salidas.",
@@ -786,12 +801,28 @@
         "pinR": "Pin motor R (bajar)",
         "pinL": "Pin motor L (subir)",
         "sensorPin": "Pin del sensor IR",
-        "downTime": "Tiempo de bajada (s)"
+        "downTime": "Tiempo de bajada (s)",
+        "maxUpTime": "Tiempo máximo de subida (s)",
+        "expander": "Expansor",
+        "activeLow": "Placa activa a nivel bajo",
+        "chip": "Chip",
+        "bus": "Bus I2C",
+        "address": "Dirección",
+        "profile": "Perfil del aparato",
+        "relay": { "channel": "Canal del expansor (0–15)" },
+        "gpio_expander": { "address": "Dirección I2C (32–39 = 0x20–0x27)" },
+        "moving_head": { "address": "Dirección DMX (primer canal)" }
       },
       "config_help": {
         "first": "Los segmentos pueden ir al revés (primero > último).",
         "last": "Entre 0 y el número de LED de la tira menos 1.",
-        "strip": "Nombre de un puerto de tipo Tira LED."
+        "strip": "Nombre de un puerto de tipo Tira LED.",
+        "maxUpTime": "Corte duro de seguridad: el motor no sube más de este tiempo aunque el sensor no detecte. Mide la subida más lenta en el banco y pon 1,3 veces.",
+        "activeLow": "La salida se activa con nivel bajo (placas de relés con optoacoplador).",
+        "expander": "Puerto de tipo Expansor del que cuelga el relé.",
+        "address": "Primer canal DMX del aparato (menú DMX Address); ocupa 15 canales y no puede solaparse con otro cabezal.",
+        "gpio_expander": { "address": "Única por bus. Con un expansor, los GPIO 2 y 3 (I2C) quedan reservados.", "activeLow": "Polaridad de toda la placa de relés conectada al expansor." },
+        "moving_head": { "profile": "Modelo del cabezal: canales, rangos de pan/tilt/zoom y conversión a DMX." }
       }
     },
     "devices": {
@@ -1482,11 +1513,12 @@
     },
     "kinds": {
       "relay": "Relé",
+      "gpio_expander": "Expansor de relés (MCP23017)",
       "led_strip": "Tira LED",
       "led_segment": "Segmento LED",
       "motor": "Motor",
       "audio": "Audio",
-      "video": "Vídeo",
+      "moving_head": "Cabezal móvil (DMX)",
       "button": "Pulsador"
     }
   },
@@ -1606,7 +1638,18 @@
       "segment_strip_not_found": "La tira «{strip}» no existe como puerto de tipo Tira LED en la organización.",
       "segment_out_of_range": "El segmento {first}–{last} se sale de la tira (0–{max}).",
       "strip_shrink_breaks_segment": "No se puede acortar la tira: el segmento «{segment}» ({first}–{last}) quedaría fuera.",
-      "strip_in_use": "La tira tiene segmentos que dependen de ella: {segments}."
+      "strip_in_use": "La tira tiene segmentos que dependen de ella: {segments}.",
+      "relay_pin_or_expander": "Un relé lleva un pin de la Raspberry o bien un expansor con canal, y solo una de las dos cosas.",
+      "relay_channel_required": "Un relé en un expansor necesita el canal (0–15).",
+      "relay_channel_without_expander": "El canal solo tiene sentido cuando el relé cuelga de un expansor.",
+      "relay_active_low_on_expander": "La polaridad (activeLow) se declara en el expansor, no en el relé.",
+      "expander_not_found": "El expansor «{expander}» no existe como puerto de la organización.",
+      "expander_channel_conflict": "El canal {channel} de «{expander}» ya lo usa el puerto «{port}».",
+      "expander_address_conflict": "La dirección I2C {address} del bus {bus} ya la usa el expansor «{port}».",
+      "expander_in_use": "El expansor tiene relés que dependen de él: {relays}.",
+      "i2c_pin_reserved": "El GPIO {pin} es del bus I2C y queda reservado mientras haya un expansor.",
+      "dmx_address_range": "El cabezal en la dirección {address} necesita {channels} canales y sale del universo DMX (hasta {last}).",
+      "dmx_address_conflict": "Los canales DMX se solapan con el cabezal «{port}» ({first}–{last})."
     },
     "devices": {
       "name_taken": "Ya existe un dispositivo con este nombre en la organización.",

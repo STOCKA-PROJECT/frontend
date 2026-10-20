@@ -19,6 +19,7 @@ const canWrite = computed(() => props.role === 'OWNER' || props.role === 'MANAGE
 const pieceTypeOptions = computed(() => pieceTypes.list.map(t => ({ id: t.id, name: t.name, kind: t.kind ?? null })))
 // Segments reference a strip by name.
 const stripNames = computed(() => ports.list.filter(p => p.kind === 'led_strip').map(p => p.name))
+const expanderNames = computed(() => ports.list.filter(p => p.kind === 'gpio_expander').map(p => p.name))
 
 function notifyError(e: unknown) {
   const view = apiError(e)
@@ -150,6 +151,7 @@ const showInitialLoading = computed(() => ports.loading && !ports.loaded)
       :mode="formDialog.mode"
       :piece-types="pieceTypeOptions"
       :strips="stripNames"
+      :expanders="expanderNames"
       :initial="formDialog.target"
       :loading="formDialog.loading"
       :error-msg="formDialog.error"

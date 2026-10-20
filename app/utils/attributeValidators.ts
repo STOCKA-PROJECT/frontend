@@ -38,7 +38,7 @@ export const NAME_PATTERN = /^[a-z][a-z0-9_]{0,79}$/
 /**
  * Technical-name shape of actions and their parameters: like {@link NAME_PATTERN} but allowing
  * uppercase letters after the first one, because catalog actions are the real controller methods
- * (`focoOn`, `setBrightness`). The backend puts no pattern on action names.
+ * (`turn_on`, `setBrightness`). The backend puts no pattern on action names.
  */
 export const ACTION_NAME_PATTERN = /^[a-z][A-Za-z0-9_]{0,79}$/
 

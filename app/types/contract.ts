@@ -4,10 +4,10 @@ import type { AttributeType } from '~/types/api'
 // the Raspberry Pi player: the kinds of output a port can be, what each kind needs in its config,
 // and the actions (with typed parameters) a piece type of that kind may define.
 
-export type OutputKind = 'relay' | 'led_strip' | 'led_segment' | 'motor' | 'audio' | 'video' | 'button'
+export type OutputKind = 'relay' | 'gpio_expander' | 'led_strip' | 'led_segment' | 'motor' | 'audio' | 'moving_head' | 'button'
 export type CatalogType = 'int' | 'number' | 'bool' | 'string' | 'rgb' | 'rgb_list' | 'enum'
 
-export const OUTPUT_KINDS: readonly OutputKind[] = ['relay', 'led_strip', 'led_segment', 'motor', 'audio', 'video', 'button']
+export const OUTPUT_KINDS: readonly OutputKind[] = ['relay', 'gpio_expander', 'led_strip', 'led_segment', 'motor', 'audio', 'moving_head', 'button']
 
 export interface CatalogParam {
   type: CatalogType
@@ -18,10 +18,11 @@ export interface CatalogParam {
   values?: string[]
   /** The single parameter that receives the clip length (seconds) in the timeline editor. */
   duration?: boolean
-  asset?: 'audio' | 'video'
+  asset?: 'audio'
   /** Config keys only: the value must be the name of a port of this kind. */
   ref?: OutputKind
   recommended?: [number, number]
+  notes?: string
 }
 
 export interface CatalogAnimation {
@@ -39,9 +40,32 @@ export interface CatalogAction {
 export interface CatalogKind {
   controller: string
   infrastructure: boolean
-  pin: boolean
+  /** `true`: always a GPIO pin; `'optional'`: a pin unless the config addresses the port otherwise (relay on an expander); `false`: never. */
+  pin: boolean | 'optional'
+  notes?: string
   config: Record<string, CatalogParam>
   actions: Record<string, CatalogAction>
+}
+
+export type PinMode = 'required' | 'optional' | 'none'
+
+/** How ports of a kind carry their pin. */
+export function pinModeOf(spec: CatalogKind | null | undefined): PinMode {
+  if (!spec) return 'none'
+  if (spec.pin === true) return 'required'
+  if (spec.pin === 'optional') return 'optional'
+  return 'none'
+}
+
+/** A DMX fixture profile (`profiles.moving_head.<id>`): channel count and physical ranges. */
+export interface FixtureProfile {
+  name: string
+  mode?: string
+  channels: number
+  pan: { max: number }
+  tilt: { max: number }
+  zoom: { min: number, max: number }
+  notes?: string
 }
 
 export interface BoardSpec {
@@ -57,6 +81,7 @@ export interface OutputCatalog {
   format: 'stocka-catalog'
   version: number
   kinds: Record<OutputKind, CatalogKind>
+  profiles?: { moving_head?: Record<string, FixtureProfile> }
   boards: Record<string, BoardSpec>
 }
 

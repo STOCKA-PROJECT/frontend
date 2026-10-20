@@ -5,12 +5,14 @@ import type {
   PortResponseDto,
   UpdatePortDto
 } from '~/types/api'
-import type { OutputKind } from '~/types/contract'
+import { pinModeOf, type OutputKind } from '~/types/contract'
 import { ACTION_NAME_PATTERN } from '~/utils/attributeValidators'
 
 // Create/edit a port. The kind drives the rest of the form: which piece types can be chosen (those
 // of the same kind; none for infrastructure kinds), whether a GPIO pin is needed, and which config
-// keys the catalog requires. Legacy typed parameters stay available under "Avançat".
+// keys the catalog requires. A relay chooses its connection: a GPIO of the Pi (pin, optional
+// activeLow) or a channel of a gpio_expander port (expander + channel, no pin). Legacy typed
+// parameters stay available under "Avançat".
 
 const props = withDefaults(defineProps<{
   open: boolean
@@ -18,13 +20,16 @@ const props = withDefaults(defineProps<{
   pieceTypes: { id: number, name: string, kind?: OutputKind | null }[]
   /** Names of the organization's led_strip ports (segments reference them). */
   strips: string[]
+  /** Names of the organization's gpio_expander ports (relays on an expander reference them). */
+  expanders?: string[]
   initial?: PortResponseDto | null
   loading?: boolean
   errorMsg?: string | null
 }>(), {
   loading: false,
   errorMsg: null,
-  initial: null
+  initial: null,
+  expanders: () => []
 })
 
 const emit = defineEmits<{
@@ -42,6 +47,11 @@ const kind = ref<OutputKind | null>(null)
 const pieceTypeId = ref<number | null>(null)
 const pin = ref<number | null>(null)
 const config = ref<Record<string, unknown>>({})
+/** Relays only: on a GPIO of the Pi or on a channel of an expander. */
+type Connection = 'gpio' | 'expander'
+const connection = ref<Connection>('gpio')
+const RELAY_EXPANDER_KEYS = ['expander', 'channel']
+const RELAY_GPIO_KEYS = ['activeLow']
 const params = ref<ParamDraft[]>([])
 const advancedOpen = ref(false)
 
@@ -62,6 +72,7 @@ function resetState() {
     pieceTypeId.value = props.initial.pieceTypeId
     pin.value = props.initial.pin
     config.value = { ...(props.initial.config ?? {}) }
+    connection.value = typeof props.initial.config?.expander === 'string' ? 'expander' : 'gpio'
     params.value = props.initial.parameters.map(p => newParamDraft({ ...p }))
     advancedOpen.value = props.initial.parameters.length > 0
   } else {
@@ -70,6 +81,7 @@ function resetState() {
     pieceTypeId.value = null
     pin.value = null
     config.value = {}
+    connection.value = 'gpio'
     params.value = []
     advancedOpen.value = false
   }
@@ -85,10 +97,30 @@ watch(() => props.open, (open) => {
 
 // ----- kind-driven shape -----
 const kindSpec = computed(() => contract.kind(kind.value))
-// Infrastructure kinds (strips, button) may exist without a piece type; the others require one.
+// Infrastructure kinds (strips, expanders, button) may exist without a piece type; the others require one.
 const pieceTypeOptional = computed(() => kindSpec.value?.infrastructure === true)
-const hasPin = computed(() => kindSpec.value?.pin === true)
-const configFields = computed(() => contract.configFieldsOf(kind.value))
+const pinMode = computed(() => pinModeOf(kindSpec.value))
+/** Kinds with an optional pin (relay) show the connection selector. */
+const hasConnectionChoice = computed(() => pinMode.value === 'optional')
+const hasPin = computed(() => pinMode.value === 'required' || (pinMode.value === 'optional' && connection.value === 'gpio'))
+/** Config keys hidden in the current connection mode (a relay on a GPIO has no expander/channel; on an expander no activeLow). */
+const hiddenKeys = computed<string[]>(() => {
+  if (!hasConnectionChoice.value) return []
+  return connection.value === 'expander' ? RELAY_GPIO_KEYS : RELAY_EXPANDER_KEYS
+})
+const configFields = computed(() => contract.configFieldsOf(kind.value).filter(f => !hiddenKeys.value.includes(f.key)))
+/** Keys the current mode requires beyond the catalog (expander + channel when the relay hangs from an expander). */
+const requiredKeys = computed<string[]>(() => (hasConnectionChoice.value && connection.value === 'expander') ? RELAY_EXPANDER_KEYS : [])
+const refOptions = computed(() => ({ led_strip: props.strips, gpio_expander: props.expanders }))
+
+function onConnectionChange(next: Connection) {
+  if (next === connection.value) return
+  connection.value = next
+  const nextConfig = { ...config.value }
+  for (const key of (next === 'expander' ? RELAY_GPIO_KEYS : RELAY_EXPANDER_KEYS)) delete nextConfig[key]
+  config.value = nextConfig
+  if (next === 'expander') pin.value = null
+}
 const board = computed(() => contract.catalog?.boards[DEFAULT_BOARD_ID] ?? null)
 const DEFAULT_BOARD_ID = 'rpi4b'
 
@@ -103,6 +135,7 @@ function onKindChange(next: OutputKind | null) {
   pieceTypeId.value = null
   pin.value = null
   config.value = {}
+  connection.value = 'gpio'
 }
 
 function onPinInput(e: Event) {
@@ -150,7 +183,7 @@ const configValid = computed(() => {
   for (const { key, spec } of configFields.value) {
     const value = config.value[key]
     if (value === undefined || value === '') {
-      if (spec.required) return false
+      if (spec.required || requiredKeys.value.includes(key)) return false
       continue
     }
     if ((spec.type === 'int' || spec.type === 'number') && typeof value !== 'number') return false
@@ -209,12 +242,13 @@ function buildParameters(): ActionParameterDto[] {
 
 function submit() {
   if (!canSubmit.value || !kind.value) return
+  const visible = new Set(configFields.value.map(f => f.key))
   const payload: CreatePortDto = {
     name: name.value.trim(),
     kind: kind.value,
     pieceTypeId: pieceTypeId.value,
     pin: hasPin.value ? pin.value : null,
-    config: { ...config.value },
+    config: Object.fromEntries(Object.entries(config.value).filter(([key]) => visible.has(key))),
     parameters: buildParameters()
   }
   // Both modes send the full set of fields; the backend keeps the kind immutable and re-validates
@@ -278,6 +312,18 @@ function submit() {
                 {{ t('dashboard.ports.form.infrastructure_help') }}
               </p>
 
+              <div v-if="hasConnectionChoice" class="flex flex-col gap-1">
+                <label for="port-connection" class="field-label">{{ t('dashboard.ports.form.field_connection') }}</label>
+                <select id="port-connection" class="field-input" :value="connection"
+                  @change="onConnectionChange(($event.target as HTMLSelectElement).value as Connection)">
+                  <option value="gpio">{{ t('dashboard.ports.form.connection_gpio') }}</option>
+                  <option value="expander" :disabled="!expanders.length && connection !== 'expander'">{{ t('dashboard.ports.form.connection_expander') }}</option>
+                </select>
+                <p class="field-help">
+                  {{ expanders.length ? t('dashboard.ports.form.connection_help') : t('dashboard.ports.form.connection_no_expanders') }}
+                </p>
+              </div>
+
               <div v-if="hasPin" class="flex flex-col gap-1">
                 <label for="port-pin" class="field-label">{{ t('dashboard.ports.form.field_pin') }}</label>
                 <input id="port-pin" :value="pin ?? ''" type="number" :min="board?.gpios.min ?? 0" :max="board?.gpios.max ?? 27" step="1" required
@@ -292,7 +338,7 @@ function submit() {
 
             <section v-if="kindSpec && configFields.length" class="flex flex-col gap-3">
               <h3 class="section-label">{{ t('dashboard.ports.form.config_title') }}</h3>
-              <DashboardPortConfigFields v-model="config" :kind="kind!" :fields="configFields" :strips="strips" />
+              <DashboardPortConfigFields v-model="config" :kind="kind!" :fields="configFields" :ref-options="refOptions" :required-keys="requiredKeys" />
             </section>
 
             <details v-if="kindSpec" class="advanced" :open="advancedOpen" @toggle="advancedOpen = ($event.target as HTMLDetailsElement).open">
