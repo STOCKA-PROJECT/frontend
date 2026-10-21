@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { DeviceResponseDto } from '~/types/api'
+import type { DeviceAlertDto, DeviceResponseDto } from '~/types/api'
 
 /**
  * One registered Raspberry Pi and the last state it reported: online/offline, player state,
- * active show, cut ports, version, IP and last error. Actions are emitted to the board.
+ * active show, cut ports, alerts, version, IP and last error. Actions are emitted to the board.
  */
 const props = defineProps<{
   device: DeviceResponseDto
@@ -29,6 +29,14 @@ const STATE_TONES: Record<string, string> = {
   TEST: 'badge-highlight'
 }
 
+// Alerts the player sends today; any other code still renders with the generic label.
+const ALERT_TONES: Record<string, string> = {
+  motor_timeout: 'badge-warn',
+  sensor_stop_show: 'badge-warn',
+  sensor_panic: 'badge-danger'
+}
+const ALERT_CODE_PATTERN = /^[a-z0-9_]+$/
+
 // `sha256:` is 7 characters: the short form shows the first 8 hex digits of the hash.
 const SHOW_HASH_START = 7
 const SHOW_HASH_END = 15
@@ -45,23 +53,68 @@ const UNITS: RelativeUnit[] = [
 const relativeFormatter = computed(() => new Intl.RelativeTimeFormat(locale.value, { numeric: 'auto' }))
 const absoluteFormatter = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeStyle: 'short' }))
 
-/** «fa 3 minuts» / «hace 3 minutos» / «3 minutes ago»; under a minute, «ara mateix». */
-const lastSeenRelative = computed<string | null>(() => {
-  const iso = props.device.lastSeenAt
+function parseInstant(iso: string | null): number | null {
   if (!iso) return null
-  // A heartbeat stamped slightly in the future (clock skew) still reads as «just now».
-  const diff = Math.min(0, new Date(iso).getTime() - props.now)
+  const time = new Date(iso).getTime()
+  return Number.isNaN(time) ? null : time
+}
+
+/** «fa 3 minuts» / «hace 3 minutos» / «3 minutes ago»; under a minute, «ara mateix». */
+function relativeTime(iso: string | null): string | null {
+  const time = parseInstant(iso)
+  if (time === null) return null
+  // An instant stamped slightly in the future (clock skew) still reads as «just now».
+  const diff = Math.min(0, time - props.now)
   const abs = Math.abs(diff)
   for (const { unit, ms } of UNITS) {
     if (abs >= ms) return relativeFormatter.value.format(Math.round(diff / ms), unit)
   }
   return t('dashboard.devices.list.just_now')
-})
+}
 
-const lastSeenAbsolute = computed<string | null>(() => {
-  const iso = props.device.lastSeenAt
-  return iso ? absoluteFormatter.value.format(new Date(iso)) : null
-})
+function absoluteTime(iso: string | null): string | null {
+  const time = parseInstant(iso)
+  return time === null ? null : absoluteFormatter.value.format(new Date(time))
+}
+
+const lastSeenRelative = computed(() => relativeTime(props.device.lastSeenAt))
+const lastSeenAbsolute = computed(() => absoluteTime(props.device.lastSeenAt))
+
+interface AlertView {
+  key: string
+  label: string
+  tone: string
+  port: string | null
+  message: string | null
+  when: string | null
+  whenTitle: string | undefined
+}
+
+function alertLabel(code: string): string {
+  const key = `dashboard.devices.alerts.${code}`
+  if (ALERT_CODE_PATTERN.test(code) && te(key)) return t(key)
+  return t('dashboard.devices.alerts.unknown', { code })
+}
+
+// Older backends may omit the field: treat it as no alerts.
+const alerts = computed<DeviceAlertDto[]>(() => props.device.lastAlerts ?? [])
+
+/** The alerts of the last heartbeat, with the player's own (Catalan) message shown as-is. */
+const alertViews = computed<AlertView[]>(() => alerts.value.map((alert, index) => {
+  const absolute = absoluteTime(alert.at)
+  return {
+    key: `${index}-${alert.code}-${alert.port ?? ''}`,
+    label: alertLabel(alert.code),
+    tone: ALERT_TONES[alert.code] ?? 'badge-warn',
+    port: alert.port,
+    message: alert.message,
+    when: relativeTime(alert.at),
+    whenTitle: absolute ?? undefined
+  }
+}))
+
+/** The count badge turns red when any alert is a panic. */
+const alertsTone = computed(() => alerts.value.some(a => ALERT_TONES[a.code] === 'badge-danger') ? 'badge-danger' : 'badge-warn')
 
 const stateTone = computed(() => STATE_TONES[props.device.lastState ?? ''] ?? '')
 
@@ -114,6 +167,21 @@ const hasShow = computed(() => props.device.lastShowName !== null || props.devic
         <span class="label">{{ t('dashboard.devices.list.overrides_label') }}</span>
         <span v-for="port in device.lastOverrides" :key="port" class="badge badge-danger">{{ port }}</span>
       </div>
+
+      <section v-if="alertViews.length" class="alerts mt-2" :aria-label="t('dashboard.devices.list.alerts_label')">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <span class="label">{{ t('dashboard.devices.list.alerts_label') }}</span>
+          <span class="badge" :class="alertsTone">{{ t('dashboard.devices.list.alerts_count', { n: alertViews.length }) }}</span>
+        </div>
+        <ul class="mt-1.5 flex flex-col gap-1.5">
+          <li v-for="alert in alertViews" :key="alert.key" class="alert-item">
+            <span class="badge" :class="alert.tone">{{ alert.label }}</span>
+            <code v-if="alert.port" class="mono text-ink-soft">{{ alert.port }}</code>
+            <span v-if="alert.message" class="min-w-0 text-ink">{{ alert.message }}</span>
+            <span v-if="alert.when" class="text-[12.5px] leading-4 text-ink-muted" :title="alert.whenTitle">{{ alert.when }}</span>
+          </li>
+        </ul>
+      </section>
 
       <dl class="meta mt-2 flex flex-wrap gap-x-4 gap-y-1">
         <div class="meta-item">
@@ -201,6 +269,20 @@ const hasShow = computed(() => props.device.lastShowName !== null || props.devic
 .badge-warn { background: var(--c-warn-soft); color: var(--c-warn-ink); }
 .badge-danger { background: var(--c-danger-soft); color: var(--c-danger); }
 .badge-highlight { background: color-mix(in oklab, var(--c-highlight) 22%, var(--c-bg-card)); color: var(--c-highlight-ink); }
+.alerts {
+  border-radius: 6px;
+  border: 1px solid var(--c-line);
+  background: var(--c-bg-soft);
+  padding: 8px 10px;
+}
+.alert-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font-size: 13px;
+  line-height: 18px;
+}
 .meta-item {
   display: flex;
   align-items: baseline;

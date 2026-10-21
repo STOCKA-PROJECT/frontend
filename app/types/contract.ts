@@ -4,10 +4,10 @@ import type { AttributeType } from '~/types/api'
 // the Raspberry Pi player: the kinds of output a port can be, what each kind needs in its config,
 // and the actions (with typed parameters) a piece type of that kind may define.
 
-export type OutputKind = 'relay' | 'gpio_expander' | 'led_strip' | 'led_segment' | 'motor' | 'audio' | 'moving_head' | 'button'
+export type OutputKind = 'relay' | 'gpio_expander' | 'led_strip' | 'led_segment' | 'motor' | 'audio' | 'moving_head' | 'sensor'
 export type CatalogType = 'int' | 'number' | 'bool' | 'string' | 'rgb' | 'rgb_list' | 'enum'
 
-export const OUTPUT_KINDS: readonly OutputKind[] = ['relay', 'gpio_expander', 'led_strip', 'led_segment', 'motor', 'audio', 'moving_head', 'button']
+export const OUTPUT_KINDS: readonly OutputKind[] = ['relay', 'gpio_expander', 'led_strip', 'led_segment', 'motor', 'audio', 'moving_head', 'sensor']
 
 export interface CatalogParam {
   type: CatalogType
@@ -40,7 +40,7 @@ export interface CatalogAction {
 export interface CatalogKind {
   controller: string
   infrastructure: boolean
-  /** `true`: always a GPIO pin; `'optional'`: a pin unless the config addresses the port otherwise (relay on an expander); `false`: never. */
+  /** `true`: always a GPIO pin; `'optional'`: a pin unless the config addresses the port otherwise (relay or sensor on an expander); `false`: never (a motor carries its two outputs in the config). */
   pin: boolean | 'optional'
   notes?: string
   config: Record<string, CatalogParam>
@@ -48,6 +48,47 @@ export interface CatalogKind {
 }
 
 export type PinMode = 'required' | 'optional' | 'none'
+
+/** What a sensor does with the show when it becomes active (`config.onActive`). */
+export type SensorOnActive = 'none' | 'play' | 'stop_show' | 'panic'
+
+/** Config of a `sensor` port: a native pin (on the port) or an expander channel. */
+export interface SensorConfig {
+  expander?: string
+  channel?: number
+  /** Default `true`: active when the input is low (contact to ground with pull-up). */
+  activeLow?: boolean
+  /** Default `up`; on an expander only `up` or `none`. */
+  pull?: 'up' | 'down' | 'none'
+  /** 0–2000 ms, default 50. */
+  debounceMs?: number
+  /** Default `none` (limit switch only). */
+  onActive?: SensorOnActive
+}
+
+/**
+ * Config of an H-bridge `motor` port: both outputs on native GPIOs (`pinForward` + `pinReverse`,
+ * optional `activeLow`) or both on channels of the same expander, never mixed.
+ */
+export interface MotorConfig {
+  pinForward?: number
+  pinReverse?: number
+  expander?: string
+  channelForward?: number
+  channelReverse?: number
+  /** Native outputs only; on an expander the board decides. */
+  activeLow?: boolean
+  /** 0–5000 ms, default 50: both outputs off when reversing. */
+  switchDelayMs?: number
+  /** Hard cut, seconds, per direction. */
+  maxTimeForward: number
+  maxTimeReverse: number
+  /** Name of a `sensor` port: limit switch of each direction. */
+  limitForward?: string
+  limitReverse?: string
+  /** A direction with a limit switch that ends by max time locks the motor until unlocked on the Pi. */
+  lockOnTimeout?: boolean
+}
 
 /** How ports of a kind carry their pin. */
 export function pinModeOf(spec: CatalogKind | null | undefined): PinMode {

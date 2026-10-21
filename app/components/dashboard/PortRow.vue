@@ -15,14 +15,45 @@ const { t } = useI18n()
 
 const kindLabel = computed(() => t(`dashboard.kinds.${props.port.kind}`))
 
-/** Short, monospace summary of what the kind needs: GPIO or expander channel, segment range, motor pins, I2C or DMX address. */
+/** `exp1:6/7`, `GPIO 27/17`: where a motor's two outputs are wired. */
+function motorOutputs(c: Record<string, unknown>): string {
+  if (typeof c.expander === 'string') return `${c.expander}:${String(c.channelForward ?? '?')}/${String(c.channelReverse ?? '?')}`
+  return `GPIO ${String(c.pinForward ?? '?')}/${String(c.pinReverse ?? '?')}`
+}
+
+/** `máx 24/18 s · final: AngelDalt` (forward/reverse; a missing limit is a dash). */
+function motorLimits(c: Record<string, unknown>): string {
+  const parts = [`${t('dashboard.ports.list.max')} ${String(c.maxTimeForward ?? '?')}/${String(c.maxTimeReverse ?? '?')} s`]
+  const forward = typeof c.limitForward === 'string' ? c.limitForward : null
+  const reverse = typeof c.limitReverse === 'string' ? c.limitReverse : null
+  if (forward || reverse) {
+    const limits = reverse ? `${forward ?? '—'}/${reverse}` : forward!
+    parts.push(`${t('dashboard.ports.list.limit')}: ${limits}`)
+  }
+  if (c.lockOnTimeout === true) parts.push(t('dashboard.ports.list.lock'))
+  return parts.join(' · ')
+}
+
+/** `GPIO 20 · play`, `exp1:15 · stop_show`: input and what it does with the show (nothing for a plain limit switch). */
+function sensorSummary(c: Record<string, unknown>): string | null {
+  const input = typeof c.expander === 'string'
+    ? `${c.expander}:${String(c.channel ?? '?')}`
+    : (props.port.pin == null ? null : `GPIO ${props.port.pin}`)
+  if (!input) return null
+  const onActive = typeof c.onActive === 'string' && c.onActive !== 'none' ? ` · ${c.onActive}` : ''
+  return `${input}${onActive}`
+}
+
+/** Short, monospace summary of what the kind needs: GPIO or expander channel, segment range, motor outputs, I2C or DMX address. */
 const address = computed<string | null>(() => {
   const c = props.port.config ?? {}
   switch (props.port.kind) {
     case 'led_segment':
       return `${String(c.strip ?? '?')} · ${String(c.first ?? '?')}–${String(c.last ?? '?')}`
     case 'motor':
-      return `R ${String(c.pinR ?? '?')} · L ${String(c.pinL ?? '?')} · S ${String(c.sensorPin ?? '?')} · ↓ ${String(c.downTime ?? '?')} s · ↑ max ${String(c.maxUpTime ?? '?')} s`
+      return `${motorOutputs(c)} · ${motorLimits(c)}`
+    case 'sensor':
+      return sensorSummary(c)
     case 'led_strip':
       return props.port.pin == null ? null : `GPIO ${props.port.pin} · ${String(c.length ?? '?')} LED · DMA ${String(c.dma ?? '?')}/${String(c.channel ?? '?')}`
     case 'relay':

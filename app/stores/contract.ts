@@ -20,7 +20,7 @@ export const useContractStore = defineStore('contract', () => {
   const kinds = computed<OutputKind[]>(() =>
     catalog.value ? (Object.keys(catalog.value.kinds) as OutputKind[]).filter(k => !HIDDEN_KINDS.includes(k)) : [])
 
-  /** Kinds a piece type can drive: every kind with show actions (a strip is a piece too; the button is not). */
+  /** Kinds a piece type can drive: every kind with show actions (a strip is a piece too; a sensor is not). */
   const pieceKinds = computed<OutputKind[]>(() =>
     kinds.value.filter(k => Object.keys(catalog.value!.kinds[k].actions).length > 0))
 

@@ -5,15 +5,19 @@ import type { CatalogParam, OutputKind } from '~/types/contract'
 // the catalog (`int`/`number` → number, `bool` → checkbox, `enum` → select of the catalog values,
 // `string` with `ref` → a select of the organization's ports of that kind, other strings → text).
 // The parent owns the config object and decides which fields are shown (a relay on an expander hides
-// `activeLow`; one on a GPIO hides `expander`/`channel`) and which of them are required right now.
+// `activeLow`; one on a GPIO hides `expander`/`channel`), which of them are required right now and
+// which enum values do not apply (a sensor on an expander has no pull-down). Unset booleans and
+// enums show the catalog default, which is what the backend applies.
 
 const props = defineProps<{
   kind: OutputKind
   fields: Array<{ key: string, spec: CatalogParam }>
-  /** Names of the organization's ports by kind, for `ref` keys (`led_strip` → strips, `gpio_expander` → expanders). */
+  /** Names of the organization's ports by kind, for `ref` keys (`led_strip` → strips, `gpio_expander` → expanders, `sensor` → sensors). */
   refOptions: Partial<Record<OutputKind, string[]>>
   /** Keys the parent requires in the current mode even if the catalog marks them optional. */
   requiredKeys?: string[]
+  /** Enum values not offered in the current mode, by key. */
+  enumExclusions?: Record<string, string[]>
   disabled?: boolean
 }>()
 
@@ -45,6 +49,33 @@ function help(key: string, spec: CatalogParam): string {
   return parts.join(' · ')
 }
 
+/** Explanation of the chosen enum value (`config_values_help.onActive.play`), if there is one. */
+function valueHelp(key: string, spec: CatalogParam): string {
+  if (spec.type !== 'enum') return ''
+  const value = enumValue(key, spec)
+  if (!value) return ''
+  const k = `dashboard.ports.config_values_help.${key}.${value}`
+  return te(k) ? t(k) : ''
+}
+
+function enumValues(key: string, spec: CatalogParam): string[] {
+  const excluded = props.enumExclusions?.[key] ?? []
+  return (spec.values ?? []).filter(v => !excluded.includes(v))
+}
+
+/** The stored value, or the catalog default when unset (and still offered). */
+function enumValue(key: string, spec: CatalogParam): string {
+  const stored = config.value[key]
+  if (typeof stored === 'string') return stored
+  const fallback = typeof spec.default === 'string' ? spec.default : ''
+  return enumValues(key, spec).includes(fallback) ? fallback : ''
+}
+
+function boolValue(key: string, spec: CatalogParam): boolean {
+  const stored = config.value[key]
+  return typeof stored === 'boolean' ? stored : spec.default === true
+}
+
 function setValue(key: string, value: unknown) {
   const next = { ...config.value }
   if (value === '' || value === null || value === undefined) delete next[key]
@@ -70,6 +101,10 @@ function refPlaceholder(spec: CatalogParam): string {
   return t(`dashboard.ports.form.ref_placeholder.${refKind(spec) ?? 'led_strip'}`)
 }
 
+function refNone(spec: CatalogParam): string {
+  return t(`dashboard.ports.form.ref_none.${refKind(spec) ?? 'led_strip'}`)
+}
+
 function refEmpty(spec: CatalogParam): string {
   return t(`dashboard.ports.form.ref_empty.${refKind(spec) ?? 'led_strip'}`)
 }
@@ -92,20 +127,21 @@ const inputId = (key: string) => `port-config-${props.kind}-${key}`
       <select v-if="refKind(spec) !== null" :id="inputId(key)" class="cfg-input" :disabled="disabled"
         :value="(config[key] as string | undefined) ?? ''"
         @change="setValue(key, ($event.target as HTMLSelectElement).value)">
-        <option value="" disabled>{{ refPlaceholder(spec) }}</option>
+        <option v-if="isRequired(key, spec)" value="" disabled>{{ refPlaceholder(spec) }}</option>
+        <option v-else value="">{{ refNone(spec) }}</option>
         <option v-for="name in refList(spec)" :key="name" :value="name">{{ name }}</option>
       </select>
 
       <select v-else-if="spec.type === 'enum'" :id="inputId(key)" class="cfg-input" :disabled="disabled"
-        :value="(config[key] as string | undefined) ?? ''"
+        :value="enumValue(key, spec)"
         @change="setValue(key, ($event.target as HTMLSelectElement).value)">
         <option value="" disabled>{{ t('dashboard.ports.form.enum_placeholder') }}</option>
-        <option v-for="value in spec.values ?? []" :key="value" :value="value">{{ enumLabel(key, value) }}</option>
+        <option v-for="value in enumValues(key, spec)" :key="value" :value="value">{{ enumLabel(key, value) }}</option>
       </select>
 
       <label v-else-if="spec.type === 'bool'" class="flex h-8 items-center gap-2 text-[14px] text-ink">
         <input :id="inputId(key)" type="checkbox" class="h-4 w-4 accent-[var(--c-accent)]" :disabled="disabled"
-          :checked="Boolean(config[key])" @change="setValue(key, ($event.target as HTMLInputElement).checked)">
+          :checked="boolValue(key, spec)" @change="setValue(key, ($event.target as HTMLInputElement).checked)">
         <span>{{ t('dashboard.ports.form.config_enabled') }}</span>
       </label>
 
@@ -119,10 +155,11 @@ const inputId = (key: string) => `port-config-${props.kind}-${key}`
         :value="(config[key] as string | undefined) ?? ''"
         @input="setValue(key, ($event.target as HTMLInputElement).value)">
 
-      <p v-if="refKind(spec) !== null && !refList(spec).length" class="cfg-help text-danger">
+      <p v-if="refKind(spec) !== null && !refList(spec).length" class="cfg-help" :class="{ 'text-danger': isRequired(key, spec) }">
         {{ refEmpty(spec) }}
       </p>
       <p v-else-if="help(key, spec)" class="cfg-help">{{ help(key, spec) }}</p>
+      <p v-if="valueHelp(key, spec)" class="cfg-help cfg-value-help">{{ valueHelp(key, spec) }}</p>
     </div>
   </div>
 </template>
@@ -145,5 +182,6 @@ const inputId = (key: string) => `port-config-${props.kind}-${key}`
 }
 .cfg-input:focus { border-color: var(--c-accent); box-shadow: 0 0 0 2px var(--c-bg-card), 0 0 0 4px var(--c-accent); }
 .cfg-input:disabled { border-color: transparent; background: var(--c-bg-alt); color: var(--c-ink-muted); }
+.cfg-value-help { color: var(--c-ink-soft); }
 .cfg-input-code { font-family: var(--font-mono, ui-monospace, monospace); font-size: 13px; }
 </style>

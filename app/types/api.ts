@@ -552,10 +552,10 @@ export interface PortResponseDto {
   name: string
   /** Output kind from the catalog; immutable after creation. */
   kind: OutputKind
-  /** Null for infrastructure ports (strips, button). */
+  /** Null for infrastructure ports (strips, expanders, sensors). */
   pieceTypeId: number | null
   pieceTypeName: string | null
-  /** GPIO pin for kinds that have one (relay, led_strip, button); null otherwise. */
+  /** GPIO pin for kinds that have one (led_strip; relay and sensor unless on an expander); null otherwise. */
   pin: number | null
   /** Kind-specific keys validated against the catalog (never includes `pin`). */
   config: Record<string, unknown>
@@ -583,6 +583,20 @@ export interface UpdatePortDto {
   parameters?: ActionParameterDto[]
 }
 
+/**
+ * An alert of the last heartbeat. Known codes: `motor_timeout` (a motor reached its hard time limit;
+ * it may be locked), `sensor_stop_show` and `sensor_panic`. {@link message} comes ready-made in
+ * Catalan from the player.
+ */
+export interface DeviceAlertDto {
+  code: string
+  /** Port the alert is about, if any. */
+  port: string | null
+  message: string | null
+  /** ISO-8601 instant on the player's clock. */
+  at: string | null
+}
+
 /** Player states reported by the Raspberry Pi in its heartbeat (`rpi4-system`). */
 export type DeviceState = 'BOOT' | 'SAFE' | 'IDLE' | 'PLAYING' | 'TEST' | 'ERROR'
 
@@ -606,6 +620,8 @@ export interface DeviceResponseDto {
   lastShowName: string | null
   /** Names of the ports the player currently has cut (overrides). */
   lastOverrides: string[]
+  /** Alerts of the last heartbeat (motor timeouts, sensors that stopped the show). */
+  lastAlerts: DeviceAlertDto[]
   lastVersion: string | null
   lastIp: string | null
   lastError: string | null
