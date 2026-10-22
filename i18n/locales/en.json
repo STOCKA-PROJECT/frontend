@@ -687,7 +687,7 @@
       "catalogActions": {
         "turn_on": "Turn on",
         "turn_off": "Turn off",
-        "pulse": "Pulse (close and open)",
+        "double_pulse": "Double press",
         "set": "Moving head cue",
         "blackout": "Moving head blackout",
         "setBrightness": "Strip brightness",
@@ -703,6 +703,9 @@
         "time": "Time (s)",
         "hold_time": "Hold time (s)",
         "pulse_delay": "Pulse delay (s)",
+        "first_press": "First press (s)",
+        "gap": "Gap (s)",
+        "second_press": "Second press (s)",
         "brightness": "Brightness",
         "color": "Colour",
         "first": "First LED",

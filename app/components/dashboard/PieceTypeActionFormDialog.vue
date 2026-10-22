@@ -108,14 +108,17 @@ function catalogLabel(scope: 'catalogActions' | 'catalogParams', key: string): s
   return te(k) ? t(k) : key
 }
 
-/** A parameter draft for a catalog parameter: typed from the catalog and bound dynamically. */
+/**
+ * A parameter draft for a catalog parameter: typed from the catalog and bound dynamically, or
+ * statically when the catalog marks it `static` (e.g. the three durations of double_pulse).
+ */
 function draftFromCatalog(action: CatalogAction, pname: string, spec: CatalogParam): ParamDraft {
   return newParamDraft({
     name: pname,
     displayName: catalogLabel('catalogParams', pname),
     type: attributeTypeFor(spec.type),
     required: spec.required === true,
-    dynamic: true,
+    dynamic: spec.static !== true,
     ...(pname === durationParamOf(action) ? { isDuration: true } : {}),
     ...(spec.type === 'enum' ? { validators: { options: [...(spec.values ?? [])] } } : {})
   })

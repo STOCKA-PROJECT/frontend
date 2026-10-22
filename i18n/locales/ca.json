@@ -687,7 +687,7 @@
       "catalogActions": {
         "turn_on": "Encendre",
         "turn_off": "Apagar",
-        "pulse": "Pols (tancar i obrir)",
+        "double_pulse": "Doble pulsació",
         "set": "Cue del cap mòbil",
         "blackout": "Apagar el cap mòbil",
         "setBrightness": "Brillantor de la tira",
@@ -703,6 +703,9 @@
         "time": "Temps (s)",
         "hold_time": "Temps premut (s)",
         "pulse_delay": "Retard del pols (s)",
+        "first_press": "1a pulsació (s)",
+        "gap": "Pausa (s)",
+        "second_press": "2a pulsació (s)",
         "brightness": "Brillantor",
         "color": "Color",
         "first": "Primer LED",

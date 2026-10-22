@@ -687,7 +687,7 @@
       "catalogActions": {
         "turn_on": "Encender",
         "turn_off": "Apagar",
-        "pulse": "Pulso (cerrar y abrir)",
+        "double_pulse": "Doble pulsación",
         "set": "Cue del cabezal",
         "blackout": "Apagar el cabezal",
         "setBrightness": "Brillo de la tira",
@@ -703,6 +703,9 @@
         "time": "Tiempo (s)",
         "hold_time": "Tiempo pulsado (s)",
         "pulse_delay": "Retardo del pulso (s)",
+        "first_press": "1.ª pulsación (s)",
+        "gap": "Pausa (s)",
+        "second_press": "2.ª pulsación (s)",
         "brightness": "Brillo",
         "color": "Color",
         "first": "Primer LED",
