@@ -57,7 +57,13 @@ export function useApiError() {
 
     let description: string
     const key = `errors.${code}`
-    if (te(key)) {
+    // A code with a `reason` param may translate each reason (`errors.ports.sensor_config_invalid.wiring_key`)
+    // with `default` as the fallback; plain codes are a single message.
+    const reason = typeof (params as Record<string, unknown>).reason === 'string' ? (params as Record<string, unknown>).reason as string : null
+    const reasonKey = [reason ? `${key}.${reason}` : null, `${key}.default`].find((k): k is string => k !== null && te(k))
+    if (reasonKey) {
+      description = t(reasonKey, params as Record<string, unknown>)
+    } else if (te(key)) {
       description = t(key, params as Record<string, unknown>)
     } else if (body?.detail) {
       description = body.detail

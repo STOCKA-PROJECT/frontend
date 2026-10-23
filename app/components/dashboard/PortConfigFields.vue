@@ -18,6 +18,10 @@ const props = defineProps<{
   requiredKeys?: string[]
   /** Enum values not offered in the current mode, by key. */
   enumExclusions?: Record<string, string[]>
+  /** Labels of enum values that come from the catalog itself (a sensor model shows its profile name), by key. */
+  enumLabels?: Record<string, Record<string, string>>
+  /** Unit shown next to the label, by key (a measured sensor's threshold in cm, °C…). */
+  units?: Record<string, string>
   disabled?: boolean
 }>()
 
@@ -25,12 +29,13 @@ const config = defineModel<Record<string, unknown>>({ required: true })
 
 const { t, te } = useI18n()
 
-/** Kind-specific label first (`config.relay.channel`), then the shared one (`config.channel`), then the key. */
+/** Kind-specific label first (`config.relay.channel`), then the shared one (`config.channel`), then the key; plus the unit, if any. */
 function label(key: string): string {
   const specific = `dashboard.ports.config.${props.kind}.${key}`
-  if (te(specific)) return t(specific)
   const shared = `dashboard.ports.config.${key}`
-  return te(shared) ? t(shared) : key
+  const text = te(specific) ? t(specific) : te(shared) ? t(shared) : key
+  const unit = props.units?.[key]
+  return unit ? `${text} (${unit})` : text
 }
 
 function isRequired(key: string, spec: CatalogParam): boolean {
@@ -110,6 +115,8 @@ function refEmpty(spec: CatalogParam): string {
 }
 
 function enumLabel(key: string, value: string): string {
+  const fromCatalog = props.enumLabels?.[key]?.[value]
+  if (fromCatalog) return fromCatalog
   const k = `dashboard.ports.config_values.${key}.${value}`
   return te(k) ? t(k) : value
 }

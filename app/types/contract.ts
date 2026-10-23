@@ -54,8 +54,16 @@ export type PinMode = 'required' | 'optional' | 'none'
 /** What a sensor does with the show when it becomes active (`config.onActive`). */
 export type SensorOnActive = 'none' | 'play' | 'stop_show' | 'panic'
 
-/** Config of a `sensor` port: a native pin (on the port) or an expander channel. */
+/** Where a sensor's state comes from: a digital input, or a value read by a model of `profiles.sensor`. */
+export type SensorSource = 'digital' | 'measured'
+
+/**
+ * Config of a `sensor` port. Digital (default): a native pin (on the port) or an expander channel.
+ * Measured: a `model` of `profiles.sensor` with its own wiring, active when the value crosses `threshold`.
+ */
 export interface SensorConfig {
+  /** Default `digital`. */
+  source?: SensorSource
   expander?: string
   channel?: number
   /** Default `true`: active when the input is low (contact to ground with pull-up). */
@@ -66,6 +74,40 @@ export interface SensorConfig {
   debounceMs?: number
   /** Default `none` (limit switch only). */
   onActive?: SensorOnActive
+  /** Measured only: id of a `profiles.sensor` entry. */
+  model?: string
+  /** Measured only: required when the model measures more than one quantity. */
+  quantity?: string
+  /** Measured, I2C models: bus (default 1) and address (default the profile's first). */
+  bus?: number
+  address?: number
+  /** Measured, `trig_echo` models: the two GPIOs. */
+  pinTrig?: number
+  pinEcho?: number
+  /** Measured, 1-Wire models: `28-xxxxxxxxxxxx`; without it, the first sensor of the bus. */
+  deviceId?: string
+  /** Measured: in the unit of the quantity. */
+  threshold?: number
+  /** Measured: `below` = active at or under the threshold, `above` = at or over it. */
+  activeWhen?: 'above' | 'below'
+  /** Measured: margin to release, default 0. */
+  hysteresis?: number
+  /** Measured: reading period, default the profile's. */
+  pollMs?: number
+}
+
+/** How a measured-sensor model is connected to the Pi. */
+export type SensorWiring = 'i2c' | 'onewire' | 'trig_echo'
+
+/** A measured-sensor model (`profiles.sensor.<id>`): wiring, I2C addresses and measured quantities. */
+export interface SensorProfile {
+  name: string
+  wiring: SensorWiring
+  /** I2C models: accepted addresses, the first is the default. */
+  addresses?: number[]
+  quantities: Record<string, { unit: string, min: number, max: number }>
+  pollMs: number
+  notes?: string
 }
 
 /**
@@ -124,7 +166,7 @@ export interface OutputCatalog {
   format: 'stocka-catalog'
   version: number
   kinds: Record<OutputKind, CatalogKind>
-  profiles?: { moving_head?: Record<string, FixtureProfile> }
+  profiles?: { moving_head?: Record<string, FixtureProfile>, sensor?: Record<string, SensorProfile> }
   boards: Record<string, BoardSpec>
 }
 

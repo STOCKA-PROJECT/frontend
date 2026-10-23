@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { CatalogAction, CatalogKind, CatalogParam, OutputCatalog, OutputKind } from '~/types/contract'
+import type { CatalogAction, CatalogKind, CatalogParam, OutputCatalog, OutputKind, SensorProfile } from '~/types/contract'
 
 /**
  * The output catalog (kinds, config schemas and actions), fetched once from the backend. Read-only:
@@ -56,5 +56,12 @@ export const useContractStore = defineStore('contract', () => {
     return Object.entries(kind(k)?.config ?? {}).map(([key, spec]) => ({ key, spec }))
   }
 
-  return { catalog, loading, error, kinds, pieceKinds, load, kind, actionsOf, action, configFieldsOf }
+  /** Measured-sensor models (`profiles.sensor`), by id. */
+  const sensorProfiles = computed<Record<string, SensorProfile>>(() => catalog.value?.profiles?.sensor ?? {})
+
+  function sensorProfile(id: unknown): SensorProfile | null {
+    return typeof id === 'string' ? sensorProfiles.value[id] ?? null : null
+  }
+
+  return { catalog, loading, error, kinds, pieceKinds, load, kind, actionsOf, action, configFieldsOf, sensorProfiles, sensorProfile }
 })

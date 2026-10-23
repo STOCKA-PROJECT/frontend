@@ -12,6 +12,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const contract = useContractStore()
 
 const kindLabel = computed(() => t(`dashboard.kinds.${props.port.kind}`))
 
@@ -34,13 +35,26 @@ function motorLimits(c: Record<string, unknown>): string {
   return parts.join(' · ')
 }
 
+/** `vl53l0x · ≤ 20 cm`, `ds18b20 GPIO 4 · ≥ 40 °C`: a measured sensor's model, wiring when it has a GPIO, and threshold. */
+function measuredSummary(c: Record<string, unknown>): string {
+  const profile = contract.sensorProfile(c.model)
+  const quantities = Object.entries(profile?.quantities ?? {})
+  const quantity = quantities.find(([id]) => id === c.quantity) ?? (quantities.length === 1 ? quantities[0] : undefined)
+  const unit = quantity ? ` ${quantity[1].unit}` : ''
+  const wiring = profile?.wiring === 'onewire' && props.port.pin != null
+    ? ` GPIO ${props.port.pin}`
+    : profile?.wiring === 'trig_echo' ? ` GPIO ${String(c.pinTrig ?? '?')}/${String(c.pinEcho ?? '?')}` : ''
+  return `${String(c.model ?? '?')}${wiring} · ${c.activeWhen === 'above' ? '≥' : '≤'} ${String(c.threshold ?? '?')}${unit}`
+}
+
 /** `GPIO 20 · play`, `exp1:15 · stop_show`: input and what it does with the show (nothing for a plain limit switch). */
 function sensorSummary(c: Record<string, unknown>): string | null {
+  const onActive = typeof c.onActive === 'string' && c.onActive !== 'none' ? ` · ${c.onActive}` : ''
+  if (c.source === 'measured') return `${measuredSummary(c)}${onActive}`
   const input = typeof c.expander === 'string'
     ? `${c.expander}:${String(c.channel ?? '?')}`
     : (props.port.pin == null ? null : `GPIO ${props.port.pin}`)
   if (!input) return null
-  const onActive = typeof c.onActive === 'string' && c.onActive !== 'none' ? ` · ${c.onActive}` : ''
   return `${input}${onActive}`
 }
 
