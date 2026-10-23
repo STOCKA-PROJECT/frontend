@@ -902,6 +902,8 @@
         "last_seen_title": "Last heartbeat: {date}",
         "show_label": "Show",
         "no_show": "No active show",
+        "show_timeline": "from timeline «{name}»",
+        "show_timeline_deleted": "from a deleted timeline",
         "overrides_label": "Cut ports",
         "version": "Version",
         "ip": "IP",

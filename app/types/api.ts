@@ -618,6 +618,8 @@ export interface DeviceResponseDto {
   /** `sha256:…` hash of the show active on the player. */
   lastShowHash: string | null
   lastShowName: string | null
+  /** Stocka timeline the active show was exported from (absent on older backends). */
+  lastShowTimelineId?: number | null
   /** Names of the ports the player currently has cut (overrides). */
   lastOverrides: string[]
   /** Alerts of the last heartbeat (motor timeouts, sensors that stopped the show). */

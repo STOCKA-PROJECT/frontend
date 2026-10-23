@@ -902,6 +902,8 @@
         "last_seen_title": "Última pulsació: {date}",
         "show_label": "Show",
         "no_show": "Cap show actiu",
+        "show_timeline": "del timeline «{name}»",
+        "show_timeline_deleted": "d'un timeline esborrat",
         "overrides_label": "Ports tallats",
         "version": "Versió",
         "ip": "IP",

@@ -13,6 +13,9 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const devices = useDevicesStore()
+const timelines = useTimelinesStore()
+/** The timelines list arrived: a device id missing from it is a deleted timeline. */
+const timelinesLoaded = ref(false)
 const toast = useToastStore()
 const apiError = useApiError()
 
@@ -26,7 +29,21 @@ const canWrite = computed(() => props.role === 'OWNER' || props.role === 'MANAGE
 const now = shallowRef(Date.now())
 const loadError = ref<string | null>(null)
 
+/** Which timeline the device's active show comes from, by its current name. */
+function timelineLabel(device: DeviceResponseDto): string | null {
+  const id = device.lastShowTimelineId
+  if (id == null || !timelinesLoaded.value) return null
+  const timeline = timelines.list.find(tl => tl.id === id)
+  return timeline
+    ? t('dashboard.devices.list.show_timeline', { name: timeline.name })
+    : t('dashboard.devices.list.show_timeline_deleted')
+}
+
 async function refresh() {
+  if (!timelinesLoaded.value) {
+    // Best effort: without it the row just shows the show name.
+    timelines.fetchList(props.orgSlug).then(() => { timelinesLoaded.value = true }).catch(() => {})
+  }
   try {
     await devices.load(props.orgSlug)
     loadError.value = null
@@ -198,6 +215,7 @@ const showInitialLoading = computed(() => devices.loading && !devices.loaded)
           v-for="device in devices.list"
           :key="device.id"
           :device="device"
+          :timeline-label="timelineLabel(device)"
           :can-write="canWrite"
           :now="now"
           @rename="openRename(device)"

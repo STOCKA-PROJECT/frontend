@@ -7,6 +7,8 @@ import type { DeviceAlertDto, DeviceResponseDto } from '~/types/api'
  */
 const props = defineProps<{
   device: DeviceResponseDto
+  /** «del timeline «X»» when the active show comes from a timeline of the organization. */
+  timelineLabel?: string | null
   canWrite: boolean
   /** Reference instant for the relative «last heartbeat» label; the board refreshes it. */
   now: number
@@ -159,6 +161,7 @@ const hasShow = computed(() => props.device.lastShowName !== null || props.devic
         <template v-if="hasShow">
           <span class="text-ink">{{ device.lastShowName ?? '—' }}</span>
           <code v-if="shortHash" class="mono text-ink-muted" :title="device.lastShowHash ?? undefined">{{ shortHash }}</code>
+          <span v-if="timelineLabel" class="text-ink-soft">{{ timelineLabel }}</span>
         </template>
         <span v-else class="text-ink-muted">{{ t('dashboard.devices.list.no_show') }}</span>
       </p>

@@ -902,6 +902,8 @@
         "last_seen_title": "Último latido: {date}",
         "show_label": "Show",
         "no_show": "Ningún show activo",
+        "show_timeline": "del timeline «{name}»",
+        "show_timeline_deleted": "de un timeline borrado",
         "overrides_label": "Puertos cortados",
         "version": "Versión",
         "ip": "IP",
