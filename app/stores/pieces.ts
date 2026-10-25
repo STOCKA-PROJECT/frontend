@@ -400,8 +400,12 @@ export const usePiecesStore = defineStore('pieces', () => {
     const inflight = attachmentBlobInFlight.value[key]
     if (inflight) return inflight
     const promise = (async () => {
+      // `/content` hace que el backend lea los bytes de R2 y los sirva por el
+      // proxy `/api`. `/download` redirige a una URL firmada de R2 a la que el
+      // navegador conecta directamente, y las operadoras españolas bloquean las
+      // IPs de R2 durante los partidos de LaLiga.
       const res = await fetch(
-        `/api/organizations/${orgSlug}/pieces/${pieceId}/attachments/${attachmentId}/download`
+        `/api/organizations/${orgSlug}/pieces/${pieceId}/attachments/${attachmentId}/content`
       )
       if (!res.ok) {
         throw new Error(`download_failed_${res.status}`)
