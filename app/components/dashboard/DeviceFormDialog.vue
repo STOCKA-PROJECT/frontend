@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import type { DeviceResponseDto } from '~/types/api'
+import type { DeviceResponseDto, UpdateDeviceDto } from '~/types/api'
 
-/** Register a device (name only; the backend mints the token) or rename an existing one. */
+/**
+ * Register a device (the backend mints the token) or edit one: its name, where the editor reaches it on
+ * the local network and its PIN, so every computer and phone of the organization finds it configured.
+ * In edit mode only the fields that changed are submitted; an emptied address or PIN is removed.
+ */
 const props = withDefaults(defineProps<{
   open: boolean
-  mode: 'register' | 'rename'
+  mode: 'register' | 'edit'
   initial?: DeviceResponseDto | null
   loading?: boolean
   errorMsg?: string | null
@@ -15,38 +19,72 @@ const props = withDefaults(defineProps<{
 })
 
 const emit = defineEmits<{
-  submit: [name: string]
+  submit: [payload: UpdateDeviceDto]
   close: []
 }>()
 
 const { t } = useI18n()
 
 const NAME_MAX_LENGTH = 80
+const URL_MAX_LENGTH = 255
+const PIN_PATTERN = /^\d{6}$/
 
 const name = ref('')
+const localUrl = ref('')
+const pin = ref('')
+const pinVisible = ref(false)
 const nameInput = useTemplateRef<HTMLInputElement>('nameInput')
 const inputId = useId()
+const urlId = useId()
+const pinId = useId()
+
+const initialUrl = computed(() => props.initial?.localUrl ?? '')
+const initialPin = computed(() => props.initial?.pin ?? '')
 
 watch(() => props.open, (open) => {
   if (!open) return
-  name.value = props.mode === 'rename' && props.initial ? props.initial.name : ''
+  const editing = props.mode === 'edit' && props.initial
+  name.value = editing ? props.initial!.name : ''
+  localUrl.value = editing ? initialUrl.value : ''
+  pin.value = editing ? initialPin.value : ''
+  pinVisible.value = false
   nextTick(() => nameInput.value?.focus())
 }, { immediate: true })
 
-const title = computed(() => props.mode === 'rename'
+const title = computed(() => props.mode === 'edit'
   ? t('dashboard.devices.form.rename_title', { name: props.initial?.name ?? '' })
   : t('dashboard.devices.form.register_title'))
 
-const submitLabel = computed(() => props.mode === 'rename'
+const submitLabel = computed(() => props.mode === 'edit'
   ? t('dashboard.devices.form.save')
   : t('dashboard.devices.form.register'))
 
 const trimmedName = computed(() => name.value.trim())
+const trimmedUrl = computed(() => localUrl.value.trim())
+const trimmedPin = computed(() => pin.value.trim())
+const pinInvalid = computed(() => trimmedPin.value !== '' && !PIN_PATTERN.test(trimmedPin.value))
+
+/** What goes to the backend: everything on register, only what changed on edit. */
+const payload = computed<UpdateDeviceDto>(() => {
+  if (props.mode === 'register') {
+    return {
+      name: trimmedName.value,
+      ...(trimmedUrl.value ? { localUrl: trimmedUrl.value } : {}),
+      ...(trimmedPin.value ? { pin: trimmedPin.value } : {})
+    }
+  }
+  const out: UpdateDeviceDto = {}
+  if (trimmedName.value !== props.initial?.name) out.name = trimmedName.value
+  if (trimmedUrl.value !== initialUrl.value) out.localUrl = trimmedUrl.value
+  // A SPECTATOR never gets here (no edit button); a hidden PIN would read as empty otherwise.
+  if (trimmedPin.value !== initialPin.value) out.pin = trimmedPin.value
+  return out
+})
 
 const canSubmit = computed(() => {
-  if (props.loading || trimmedName.value.length === 0) return false
-  // Renaming to the same name is a no-op; keep the button disabled.
-  return props.mode !== 'rename' || trimmedName.value !== props.initial?.name
+  if (props.loading || trimmedName.value.length === 0 || pinInvalid.value) return false
+  // Saving an unchanged device is a no-op; keep the button disabled.
+  return props.mode !== 'edit' || Object.keys(payload.value).length > 0
 })
 
 function onBackdropClick(e: MouseEvent) {
@@ -59,7 +97,7 @@ function onKey(e: KeyboardEvent) {
 
 function submit() {
   if (!canSubmit.value) return
-  emit('submit', trimmedName.value)
+  emit('submit', payload.value)
 }
 </script>
 
@@ -87,6 +125,53 @@ function submit() {
                 class="field-input"
               >
               <p class="field-help">{{ t('dashboard.devices.form.field_name_help') }}</p>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label :for="urlId" class="field-label">{{ t('dashboard.devices.form.field_url') }}</label>
+              <input
+                :id="urlId"
+                v-model="localUrl"
+                type="text"
+                inputmode="url"
+                autocapitalize="off"
+                autocomplete="off"
+                spellcheck="false"
+                :maxlength="URL_MAX_LENGTH"
+                :placeholder="t('dashboard.devices.form.field_url_placeholder')"
+                :disabled="loading"
+                class="field-input field-mono"
+              >
+              <p class="field-help">{{ t('dashboard.devices.form.field_url_help') }}</p>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label :for="pinId" class="field-label">{{ t('dashboard.devices.form.field_pin') }}</label>
+              <div class="flex items-center gap-2">
+                <input
+                  :id="pinId"
+                  v-model="pin"
+                  :type="pinVisible ? 'text' : 'password'"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  maxlength="6"
+                  :placeholder="t('dashboard.devices.form.field_pin_placeholder')"
+                  :disabled="loading"
+                  :aria-invalid="pinInvalid"
+                  class="field-input field-mono !w-32"
+                >
+                <button
+                  type="button"
+                  class="dialog-btn"
+                  :disabled="loading || !pin"
+                  :aria-pressed="pinVisible"
+                  @click="pinVisible = !pinVisible"
+                >
+                  {{ pinVisible ? t('dashboard.devices.form.hide_pin') : t('dashboard.devices.form.show_pin') }}
+                </button>
+              </div>
+              <p v-if="pinInvalid" class="field-error">{{ t('dashboard.devices.form.pin_invalid') }}</p>
+              <p class="field-help">{{ t('dashboard.devices.form.field_pin_help') }}</p>
             </div>
           </div>
 
@@ -153,6 +238,9 @@ function submit() {
   outline: none;
   transition: border-color .12s, box-shadow .12s;
 }
+.field-mono { font-family: var(--font-mono, ui-monospace, monospace); font-size: 13px; }
+.field-error { font-size: 12px; line-height: 16px; color: var(--c-danger); }
+.field-input[aria-invalid="true"] { border-color: var(--c-danger); }
 .field-input::placeholder { color: var(--c-ink-muted); }
 .field-input:focus { border-color: var(--c-accent); box-shadow: 0 0 0 2px var(--c-bg-card), 0 0 0 4px var(--c-accent); }
 .field-input:disabled { border-color: transparent; background: var(--c-bg-alt); color: var(--c-ink-muted); }

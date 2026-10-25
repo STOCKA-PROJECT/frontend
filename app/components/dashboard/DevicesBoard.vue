@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { DeviceCreatedDto, DeviceResponseDto, OrganizationRole } from '~/types/api'
+import type { DeviceCreatedDto, DeviceResponseDto, OrganizationRole, UpdateDeviceDto } from '~/types/api'
 
 /**
  * Registered Raspberry Pi players of an organization with the last state each one reported.
  * The list is reloaded every {@link REFRESH_INTERVAL_MS} while the tab is visible; managers
- * can register, rename, delete and rotate the heartbeat token (shown once in a dialog).
+ * can register, edit (name, local address, PIN), delete and rotate the heartbeat token (shown once
+ * in a dialog).
  */
 const props = defineProps<{
   orgSlug: string
@@ -68,10 +69,10 @@ function notifyError(e: unknown) {
   toast.push({ type: 'error', title: view.title, description: view.description })
 }
 
-// ---- register / rename dialog ----
+// ---- register / edit dialog ----
 const formDialog = ref<{
   open: boolean
-  mode: 'register' | 'rename'
+  mode: 'register' | 'edit'
   target: DeviceResponseDto | null
   loading: boolean
   error: string | null
@@ -81,24 +82,24 @@ function openRegister() {
   formDialog.value = { open: true, mode: 'register', target: null, loading: false, error: null }
 }
 
-function openRename(device: DeviceResponseDto) {
-  formDialog.value = { open: true, mode: 'rename', target: device, loading: false, error: null }
+function openEdit(device: DeviceResponseDto) {
+  formDialog.value = { open: true, mode: 'edit', target: device, loading: false, error: null }
 }
 
 function closeForm() {
   formDialog.value = { ...formDialog.value, open: false, error: null, loading: false }
 }
 
-async function submitForm(name: string) {
+async function submitForm(payload: UpdateDeviceDto) {
   formDialog.value.loading = true
   formDialog.value.error = null
   try {
     if (formDialog.value.mode === 'register') {
-      const created = await devices.create(props.orgSlug, { name })
+      const created = await devices.create(props.orgSlug, { ...payload, name: payload.name ?? '' })
       closeForm()
       showToken('register', created)
     } else if (formDialog.value.target) {
-      await devices.rename(props.orgSlug, formDialog.value.target.id, name)
+      await devices.update(props.orgSlug, formDialog.value.target.id, payload)
       closeForm()
     }
   } catch (e) {
@@ -218,7 +219,7 @@ const showInitialLoading = computed(() => devices.loading && !devices.loaded)
           :timeline-label="timelineLabel(device)"
           :can-write="canWrite"
           :now="now"
-          @rename="openRename(device)"
+          @edit="openEdit(device)"
           @rotate="openConfirm('rotate', device)"
           @delete="openConfirm('delete', device)"
         />

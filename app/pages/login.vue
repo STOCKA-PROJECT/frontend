@@ -16,6 +16,10 @@ const apiError = useApiError()
 const email = ref('')
 const password = ref('')
 const rememberMe = ref(false)
+// Phones drop session cookies when the browser closes: there it comes ticked (30 days).
+onMounted(() => {
+  if (isMobileDevice()) rememberMe.value = true
+})
 const loading = ref(false)
 const errorMsg = ref<string | null>(null)
 const errorCode = ref<string | null>(null)

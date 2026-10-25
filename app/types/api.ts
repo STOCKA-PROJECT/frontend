@@ -611,6 +611,11 @@ export interface DeviceResponseDto {
   deviceId: string | null
   name: string
   board: string
+  /** Where the editor reaches the player on the local network (`http://belen.local:8080`). */
+  localUrl?: string | null
+  /** The player's PIN; null when none is saved or the caller is a SPECTATOR (see {@link hasPin}). */
+  pin?: string | null
+  hasPin?: boolean
   online: boolean
   lastSeenAt: string | null
   /** One of {@link DeviceState}; kept as a string so a state added later still renders. */
@@ -644,10 +649,17 @@ export interface DeviceCreatedDto {
 
 export interface CreateDeviceDto {
   name: string
+  /** Optional; normalized by the backend (`belen.local` → `http://belen.local:8080`). */
+  localUrl?: string | null
+  /** Optional, 6 digits. */
+  pin?: string | null
 }
 
+/** Every field is optional; an empty `localUrl` or `pin` removes it. */
 export interface UpdateDeviceDto {
-  name: string
+  name?: string
+  localUrl?: string
+  pin?: string
 }
 
 /**

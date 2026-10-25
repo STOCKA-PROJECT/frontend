@@ -32,7 +32,7 @@ onMounted(async () => {
     const api = useApi()
     const data = await api<CallbackResponse>('/auth/oauth/google/callback', {
       method: 'POST',
-      body: { code, state }
+      body: { code, state, rememberMe: isMobileDevice() }
     })
     auth.setSession(data)
     await auth.routeAfterAuth()

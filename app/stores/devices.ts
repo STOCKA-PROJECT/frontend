@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { CreateDeviceDto, DeviceCreatedDto, DeviceResponseDto } from '~/types/api'
+import type { CreateDeviceDto, DeviceCreatedDto, DeviceResponseDto, UpdateDeviceDto } from '~/types/api'
 
 /**
  * Raspberry Pi players registered in an organization (`/organizations/{slug}/devices`) with the
@@ -45,11 +45,12 @@ export const useDevicesStore = defineStore('devices', () => {
     return created
   }
 
-  async function rename(orgSlug: string, id: number, name: string) {
+  /** Changes the name, the local address or the PIN; fields left out stay as they are. */
+  async function update(orgSlug: string, id: number, payload: UpdateDeviceDto) {
     const api = useApi()
     const updated = await api<DeviceResponseDto>(`/organizations/${orgSlug}/devices/${id}`, {
       method: 'PATCH',
-      body: { name }
+      body: payload
     })
     upsert(updated)
     return updated
@@ -77,5 +78,5 @@ export const useDevicesStore = defineStore('devices', () => {
     loaded.value = false
   }
 
-  return { list, loading, loaded, load, create, rename, remove, rotateToken, reset }
+  return { list, loading, loaded, load, create, update, remove, rotateToken, reset }
 })

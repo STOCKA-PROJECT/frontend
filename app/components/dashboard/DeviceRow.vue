@@ -3,7 +3,7 @@ import type { DeviceAlertDto, DeviceResponseDto } from '~/types/api'
 
 /**
  * One registered Raspberry Pi and the last state it reported: online/offline, player state,
- * active show, cut ports, alerts, version, IP and last error. Actions are emitted to the board.
+ * active show, cut ports, alerts, local address, whether its PIN is saved, version, IP and last error. Actions are emitted to the board.
  */
 const props = defineProps<{
   device: DeviceResponseDto
@@ -15,7 +15,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  rename: []
+  edit: []
   rotate: []
   delete: []
 }>()
@@ -188,6 +188,14 @@ const hasShow = computed(() => props.device.lastShowName !== null || props.devic
 
       <dl class="meta mt-2 flex flex-wrap gap-x-4 gap-y-1">
         <div class="meta-item">
+          <dt>{{ t('dashboard.devices.list.local_url') }}</dt>
+          <dd>{{ device.localUrl?.replace(/^https?:\/\//, '') ?? t('dashboard.devices.list.no_local_url') }}</dd>
+        </div>
+        <div class="meta-item">
+          <dt>{{ t('dashboard.devices.list.pin') }}</dt>
+          <dd>{{ device.hasPin ? t('dashboard.devices.list.pin_saved') : t('dashboard.devices.list.pin_missing') }}</dd>
+        </div>
+        <div class="meta-item">
           <dt>{{ t('dashboard.devices.list.version') }}</dt>
           <dd>{{ device.lastVersion ?? '—' }}</dd>
         </div>
@@ -216,7 +224,7 @@ const hasShow = computed(() => props.device.lastShowName !== null || props.devic
     </div>
 
     <div v-if="canWrite" class="flex flex-shrink-0 flex-wrap items-center gap-1.5">
-      <button type="button" class="row-btn" @click="emit('rename')">
+      <button type="button" class="row-btn" @click="emit('edit')">
         <DashboardIcon name="edit" :size="14" />
         {{ t('dashboard.devices.list.rename') }}
       </button>
