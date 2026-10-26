@@ -11,10 +11,12 @@ export const usePortsStore = defineStore('ports', () => {
   const loading = ref(false)
   const loaded = ref(false)
 
+  /** Ports in alphabetical order ("relé 2" before "relé 10"), whatever their stored position. */
   const list = computed(() =>
     order.value
       .map(id => byId.value[id])
       .filter((p): p is PortResponseDto => Boolean(p))
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
   )
 
   function upsert(port: PortResponseDto) {
