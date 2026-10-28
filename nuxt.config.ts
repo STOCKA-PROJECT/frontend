@@ -16,7 +16,10 @@ const SECURITY_HEADERS = {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https:",
-    "connect-src 'self' https://*.sentry.io https://*.r2.cloudflarestorage.com",
+    // `http://*:8080`: the device page controls the belén Raspberry Pi on the local network (http://belen.local:8080,
+    // http://192.168.x.y:8080…), any host but only plain HTTP on the player's port. It has to be site-wide because
+    // client-side navigation keeps the CSP of the first page loaded.
+    "connect-src 'self' https://*.sentry.io https://*.r2.cloudflarestorage.com http://*:8080",
     "frame-src 'self'",
     "worker-src 'self' blob:",
     "frame-ancestors 'none'",

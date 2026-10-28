@@ -1,3 +1,5 @@
+import { FetchError } from 'ofetch'
+
 /**
  * Browser-side helpers to save a server response as a file.
  *
@@ -63,4 +65,25 @@ function stripQuotes(value: string): string {
 function sanitizeFilename(value: string): string | null {
   const clean = value.replace(UNSAFE_FILENAME_CHARS, '').trim()
   return clean.length > 0 ? clean : null
+}
+
+/**
+ * With `responseType: 'blob'` ofetch also parses error bodies as a `Blob`. Put the
+ * ProblemDetail JSON back in place so `useApiError()` can read `code`, `detail` and
+ * `issues` exactly as for any other request. `FetchError.data` is a getter over
+ * `response._data`, so only the latter is assigned.
+ *
+ * @param err what a blob request rejected with
+ */
+export async function restoreJsonErrorBody(err: unknown): Promise<void> {
+  if (!(err instanceof FetchError) || !err.response) return
+  const data: unknown = err.response._data
+  if (!(data instanceof Blob)) return
+  const contentType = err.response.headers.get('content-type') ?? ''
+  if (!/json/i.test(contentType)) return
+  try {
+    err.response._data = JSON.parse(await data.text())
+  } catch {
+    // not JSON after all: useApiError falls back to its generic message
+  }
 }

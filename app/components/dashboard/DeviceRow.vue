@@ -21,6 +21,10 @@ const emit = defineEmits<{
 }>()
 
 const { t, te, locale } = useI18n()
+const { orgPath } = useOrgPath()
+
+/** The device page: control from the local network and the log kept in Stocka. */
+const detailPath = computed(() => orgPath(`/dispositivos/${props.device.id}`))
 
 // Same colour logic as the player's own page (rpi4-system/app/api/ui/app.js).
 const STATE_TONES: Record<string, string> = {
@@ -139,7 +143,7 @@ const hasShow = computed(() => props.device.lastShowName !== null || props.devic
   <li class="device-row flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
     <div class="min-w-0 flex-1">
       <div class="flex flex-wrap items-center gap-2">
-        <span class="truncate text-[14px] font-semibold leading-5 text-ink">{{ device.name }}</span>
+        <NuxtLink :to="detailPath" class="device-name truncate text-[14px] font-semibold leading-5 text-ink">{{ device.name }}</NuxtLink>
         <span class="badge" :class="device.online ? 'badge-ok' : ''">
           {{ device.online ? t('dashboard.devices.list.online') : t('dashboard.devices.list.offline') }}
         </span>
@@ -223,7 +227,12 @@ const hasShow = computed(() => props.device.lastShowName !== null || props.devic
       </p>
     </div>
 
-    <div v-if="canWrite" class="flex flex-shrink-0 flex-wrap items-center gap-1.5">
+    <div class="flex flex-shrink-0 flex-wrap items-center gap-1.5">
+      <NuxtLink :to="detailPath" class="row-btn row-btn-primary">
+        <DashboardIcon name="radio" :size="14" />
+        {{ t('dashboard.devices.list.open') }}
+      </NuxtLink>
+      <template v-if="canWrite">
       <button type="button" class="row-btn" @click="emit('edit')">
         <DashboardIcon name="edit" :size="14" />
         {{ t('dashboard.devices.list.rename') }}
@@ -236,6 +245,7 @@ const hasShow = computed(() => props.device.lastShowName !== null || props.devic
         <DashboardIcon name="trash" :size="14" />
         {{ t('dashboard.devices.list.delete') }}
       </button>
+      </template>
     </div>
   </li>
 </template>
@@ -322,6 +332,10 @@ const hasShow = computed(() => props.device.lastShowName !== null || props.devic
   transition: background .12s, border-color .12s, color .12s;
 }
 .row-btn:hover { background: var(--c-bg-soft); }
+.row-btn-primary { border-color: var(--c-ink); background: var(--c-ink); color: var(--c-bg-card); }
+.row-btn-primary:hover { background: color-mix(in oklab, var(--c-ink) 88%, #000); }
+.device-name { text-decoration: none; }
+.device-name:hover { text-decoration: underline; text-underline-offset: 3px; }
 .row-btn-danger { border-color: var(--c-danger); color: var(--c-danger); }
 .row-btn-danger:hover { background: var(--c-danger-soft); }
 </style>

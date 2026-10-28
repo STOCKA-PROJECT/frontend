@@ -1,0 +1,234 @@
+/**
+ * What the belén Raspberry Pi's local API (`rpi4-system/app/api/server.py`, belén-api v1) returns,
+ * for the device page that controls it from the browser. Copied from the belén app
+ * (`belen-app/src/types.ts`), which is the most complete client; keep both in step.
+ */
+
+export type PiState = 'BOOT' | 'SAFE' | 'IDLE' | 'PLAYING' | 'TEST' | 'ERROR'
+
+export interface PiHardware {
+  name: string
+  kind: string
+  off: boolean
+  /** Stocka pieces driven by this port (`meta.pieces` of the show); absent on older players. */
+  pieces?: string[]
+}
+
+/** Parameters of a test order (`POST /api/test/set`), by kind: `{on}`, `{color}`, `{direction}`, `{audio_name}`, `{off}`… */
+export type PiTestParams = Record<string, unknown>
+
+/** Test mode of the player (`status.test`, `GET /api/test`): manual orders that expire on their own. */
+export interface PiTestStatus {
+  active: boolean
+  targets: Record<string, { kind: string; params: PiTestParams; expiresInS: number }>
+}
+
+/** What the player does when a sensor becomes active (`onActive` of a `sensor` port). */
+export type SensorOnActive = 'none' | 'play' | 'stop_show' | 'panic'
+
+/** Live reading of a `sensor` port (`status.sensors[name]`, `InputController.snapshot`). */
+export interface PiSensor {
+  /** Debounced logical state (active level already applied). */
+  active: boolean
+  /** Raw pin level, null when it could not be read. */
+  raw: boolean | null
+  onActive: SensorOnActive
+  /** Cut by an override: the sensor is ignored. Panic sensors are never blocked. */
+  blocked: boolean
+  /** Human-readable input, e.g. `GPIO 20`, `exp1:15` or `vl53l0x I2C 1:0x29`. */
+  address: string
+  /** Measured sensors only (`source: measured`): last value (null = no reading), its unit and the threshold. */
+  value?: number | null
+  unit?: string | null
+  quantity?: string | null
+  threshold?: number
+  activeWhen?: 'above' | 'below'
+}
+
+export type MotorDirection = 'forward' | 'reverse'
+
+/** Why the last run of a motor ended. */
+export type MotorEnd = 'time' | 'limit' | 'max_time' | 'stop' | 'blocked' | 'locked'
+
+/** Live state of a `motor` port (`status.motors[name]`, `MotorController.status`). */
+export interface PiMotor {
+  /** Direction it is turning now; null when stopped. */
+  direction: MotorDirection | null
+  /** Seconds of the current run; 0 when stopped. */
+  runningS: number
+  lastEnd: MotorEnd | null
+  /** Locked after a `max_time` timeout (with `lockOnTimeout`): it ignores the show until unlocked. */
+  locked: boolean
+  /** Cut by an override. */
+  blocked: boolean
+  limitForward: string | null
+  limitReverse: string | null
+}
+
+/** Alert codes the player raises today; others may appear and must be shown with a fallback. */
+export const PI_ALERT_CODES = ['motor_timeout', 'sensor_stop_show', 'sensor_panic'] as const
+export type PiAlertCode = (typeof PI_ALERT_CODES)[number]
+
+/** One entry of `status.alerts` / `GET /api/alerts` (the player keeps the last 50). */
+export interface PiAlert {
+  code: string
+  port: string | null
+  /** Already in Catalan; shown as-is. */
+  message: string
+  /** ISO 8601 timestamp (UTC). */
+  at: string
+  /** `motor_timeout`: direction that timed out. */
+  direction?: MotorDirection
+  /** `motor_timeout`: whether the motor got locked. */
+  locked?: boolean
+  [extra: string]: unknown
+}
+
+/** A motor the Pi does not move in a rehearsal: a clip cut by the range, or not as many turns as returns. */
+export interface PiSkippedMotor {
+  target: string
+  reason: 'cut' | 'unbalanced'
+  forward: number
+  reverse: number
+}
+
+/** A rehearsal from the timeline editor: a range of a show that lives only in the Pi's memory. */
+export interface PiRehearsal {
+  fromMs: number
+  toMs: number
+  loop: boolean
+  startedAt: string
+  showHash: string | null
+  showName: string | null
+  showTimelineId: number | null
+  skippedMotors: PiSkippedMotor[]
+}
+
+export interface PiStatus {
+  state: PiState
+  showHash: string | null
+  showName: string | null
+  /** Stocka timeline the active show was exported from (`meta.timelineId`), when known. */
+  showTimelineId?: number | null
+  board: string | null
+  durationMs: number | null
+  mode: { on: string; cycles: number } | null
+  /** Button schedule of the active show as the Pi applies it now (absent on older players, null without one). */
+  schedule?: PiSchedule | null
+  /** The Pi's wall clock (absent on older players). */
+  clock?: PiClock
+  cycle: number
+  cyclesTarget: number | null
+  cycleMs: number
+  overrides: string[]
+  hardware: PiHardware[]
+  active: string | null
+  previous: string | null
+  lastError: string | null
+  uptimeS: number
+  freeBytes: number | null
+  version: string
+  /** Sensor ports by name (absent on players older than contract v3). */
+  sensors?: Record<string, PiSensor>
+  /** Motor ports by name (absent on players older than contract v3). */
+  motors?: Record<string, PiMotor>
+  /** Latest alerts, oldest first (absent on players older than contract v3). */
+  alerts?: PiAlert[]
+  /** A rehearsal from the editor, while it lasts (`showHash` stays the active show). */
+  rehearsal?: PiRehearsal | null
+  /** Manual test orders in force (state `TEST` while there is any). */
+  test?: PiTestStatus
+}
+
+export type PiScheduleDay = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
+
+/** When a short press of the button starts the show: `allow` only inside a window, `block` never inside one. */
+export interface PiSchedule {
+  rule: 'allow' | 'block'
+  windows: Array<{ days: PiScheduleDay[]; from: string; to: string }>
+  /** False while the Pi does not know the time: the button then always works. */
+  applies: boolean
+  open: boolean
+  /** Local time of the Pi (ISO, minutes) when `open` changes next, within 8 days. */
+  nextChange: string | null
+}
+
+/** The Pi has no battery clock: its time is reliable with NTP or once a phone or the editor gave it. */
+export interface PiClock {
+  reliable: boolean
+  source: 'ntp' | 'client' | null
+  /** Local time of the Pi, ISO without offset. */
+  now: string
+}
+
+export interface PiNet {
+  enabled?: boolean
+  mode: string
+  connected: boolean
+  hotspot: boolean
+  ssid: string | null
+  ip: string | null
+  known: string[]
+  available?: string[]
+  backend?: string
+  lastError?: string | null
+}
+
+export interface PiInfo {
+  apiVersion: number
+  version: string
+  simulate: boolean
+  device: { deviceId: string; name: string; apSsid: string; apIp: string; netMode: string }
+  board: string
+  catalogVersion?: number | string | null
+  show: { hash: string | null; name: string | null }
+  state: PiState
+  net: PiNet | null
+  freeBytes: number | null
+  uptimeS: number
+  port: number | null
+}
+
+export interface PiBundle {
+  hash: string
+  name: string | null
+  size: number
+  importedAt: string | null
+  active: boolean
+  previous: boolean
+}
+
+export interface PiBundles {
+  active: string | null
+  previous: string | null
+  shows: PiBundle[]
+}
+
+export interface ImportIssue {
+  level: string
+  code: string
+  message: string
+}
+
+/** Import report of `POST /api/bundles` and `POST /api/uploads/{id}/finish` (200 ok, 422 rejected). */
+export interface ImportReport {
+  ok: boolean
+  hash: string | null
+  name: string | null
+  errors: ImportIssue[]
+  warnings: ImportIssue[]
+  imported: string[]
+  skipped: string[]
+  activateRequested?: boolean
+  activated?: boolean
+  bytes?: number
+}
+
+export interface PiUpload {
+  uploadId: string
+  name: string
+  size: number
+  received: number
+}
+
+export type OverrideMode = 'off' | 'normal'

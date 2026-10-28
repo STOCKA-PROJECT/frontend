@@ -638,6 +638,26 @@ export interface DeviceResponseDto {
 }
 
 /**
+ * One log file of a player kept in Stocka (`GET /organizations/{slug}/devices/{id}/logs`). The player
+ * uploads it itself when it has Internet and the belén app carries it when it has not.
+ */
+export interface DeviceLogFileDto {
+  /** File name on the player, e.g. `system-2026-10-26.log`. */
+  file: string
+  /** Day of the file (`YYYY-MM-DD`). */
+  day: string
+  /** Bytes stored from the start of the file. */
+  size: number
+  /** Complete lines stored. */
+  lines: number
+  /** Time of the first and last line, in the player's local time (`YYYY-MM-DDTHH:MM:SS`). */
+  firstAt: string | null
+  lastAt: string | null
+  /** When the last piece arrived. */
+  syncedAt: string | null
+}
+
+/**
  * Result of registering a device or rotating its token. {@link heartbeatToken} is returned here
  * and never again: the UI shows it once with a copy button.
  */

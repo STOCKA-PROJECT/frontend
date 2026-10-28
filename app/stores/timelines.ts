@@ -1,12 +1,11 @@
 import { defineStore } from 'pinia'
-import { FetchError } from 'ofetch'
 import type {
   CreateTimelineDto,
   TimelineResponseDto,
   UpdateTimelineDto
 } from '~/types/api'
 import { slugifyOrgName } from '~/composables/useSlugify'
-import { filenameFromContentDisposition } from '~/utils/download'
+import { filenameFromContentDisposition, restoreJsonErrorBody } from '~/utils/download'
 
 /** Bytes of a file served by the backend plus the name it should be saved under. */
 export interface DownloadedFile {
@@ -16,25 +15,6 @@ export interface DownloadedFile {
 
 const BUNDLE_ACCEPT = 'application/zip, application/problem+json, application/json'
 const SHOW_ACCEPT = 'application/json, application/problem+json'
-
-/**
- * With `responseType: 'blob'` ofetch also parses error bodies as a `Blob`. Put the
- * ProblemDetail JSON back in place so `useApiError()` can read `code`, `detail` and
- * `issues` exactly as for any other request. `FetchError.data` is a getter over
- * `response._data`, so only the latter is assigned.
- */
-async function restoreJsonErrorBody(err: unknown): Promise<void> {
-  if (!(err instanceof FetchError) || !err.response) return
-  const data: unknown = err.response._data
-  if (!(data instanceof Blob)) return
-  const contentType = err.response.headers.get('content-type') ?? ''
-  if (!/json/i.test(contentType)) return
-  try {
-    err.response._data = JSON.parse(await data.text())
-  } catch {
-    // not JSON after all: useApiError falls back to its generic message
-  }
-}
 
 function fileBaseName(timeline: TimelineResponseDto): string {
   return slugifyOrgName(timeline.name, 48) || `timeline-${timeline.id}`

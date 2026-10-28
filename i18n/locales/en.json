@@ -883,13 +883,14 @@
         "onActive": { "none": "Nothing (limit switch only)", "play": "Play (start button)", "stop_show": "Stop the show", "panic": "Panic" }
       },
       "config_values_help": {
-        "onActive": { "none": "Only motors use it, as a limit switch.", "play": "Start button of the nativity scene: a short press starts a run; held for 10 s it opens the Raspberry Pi’s own Wi-Fi and for 30 s it puts everything in safe mode.", "stop_show": "Stops the current run, leaves the outputs safe and raises an alert.", "panic": "Puts everything in safe mode, keeps the player safe until someone re-enables it and raises an alert. It cannot be cut." }
+        "onActive": { "none": "Only motors use it, as a limit switch.", "play": "Start button of the nativity scene, within the public’s reach: releasing it starts a run if the Raspberry Pi is idle and within the schedule. It does nothing else.", "stop_show": "Stops the current run, leaves the outputs safe and raises an alert.", "panic": "Puts everything in safe mode, keeps the player safe until someone re-enables it and raises an alert. It cannot be cut." }
       }
     },
     "devices": {
       "page_title": "Devices",
       "page_subtitle": "The Raspberry Pi players of the nativity scene registered in the organization and the last state they reported: active show, cut ports, version and errors.",
       "list": {
+        "open": "Open",
         "count": "{n} devices | {n} device | {n} devices",
         "new": "Register a device",
         "loading": "Loading devices…",
@@ -987,6 +988,216 @@
       "not_available": {
         "title": "Feature not available",
         "body": "Devices are only available for enabled organizations. Contact an administrator if you think you should have access."
+      }
+    },
+    "device": {
+      "back": "Devices",
+      "not_found": "This device does not exist or is gone.",
+      "pi": {
+        "connection": {
+          "idle": "Not connected",
+          "connecting": "Connecting…",
+          "connected": "Connected here",
+          "unreachable": "Not answering"
+        },
+        "connecting_hint": "Looking for the Raspberry on the local network…",
+        "address": "Local address",
+        "player_name": "Name on the Raspberry",
+        "version": "Version",
+        "simulated": "simulated",
+        "no_address": "This device has no local address. An owner or manager can save it in the device list (Edit).",
+        "port_unsupported": "Stocka can only reach the Raspberry over http on port 8080. Change the device address in the device list (Edit).",
+        "unreachable_hint": "This browser cannot reach the Raspberry. The computer must be on the same network as the Raspberry, use Chrome or Edge and allow local network access. Safari and Firefox do not allow it.",
+        "retry": "Try again",
+        "read_only_spectator": "Spectators can only see the state of the Raspberry.",
+        "read_only_no_pin": "Without a PIN only the state can be seen. An owner or manager can save it in the device list (Edit).",
+        "errors": {
+          "title": "The Raspberry did not do it",
+          "unreachable": "Could not connect to the Raspberry.",
+          "pin_required": "The device PIN is missing.",
+          "pin_invalid": "The saved PIN is not the Raspberry's: fix it in the device list.",
+          "pin_locked": "Too many attempts with a wrong PIN: the Raspberry waits a few minutes.",
+          "no_address": "The device has no local address."
+        },
+        "toasts": {
+          "motor_unlocked": "Motor «{name}» unlocked.",
+          "motor_not_locked": "Motor «{name}» was no longer locked."
+        },
+        "days": {
+          "mon": "Mon",
+          "tue": "Tue",
+          "wed": "Wed",
+          "thu": "Thu",
+          "fri": "Fri",
+          "sat": "Sat",
+          "sun": "Sun"
+        },
+        "status": {
+          "title": "State",
+          "show": "Active show",
+          "none": "None",
+          "mode": "Mode",
+          "cycle": "Cycle",
+          "uptime": "Up for",
+          "free": "Free space",
+          "mode_once": "once",
+          "mode_loop": "in a loop",
+          "mode_pulse": "when a sensor triggers",
+          "schedule": "Button schedule",
+          "schedule_allow": "Only",
+          "schedule_block": "Except",
+          "schedule_open": "works now",
+          "schedule_closed": "does not work now",
+          "schedule_until": "{now} until {when}",
+          "schedule_ignored": "the Raspberry does not know the time: the button always works",
+          "clock": "Raspberry time",
+          "clock_ntp": "Internet",
+          "clock_client": "from a phone or a computer",
+          "clock_unreliable": "Unknown: open this page connected to the Raspberry so it takes it from here",
+          "rehearsal": "Rehearsal from the editor",
+          "rehearsal_loop": "in a loop",
+          "rehearsal_end": "Leave the rehearsal",
+          "rehearsal_cut": "Motor «{motor}» does not move: the range cuts one of its clips.",
+          "rehearsal_unbalanced": "Motor «{motor}» does not move: {forward} turns and {reverse} returns in the range.",
+          "last_error": "Last error"
+        },
+        "controls": {
+          "play": "Play",
+          "stop": "Stop",
+          "panic": "All safe",
+          "panic_title": "All safe",
+          "panic_message": "Stops the show and leaves every output safe. The button will not start it again until someone presses Play."
+        },
+        "alerts": {
+          "title": "Alerts",
+          "clear": "Clear the alerts",
+          "unlock": "Unlock"
+        },
+        "ports": {
+          "title": "Ports",
+          "hint": "Under each port, the Stocka pieces connected to it. A cut port stays off and ignores the show until you restore it.",
+          "cut": "Cut",
+          "restore": "Restore",
+          "cut_badge": "Cut",
+          "restore_all": "Restore every port",
+          "none": "Without a show loaded there are no ports.",
+          "cut_count": "{n} cut",
+          "sensor_no_cut": "Safety sensor: it cannot be cut.",
+          "cut_first": "Restore it to test it."
+        },
+        "test": {
+          "hint": "While no show runs you can switch each port on to check it is wired right. It stays on until you switch it off.",
+          "blocked_playing": "Tests only work while no show runs.",
+          "blocked_rehearsal": "Leave the rehearsal from the editor to test the ports.",
+          "on": "Switch on",
+          "off": "Switch off",
+          "color": "Colour of {name}",
+          "forward": "Forward",
+          "reverse": "Reverse",
+          "hold": "Hold to turn it",
+          "sound": "Sound of {name}",
+          "play": "Play sound",
+          "stop": "Stop",
+          "no_sounds": "The Raspberry has no sounds",
+          "active": "{n} under test",
+          "off_all": "Switch every test off"
+        },
+        "motor": {
+          "forward": "Turning",
+          "reverse": "Turning (reversed)",
+          "stopped": "Stopped",
+          "locked": "Locked",
+          "last_end": "last stop: {reason}",
+          "end_time": "end of clip",
+          "end_limit": "limit switch",
+          "end_max_time": "maximum time",
+          "end_stop": "stopped",
+          "end_blocked": "cut",
+          "end_locked": "locked"
+        },
+        "sensors": {
+          "title": "Sensors",
+          "none": "This show has no sensors.",
+          "active": "active",
+          "inactive": "inactive",
+          "no_reading": "no reading",
+          "on_none": "does nothing",
+          "on_play": "starts the show",
+          "on_stop_show": "stops the show",
+          "on_panic": "all safe"
+        },
+        "send": {
+          "title": "Send a show",
+          "timeline": "Timeline",
+          "choose": "Choose a timeline",
+          "activate": "Activate it when done",
+          "button": "Send to the Raspberry",
+          "downloading": "Stocka is building the bundle of «{name}»…",
+          "uploading": "Sending «{name}»… {percent} %",
+          "verifying": "The Raspberry is checking the bundle…",
+          "ok": "Bundle imported",
+          "activated": "and active",
+          "rejected": "The Raspberry rejected the bundle",
+          "skipped": "skipped",
+          "cancel": "Cancel the upload",
+          "cancelled": "Upload cancelled.",
+          "close": "Close",
+          "failed": "Could not send it: {message}"
+        },
+        "bundles": {
+          "title": "Bundles on the Raspberry",
+          "none": "The Raspberry has no bundles.",
+          "active": "Active",
+          "previous": "Previous",
+          "activate": "Activate",
+          "delete": "Delete",
+          "rollback": "Back to the previous one",
+          "delete_title": "Delete the bundle",
+          "delete_message": "«{name}» will be deleted from the Raspberry."
+        },
+        "system": {
+          "title": "Network and system",
+          "net_mode": "Network mode",
+          "net_ap": "Always own Wi-Fi",
+          "net_auto": "Known networks",
+          "ssid": "Network",
+          "ip": "IP",
+          "hotspot_active": "own Wi-Fi on",
+          "disconnected": "Not connected",
+          "hotspot_now": "Force own Wi-Fi",
+          "hotspot_message": "The Raspberry will leave this network and broadcast the «{ssid}» Wi-Fi: this page will lose the connection.",
+          "net_disabled": "The network manager is disabled.",
+          "net_title": "Change the network mode",
+          "net_message": "The Raspberry may leave this network and this page will lose the connection.",
+          "reboot": "Restart the Raspberry",
+          "reboot_title": "Restart the Raspberry",
+          "reboot_message": "It will be back in a minute; until then it will not answer."
+        }
+      },
+      "logs": {
+        "title": "Log",
+        "subtitle": "What the Raspberry has been writing. It reaches Stocka when the Raspberry has Internet or when the belén app carries it, and is kept for 180 days.",
+        "refresh": "Refresh",
+        "none": "No log has arrived from this device yet.",
+        "day": "Day",
+        "level": "Level",
+        "module": "Module",
+        "all": "All",
+        "search": "Search",
+        "search_placeholder": "Message text",
+        "latest": "Last {n} lines",
+        "whole_day": "Whole day: {n} lines",
+        "matching": "{n} match",
+        "synced": "last upload {when}",
+        "load_all": "Load the whole day",
+        "show_latest": "Show only the last {n}",
+        "download_day": "Download the day",
+        "from": "From",
+        "to": "To",
+        "download_period": "Download the period",
+        "download_failed": "Could not download the log",
+        "empty_filter": "No line matches the filters.",
+        "truncated": "Showing the last {shown} of {total} lines: narrow the filters or download the day."
       }
     },
     "account": {

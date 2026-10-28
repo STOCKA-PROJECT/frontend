@@ -116,7 +116,7 @@ async function handleLogout() {
         <span>{{ t('dashboard.nav.ports') }}</span>
       </NuxtLink>
 
-      <NuxtLink v-if="hasOrgs && portsEnabled" :to="orgPath('/dispositivos', navOrgSlug)" exact-active-class="is-active"
+      <NuxtLink v-if="hasOrgs && portsEnabled" :to="orgPath('/dispositivos', navOrgSlug)" active-class="is-active"
         class="nav-item">
         <DashboardIcon name="radio" />
         <span>{{ t('dashboard.nav.devices') }}</span>
@@ -273,7 +273,7 @@ async function handleLogout() {
             <span>{{ t('dashboard.nav.ports') }}</span>
           </NuxtLink>
 
-          <NuxtLink v-if="hasOrgs && portsEnabled" :to="orgPath('/dispositivos', navOrgSlug)" exact-active-class="is-active"
+          <NuxtLink v-if="hasOrgs && portsEnabled" :to="orgPath('/dispositivos', navOrgSlug)" active-class="is-active"
             class="nav-item" @click="close">
             <DashboardIcon name="radio" />
             <span>{{ t('dashboard.nav.devices') }}</span>

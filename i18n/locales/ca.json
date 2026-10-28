@@ -883,13 +883,14 @@
         "onActive": { "none": "Res (només final de carrera)", "play": "Reproduir (polsador d’inici)", "stop_show": "Aturar el show", "panic": "Pànic" }
       },
       "config_values_help": {
-        "onActive": { "none": "Només el fan servir els motors com a final de carrera.", "play": "Polsador d’inici del pessebre: una pulsació curta arrenca un passi; mantingut 10 s obre la Wi-Fi pròpia de la Raspberry i 30 s ho posa tot en segur.", "stop_show": "Atura el passi en curs, deixa les sortides en segur i aixeca una alerta.", "panic": "Ho posa tot en segur, deixa el reproductor en mode segur fins que algú el reactivi i aixeca una alerta. No es pot tallar." }
+        "onActive": { "none": "Només el fan servir els motors com a final de carrera.", "play": "Polsador d’inici del pessebre, a l’abast del públic: en deixar-lo anar arrenca un passi si la Raspberry està en repòs i dins de l’horari. No fa res més.", "stop_show": "Atura el passi en curs, deixa les sortides en segur i aixeca una alerta.", "panic": "Ho posa tot en segur, deixa el reproductor en mode segur fins que algú el reactivi i aixeca una alerta. No es pot tallar." }
       }
     },
     "devices": {
       "page_title": "Dispositius",
       "page_subtitle": "Les Raspberry Pi del pessebre registrades a l’organització i l’últim estat que han comunicat: show actiu, ports tallats, versió i errors.",
       "list": {
+        "open": "Obre",
         "count": "{n} dispositius | {n} dispositiu | {n} dispositius",
         "new": "Registra un dispositiu",
         "loading": "Carregant dispositius…",
@@ -987,6 +988,216 @@
       "not_available": {
         "title": "Funció no disponible",
         "body": "Els dispositius només estan disponibles per a organitzacions habilitades. Contacta amb un administrador si creus que hi hauries de tenir accés."
+      }
+    },
+    "device": {
+      "back": "Dispositius",
+      "not_found": "Aquest dispositiu no existeix o ja no hi és.",
+      "pi": {
+        "connection": {
+          "idle": "Sense connectar",
+          "connecting": "Connectant…",
+          "connected": "Connectat aquí",
+          "unreachable": "No respon"
+        },
+        "connecting_hint": "Buscant la Raspberry a la xarxa local…",
+        "address": "Adreça local",
+        "player_name": "Nom a la Raspberry",
+        "version": "Versió",
+        "simulated": "simulada",
+        "no_address": "Aquest dispositiu no té adreça local. Un propietari o gestor la pot desar a la llista de dispositius (Edita).",
+        "port_unsupported": "Stocka només pot parlar amb la Raspberry per http al port 8080. Canvia l'adreça del dispositiu a la llista de dispositius (Edita).",
+        "unreachable_hint": "Aquest navegador no arriba a la Raspberry. Cal que l'ordinador estigui a la mateixa xarxa que la Raspberry, fer servir Chrome o Edge i acceptar el permís d'accés a la xarxa local. Safari i Firefox no ho permeten.",
+        "retry": "Torna-ho a provar",
+        "read_only_spectator": "Els espectadors només poden veure l'estat de la Raspberry.",
+        "read_only_no_pin": "Sense PIN només es pot veure l'estat. Un propietari o gestor el pot desar a la llista de dispositius (Edita).",
+        "errors": {
+          "title": "La Raspberry no ho ha fet",
+          "unreachable": "No s'ha pogut connectar amb la Raspberry.",
+          "pin_required": "Falta el PIN del dispositiu.",
+          "pin_invalid": "El PIN desat no és el de la Raspberry: corregeix-lo a la llista de dispositius.",
+          "pin_locked": "Massa intents amb un PIN incorrecte: la Raspberry espera uns minuts.",
+          "no_address": "El dispositiu no té adreça local."
+        },
+        "toasts": {
+          "motor_unlocked": "Motor «{name}» desbloquejat.",
+          "motor_not_locked": "El motor «{name}» ja no estava bloquejat."
+        },
+        "days": {
+          "mon": "dl",
+          "tue": "dt",
+          "wed": "dc",
+          "thu": "dj",
+          "fri": "dv",
+          "sat": "ds",
+          "sun": "dg"
+        },
+        "status": {
+          "title": "Estat",
+          "show": "Show actiu",
+          "none": "Cap",
+          "mode": "Mode",
+          "cycle": "Cicle",
+          "uptime": "Encesa des de fa",
+          "free": "Espai lliure",
+          "mode_once": "una vegada",
+          "mode_loop": "en bucle",
+          "mode_pulse": "en activar-se un sensor",
+          "schedule": "Horari del polsador",
+          "schedule_allow": "Només",
+          "schedule_block": "Excepte",
+          "schedule_open": "ara funciona",
+          "schedule_closed": "ara no funciona",
+          "schedule_until": "{now} fins {when}",
+          "schedule_ignored": "la Raspberry no sap l'hora: el polsador funciona sempre",
+          "clock": "Hora de la Raspberry",
+          "clock_ntp": "Internet",
+          "clock_client": "d'un mòbil o un ordinador",
+          "clock_unreliable": "No la sap: obre aquesta pàgina connectat a la Raspberry perquè l'agafi d'aquí",
+          "rehearsal": "Assaig des de l'editor",
+          "rehearsal_loop": "en bucle",
+          "rehearsal_end": "Surt de l'assaig",
+          "rehearsal_cut": "El motor «{motor}» no es mou: el tram talla un dels seus clips.",
+          "rehearsal_unbalanced": "El motor «{motor}» no es mou: {forward} girs i {reverse} retorns al tram.",
+          "last_error": "Últim error"
+        },
+        "controls": {
+          "play": "Reprodueix",
+          "stop": "Para",
+          "panic": "Tot en segur",
+          "panic_title": "Tot en segur",
+          "panic_message": "Para el show i deixa totes les sortides en segur. El polsador no tornarà a engegar-lo fins que algú premi Reprodueix."
+        },
+        "alerts": {
+          "title": "Alertes",
+          "clear": "Esborra les alertes",
+          "unlock": "Desbloqueja"
+        },
+        "ports": {
+          "title": "Ports",
+          "hint": "Sota cada port, les peces de Stocka que hi estan connectades. Un port tallat queda apagat i ignora el show fins que el restableixis.",
+          "cut": "Talla",
+          "restore": "Restableix",
+          "cut_badge": "Tallat",
+          "restore_all": "Restableix tots els ports",
+          "none": "Sense show carregat no hi ha ports.",
+          "cut_count": "{n} tallats",
+          "sensor_no_cut": "Sensor de seguretat: no es pot tallar.",
+          "cut_first": "Restableix-lo per provar-lo."
+        },
+        "test": {
+          "hint": "Mentre no s'executa cap show pots encendre cada port per comprovar que està ben connectat. Queda encès fins que l'apaguis.",
+          "blocked_playing": "Les proves només funcionen quan no s'executa cap show.",
+          "blocked_rehearsal": "Surt de l'assaig de l'editor per provar els ports.",
+          "on": "Encén",
+          "off": "Apaga",
+          "color": "Color de {name}",
+          "forward": "Endavant",
+          "reverse": "Enrere",
+          "hold": "Mantén premut per fer-lo girar",
+          "sound": "So de {name}",
+          "play": "Fes sonar",
+          "stop": "Para",
+          "no_sounds": "La Raspberry no té cap so",
+          "active": "{n} en prova",
+          "off_all": "Apaga totes les proves"
+        },
+        "motor": {
+          "forward": "Girant",
+          "reverse": "Girant (invertit)",
+          "stopped": "Aturat",
+          "locked": "Bloquejat",
+          "last_end": "última aturada: {reason}",
+          "end_time": "fi del clip",
+          "end_limit": "final de carrera",
+          "end_max_time": "temps màxim",
+          "end_stop": "aturat",
+          "end_blocked": "tallat",
+          "end_locked": "bloquejat"
+        },
+        "sensors": {
+          "title": "Sensors",
+          "none": "Aquest show no té sensors.",
+          "active": "actiu",
+          "inactive": "inactiu",
+          "no_reading": "sense lectura",
+          "on_none": "no fa res",
+          "on_play": "inicia el show",
+          "on_stop_show": "atura el show",
+          "on_panic": "tot en segur"
+        },
+        "send": {
+          "title": "Envia un show",
+          "timeline": "Timeline",
+          "choose": "Tria una timeline",
+          "activate": "Activa'l en acabar",
+          "button": "Envia a la Raspberry",
+          "downloading": "Stocka prepara el paquet de «{name}»…",
+          "uploading": "Enviant «{name}»… {percent} %",
+          "verifying": "La Raspberry comprova el paquet…",
+          "ok": "Paquet importat",
+          "activated": "i actiu",
+          "rejected": "La Raspberry ha rebutjat el paquet",
+          "skipped": "omès",
+          "cancel": "Cancel·la l'enviament",
+          "cancelled": "Enviament cancel·lat.",
+          "close": "Tanca",
+          "failed": "No s'ha pogut enviar: {message}"
+        },
+        "bundles": {
+          "title": "Paquets a la Raspberry",
+          "none": "La Raspberry no té cap paquet.",
+          "active": "Actiu",
+          "previous": "Anterior",
+          "activate": "Activa",
+          "delete": "Elimina",
+          "rollback": "Torna a l'anterior",
+          "delete_title": "Eliminar el paquet",
+          "delete_message": "S'esborrarà «{name}» de la Raspberry."
+        },
+        "system": {
+          "title": "Xarxa i sistema",
+          "net_mode": "Mode de xarxa",
+          "net_ap": "Sempre Wi-Fi pròpia",
+          "net_auto": "Xarxes conegudes",
+          "ssid": "Xarxa",
+          "ip": "IP",
+          "hotspot_active": "Wi-Fi pròpia activa",
+          "disconnected": "Sense connexió",
+          "hotspot_now": "Força la Wi-Fi pròpia",
+          "hotspot_message": "La Raspberry deixarà aquesta xarxa i emetrà la Wi-Fi «{ssid}»: aquesta pàgina en perdrà la connexió.",
+          "net_disabled": "El gestor de xarxa està desactivat.",
+          "net_title": "Canviar el mode de xarxa",
+          "net_message": "La Raspberry pot deixar aquesta xarxa i aquesta pàgina en perdrà la connexió.",
+          "reboot": "Reinicia la Raspberry",
+          "reboot_title": "Reiniciar la Raspberry",
+          "reboot_message": "Tornarà en un minut; mentrestant no respondrà."
+        }
+      },
+      "logs": {
+        "title": "Registre",
+        "subtitle": "El que la Raspberry ha anat escrivint. Arriba a Stocka quan la Raspberry té Internet o quan l'app del pessebre el porta, i es guarda 180 dies.",
+        "refresh": "Actualitza",
+        "none": "Encara no ha arribat cap registre d'aquest dispositiu.",
+        "day": "Dia",
+        "level": "Nivell",
+        "module": "Mòdul",
+        "all": "Tots",
+        "search": "Cerca",
+        "search_placeholder": "Text del missatge",
+        "latest": "Últimes {n} línies",
+        "whole_day": "Tot el dia: {n} línies",
+        "matching": "{n} coincideixen",
+        "synced": "última pujada {when}",
+        "load_all": "Carrega tot el dia",
+        "show_latest": "Mostra només les últimes {n}",
+        "download_day": "Descarrega el dia",
+        "from": "Des de",
+        "to": "Fins a",
+        "download_period": "Descarrega el període",
+        "download_failed": "No s'ha pogut descarregar el registre",
+        "empty_filter": "Cap línia coincideix amb els filtres.",
+        "truncated": "Es mostren les últimes {shown} de {total} línies: afina els filtres o descarrega el dia."
       }
     },
     "account": {

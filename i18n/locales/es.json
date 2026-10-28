@@ -883,13 +883,14 @@
         "onActive": { "none": "Nada (solo final de carrera)", "play": "Reproducir (pulsador de inicio)", "stop_show": "Parar el show", "panic": "Pánico" }
       },
       "config_values_help": {
-        "onActive": { "none": "Solo lo usan los motores como final de carrera.", "play": "Pulsador de inicio del belén: una pulsación corta arranca un pase; mantenido 10 s abre la Wi-Fi propia de la Raspberry y 30 s lo pone todo en seguro.", "stop_show": "Para el pase en curso, deja las salidas en seguro y levanta una alerta.", "panic": "Lo pone todo en seguro, deja el reproductor en modo seguro hasta que alguien lo reactive y levanta una alerta. No se puede cortar." }
+        "onActive": { "none": "Solo lo usan los motores como final de carrera.", "play": "Pulsador de inicio del belén, al alcance del público: al soltarlo arranca un pase si la Raspberry está en reposo y dentro del horario. No hace nada más.", "stop_show": "Para el pase en curso, deja las salidas en seguro y levanta una alerta.", "panic": "Lo pone todo en seguro, deja el reproductor en modo seguro hasta que alguien lo reactive y levanta una alerta. No se puede cortar." }
       }
     },
     "devices": {
       "page_title": "Dispositivos",
       "page_subtitle": "Las Raspberry Pi del belén registradas en la organización y el último estado que han comunicado: show activo, puertos cortados, versión y errores.",
       "list": {
+        "open": "Abrir",
         "count": "{n} dispositivos | {n} dispositivo | {n} dispositivos",
         "new": "Registrar un dispositivo",
         "loading": "Cargando dispositivos…",
@@ -987,6 +988,216 @@
       "not_available": {
         "title": "Función no disponible",
         "body": "Los dispositivos solo están disponibles para organizaciones habilitadas. Contacta con un administrador si crees que deberías tener acceso."
+      }
+    },
+    "device": {
+      "back": "Dispositivos",
+      "not_found": "Este dispositivo no existe o ya no está.",
+      "pi": {
+        "connection": {
+          "idle": "Sin conectar",
+          "connecting": "Conectando…",
+          "connected": "Conectado aquí",
+          "unreachable": "No responde"
+        },
+        "connecting_hint": "Buscando la Raspberry en la red local…",
+        "address": "Dirección local",
+        "player_name": "Nombre en la Raspberry",
+        "version": "Versión",
+        "simulated": "simulada",
+        "no_address": "Este dispositivo no tiene dirección local. Un propietario o gestor puede guardarla en la lista de dispositivos (Editar).",
+        "port_unsupported": "Stocka solo puede hablar con la Raspberry por http en el puerto 8080. Cambia la dirección del dispositivo en la lista de dispositivos (Editar).",
+        "unreachable_hint": "Este navegador no llega a la Raspberry. El ordenador debe estar en la misma red que la Raspberry, usar Chrome o Edge y aceptar el permiso de acceso a la red local. Safari y Firefox no lo permiten.",
+        "retry": "Volver a probar",
+        "read_only_spectator": "Los espectadores solo pueden ver el estado de la Raspberry.",
+        "read_only_no_pin": "Sin PIN solo se puede ver el estado. Un propietario o gestor puede guardarlo en la lista de dispositivos (Editar).",
+        "errors": {
+          "title": "La Raspberry no lo ha hecho",
+          "unreachable": "No se ha podido conectar con la Raspberry.",
+          "pin_required": "Falta el PIN del dispositivo.",
+          "pin_invalid": "El PIN guardado no es el de la Raspberry: corrígelo en la lista de dispositivos.",
+          "pin_locked": "Demasiados intentos con un PIN incorrecto: la Raspberry espera unos minutos.",
+          "no_address": "El dispositivo no tiene dirección local."
+        },
+        "toasts": {
+          "motor_unlocked": "Motor «{name}» desbloqueado.",
+          "motor_not_locked": "El motor «{name}» ya no estaba bloqueado."
+        },
+        "days": {
+          "mon": "lu",
+          "tue": "ma",
+          "wed": "mi",
+          "thu": "ju",
+          "fri": "vi",
+          "sat": "sá",
+          "sun": "do"
+        },
+        "status": {
+          "title": "Estado",
+          "show": "Show activo",
+          "none": "Ninguno",
+          "mode": "Modo",
+          "cycle": "Ciclo",
+          "uptime": "Encendida desde hace",
+          "free": "Espacio libre",
+          "mode_once": "una vez",
+          "mode_loop": "en bucle",
+          "mode_pulse": "al activarse un sensor",
+          "schedule": "Horario del pulsador",
+          "schedule_allow": "Solo",
+          "schedule_block": "Excepto",
+          "schedule_open": "ahora funciona",
+          "schedule_closed": "ahora no funciona",
+          "schedule_until": "{now} hasta {when}",
+          "schedule_ignored": "la Raspberry no sabe la hora: el pulsador funciona siempre",
+          "clock": "Hora de la Raspberry",
+          "clock_ntp": "Internet",
+          "clock_client": "de un móvil o un ordenador",
+          "clock_unreliable": "No la sabe: abre esta página conectado a la Raspberry para que la tome de aquí",
+          "rehearsal": "Ensayo desde el editor",
+          "rehearsal_loop": "en bucle",
+          "rehearsal_end": "Salir del ensayo",
+          "rehearsal_cut": "El motor «{motor}» no se mueve: el tramo corta uno de sus clips.",
+          "rehearsal_unbalanced": "El motor «{motor}» no se mueve: {forward} giros y {reverse} vueltas en el tramo.",
+          "last_error": "Último error"
+        },
+        "controls": {
+          "play": "Reproducir",
+          "stop": "Parar",
+          "panic": "Todo en seguro",
+          "panic_title": "Todo en seguro",
+          "panic_message": "Para el show y deja todas las salidas en seguro. El pulsador no volverá a arrancarlo hasta que alguien pulse Reproducir."
+        },
+        "alerts": {
+          "title": "Alertas",
+          "clear": "Borrar las alertas",
+          "unlock": "Desbloquear"
+        },
+        "ports": {
+          "title": "Puertos",
+          "hint": "Debajo de cada puerto, las piezas de Stocka conectadas a él. Un puerto cortado queda apagado e ignora el show hasta que lo restablezcas.",
+          "cut": "Cortar",
+          "restore": "Restablecer",
+          "cut_badge": "Cortado",
+          "restore_all": "Restablecer todos los puertos",
+          "none": "Sin show cargado no hay puertos.",
+          "cut_count": "{n} cortados",
+          "sensor_no_cut": "Sensor de seguridad: no se puede cortar.",
+          "cut_first": "Restablécelo para probarlo."
+        },
+        "test": {
+          "hint": "Mientras no se ejecuta ningún show puedes encender cada puerto para comprobar que está bien conectado. Queda encendido hasta que lo apagues.",
+          "blocked_playing": "Las pruebas solo funcionan cuando no se ejecuta ningún show.",
+          "blocked_rehearsal": "Sal del ensayo del editor para probar los puertos.",
+          "on": "Encender",
+          "off": "Apagar",
+          "color": "Color de {name}",
+          "forward": "Adelante",
+          "reverse": "Atrás",
+          "hold": "Mantén pulsado para hacerlo girar",
+          "sound": "Sonido de {name}",
+          "play": "Hacer sonar",
+          "stop": "Parar",
+          "no_sounds": "La Raspberry no tiene ningún sonido",
+          "active": "{n} en prueba",
+          "off_all": "Apagar todas las pruebas"
+        },
+        "motor": {
+          "forward": "Girando",
+          "reverse": "Girando (invertido)",
+          "stopped": "Parado",
+          "locked": "Bloqueado",
+          "last_end": "última parada: {reason}",
+          "end_time": "fin del clip",
+          "end_limit": "final de carrera",
+          "end_max_time": "tiempo máximo",
+          "end_stop": "parado",
+          "end_blocked": "cortado",
+          "end_locked": "bloqueado"
+        },
+        "sensors": {
+          "title": "Sensores",
+          "none": "Este show no tiene sensores.",
+          "active": "activo",
+          "inactive": "inactivo",
+          "no_reading": "sin lectura",
+          "on_none": "no hace nada",
+          "on_play": "inicia el show",
+          "on_stop_show": "para el show",
+          "on_panic": "todo en seguro"
+        },
+        "send": {
+          "title": "Enviar un show",
+          "timeline": "Timeline",
+          "choose": "Elige una timeline",
+          "activate": "Activarlo al terminar",
+          "button": "Enviar a la Raspberry",
+          "downloading": "Stocka prepara el paquete de «{name}»…",
+          "uploading": "Enviando «{name}»… {percent} %",
+          "verifying": "La Raspberry comprueba el paquete…",
+          "ok": "Paquete importado",
+          "activated": "y activo",
+          "rejected": "La Raspberry ha rechazado el paquete",
+          "skipped": "omitido",
+          "cancel": "Cancelar el envío",
+          "cancelled": "Envío cancelado.",
+          "close": "Cerrar",
+          "failed": "No se ha podido enviar: {message}"
+        },
+        "bundles": {
+          "title": "Paquetes en la Raspberry",
+          "none": "La Raspberry no tiene ningún paquete.",
+          "active": "Activo",
+          "previous": "Anterior",
+          "activate": "Activar",
+          "delete": "Eliminar",
+          "rollback": "Volver al anterior",
+          "delete_title": "Eliminar el paquete",
+          "delete_message": "Se borrará «{name}» de la Raspberry."
+        },
+        "system": {
+          "title": "Red y sistema",
+          "net_mode": "Modo de red",
+          "net_ap": "Siempre Wi-Fi propia",
+          "net_auto": "Redes conocidas",
+          "ssid": "Red",
+          "ip": "IP",
+          "hotspot_active": "Wi-Fi propia activa",
+          "disconnected": "Sin conexión",
+          "hotspot_now": "Forzar la Wi-Fi propia",
+          "hotspot_message": "La Raspberry dejará esta red y emitirá la Wi-Fi «{ssid}»: esta página perderá la conexión.",
+          "net_disabled": "El gestor de red está desactivado.",
+          "net_title": "Cambiar el modo de red",
+          "net_message": "La Raspberry puede dejar esta red y esta página perderá la conexión.",
+          "reboot": "Reiniciar la Raspberry",
+          "reboot_title": "Reiniciar la Raspberry",
+          "reboot_message": "Volverá en un minuto; mientras tanto no responderá."
+        }
+      },
+      "logs": {
+        "title": "Registro",
+        "subtitle": "Lo que la Raspberry ha ido escribiendo. Llega a Stocka cuando la Raspberry tiene Internet o cuando la app del belén lo lleva, y se guarda 180 días.",
+        "refresh": "Actualizar",
+        "none": "Todavía no ha llegado ningún registro de este dispositivo.",
+        "day": "Día",
+        "level": "Nivel",
+        "module": "Módulo",
+        "all": "Todos",
+        "search": "Buscar",
+        "search_placeholder": "Texto del mensaje",
+        "latest": "Últimas {n} líneas",
+        "whole_day": "Todo el día: {n} líneas",
+        "matching": "{n} coinciden",
+        "synced": "última subida {when}",
+        "load_all": "Cargar todo el día",
+        "show_latest": "Mostrar solo las últimas {n}",
+        "download_day": "Descargar el día",
+        "from": "Desde",
+        "to": "Hasta",
+        "download_period": "Descargar el periodo",
+        "download_failed": "No se ha podido descargar el registro",
+        "empty_filter": "Ninguna línea coincide con los filtros.",
+        "truncated": "Se muestran las últimas {shown} de {total} líneas: afina los filtros o descarga el día."
       }
     },
     "account": {
