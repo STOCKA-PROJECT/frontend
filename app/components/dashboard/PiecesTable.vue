@@ -33,26 +33,25 @@ const thumbVariant = (piece: PieceListItemDto) => {
   return `t-${(seed % 5) + 1}` as const
 }
 
-// Las blob URLs de las portadas viven en el store de piezas, así que se
-// reutilizan entre listados y vista detalle sin volver a descargar la imagen
-// al navegar. Aquí sólo disparamos las descargas que faltan.
+// La portada es un <img> normal contra la miniatura JPEG de 512 px que sirve
+// el backend (`/thumbnail`, cache inmutable de un año): el navegador la baja
+// una vez y la revalida con ETag. El lightbox carga el original (`/content`).
+const { srcFor, isBroken, onError } = useImageRetry()
+
 function coverUrlFor(piece: PieceListItemDto): string | null {
   if (!piece.coverAttachmentId || !props.orgSlug) return null
-  return piecesStore.attachmentBlobUrls[`${props.orgSlug}:${piece.id}:${piece.coverAttachmentId}`] ?? null
+  return piecesStore.attachmentThumbnailUrl(props.orgSlug, piece.id, piece.coverAttachmentId)
 }
 
-watch(
-  () => props.pieces.map(p => `${p.id}:${p.coverAttachmentId ?? 0}`),
-  () => {
-    if (!props.orgSlug) return
-    for (const p of props.pieces) {
-      if (!p.coverAttachmentId) continue
-      // Idempotente: si está cacheada o en vuelo, no relanza el fetch.
-      void piecesStore.fetchAttachmentBlobUrl(props.orgSlug, p.id, p.coverAttachmentId)
-    }
-  },
-  { immediate: true, deep: true }
-)
+function coverFullUrlFor(piece: PieceListItemDto): string | null {
+  if (!piece.coverAttachmentId || !props.orgSlug) return null
+  return piecesStore.attachmentContentUrl(props.orgSlug, piece.id, piece.coverAttachmentId)
+}
+
+function hasCover(piece: PieceListItemDto): boolean {
+  const url = coverUrlFor(piece)
+  return !!url && !isBroken(url)
+}
 
 // Vista previa de la portada en lightbox, abierta al pulsar la miniatura.
 const previewOpen = ref(false)
@@ -60,7 +59,7 @@ const previewUrl = ref<string | null>(null)
 const previewName = ref('')
 
 function openPreview(piece: PieceListItemDto) {
-  const url = coverUrlFor(piece)
+  const url = coverFullUrlFor(piece)
   if (!url) return
   previewUrl.value = url
   previewName.value = piece.name
@@ -175,16 +174,18 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
                   <button
                     type="button"
                     class="piece-thumb-btn piece-thumb-wrap"
-                    :disabled="!coverUrlFor(p)"
+                    :disabled="!hasCover(p)"
                     :aria-label="t('dashboard.pieces_table.preview_cover_aria', { name: p.name })"
                     @click.stop="openPreview(p)"
                   >
                     <img
-                      v-if="coverUrlFor(p)"
-                      :src="coverUrlFor(p)!"
+                      v-if="hasCover(p)"
+                      :src="srcFor(coverUrlFor(p))"
                       :alt="p.name"
                       class="piece-thumb-img"
                       loading="lazy"
+                      decoding="async"
+                      @error="onError(coverUrlFor(p))"
                     >
                     <span
                       v-else
@@ -284,17 +285,19 @@ function onDelete(e: MouseEvent, piece: PieceListItemDto) {
           <button
             type="button"
             class="piece-thumb-btn piece-thumb-wrap-card"
-            :disabled="!coverUrlFor(p)"
-            :aria-disabled="coverUrlFor(p) ? undefined : 'true'"
+            :disabled="!hasCover(p)"
+            :aria-disabled="hasCover(p) ? undefined : 'true'"
             :aria-label="t('dashboard.pieces_table.preview_cover_aria', { name: p.name })"
             @click.stop="openPreview(p)"
           >
             <img
-              v-if="coverUrlFor(p)"
-              :src="coverUrlFor(p)!"
+              v-if="hasCover(p)"
+              :src="srcFor(coverUrlFor(p))"
               :alt="p.name"
               class="piece-thumb-img"
               loading="lazy"
+              decoding="async"
+              @error="onError(coverUrlFor(p))"
             >
             <span
               v-else

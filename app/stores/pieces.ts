@@ -61,6 +61,22 @@ export const usePiecesStore = defineStore('pieces', () => {
     return `${orgSlug}:${pieceId}:${attachmentId}`
   }
 
+  /**
+   * URL same-origin de la miniatura JPEG (512 px) de un adjunto IMAGE, para
+   * `<img src>`: el proxy `/api` pone la cookie de sesión como `Authorization`
+   * y el backend la sirve con cache inmutable de un año y `ETag`, así que el
+   * navegador la descarga una vez por sesión de cache. Sin miniatura (adjuntos
+   * antiguos aún no regenerados) el backend devuelve el original.
+   */
+  function attachmentThumbnailUrl(orgSlug: string, pieceId: number, attachmentId: number): string {
+    return `/api/organizations/${orgSlug}/pieces/${pieceId}/attachments/${attachmentId}/thumbnail`
+  }
+
+  /** URL same-origin de los bytes originales de un adjunto (lightbox, audio, documentos). */
+  function attachmentContentUrl(orgSlug: string, pieceId: number, attachmentId: number): string {
+    return `/api/organizations/${orgSlug}/pieces/${pieceId}/attachments/${attachmentId}/content`
+  }
+
   function bucketKey(locationId: number | null): number {
     return locationId == null ? UNASSIGNED_KEY : locationId
   }
@@ -249,7 +265,6 @@ export const usePiecesStore = defineStore('pieces', () => {
 
   async function update(orgSlug: string, pieceId: number, patch: UpdatePieceDto) {
     const api = useApi()
-    const previousCoverId = detailById.value[pieceId]?.coverAttachmentId ?? null
     const updated = await api<PieceResponseDto>(`/organizations/${orgSlug}/pieces/${pieceId}`, {
       method: 'PATCH',
       body: patch
@@ -257,12 +272,6 @@ export const usePiecesStore = defineStore('pieces', () => {
     detailById.value = { ...detailById.value, [updated.id]: updated }
     applyToList(updated)
     invalidateAll()
-    // Si la portada ha cambiado liberamos la blob URL cacheada de la anterior
-    // para evitar que se acumulen mientras el usuario edita la pieza.
-    const newCoverId = updated.coverAttachmentId ?? null
-    if (previousCoverId != null && previousCoverId !== newCoverId) {
-      revokeAttachmentBlobUrl(orgSlug, pieceId, previousCoverId)
-    }
     return updated
   }
 
@@ -403,10 +412,10 @@ export const usePiecesStore = defineStore('pieces', () => {
       // `/content` hace que el backend lea los bytes de R2 y los sirva por el
       // proxy `/api`. `/download` redirige a una URL firmada de R2 a la que el
       // navegador conecta directamente, y las operadoras españolas bloquean las
-      // IPs de R2 durante los partidos de LaLiga.
-      const res = await fetch(
-        `/api/organizations/${orgSlug}/pieces/${pieceId}/attachments/${attachmentId}/content`
-      )
+      // IPs de R2 durante los partidos de LaLiga. Las imágenes ya no pasan por
+      // aquí (son `<img>` contra `attachmentThumbnailUrl`); esto queda para los
+      // documentos y el audio, que necesitan los bytes como blob.
+      const res = await fetch(attachmentContentUrl(orgSlug, pieceId, attachmentId))
       if (!res.ok) {
         throw new Error(`download_failed_${res.status}`)
       }
@@ -539,6 +548,8 @@ export const usePiecesStore = defineStore('pieces', () => {
     revokeAttachmentBlobUrl,
     attachmentBlobUrls,
     attachmentBlobInFlight,
+    attachmentThumbnailUrl,
+    attachmentContentUrl,
 
     historyByPiece,
     loadingHistory,

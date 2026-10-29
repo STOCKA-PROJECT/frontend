@@ -48,8 +48,13 @@ const images = computed(() => props.attachments.filter(a => a.kind === 'IMAGE'))
 const documents = computed(() => props.attachments.filter(a => a.kind === 'DOCUMENT'))
 const audios = computed(() => props.attachments.filter(a => a.kind === 'AUDIO'))
 
-const blobUrlByAttachmentId = ref<Record<number, string>>({})
-const loadingImageIds = ref<Set<number>>(new Set())
+// Las imágenes de la galería son <img> contra la miniatura JPEG del backend
+// (`/thumbnail`, cache inmutable); el lightbox carga el original (`/content`).
+const { srcFor, isBroken, onError } = useImageRetry()
+
+function thumbnailUrl(att: PieceAttachmentResponseDto): string {
+  return pieces.attachmentThumbnailUrl(props.orgSlug, props.pieceId, att.id)
+}
 
 const dateLocale = computed(() => {
   const l = locale.value as string
@@ -66,38 +71,6 @@ function humanSize(bytes: number): string {
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(dateLocale.value, { day: '2-digit', month: 'short', year: 'numeric' })
 }
-
-async function loadImageUrl(attachmentId: number) {
-  if (blobUrlByAttachmentId.value[attachmentId]) return
-  if (loadingImageIds.value.has(attachmentId)) return
-  loadingImageIds.value.add(attachmentId)
-  try {
-    const url = await pieces.fetchAttachmentBlobUrl(props.orgSlug, props.pieceId, attachmentId)
-    blobUrlByAttachmentId.value = { ...blobUrlByAttachmentId.value, [attachmentId]: url }
-  } catch {
-    /* silenciamos: la galería muestra placeholder */
-  } finally {
-    loadingImageIds.value.delete(attachmentId)
-  }
-}
-
-watch(images, (next) => {
-  // Sólo disparamos descargas pendientes. Las blob URLs viven en el store
-  // (`pieces.attachmentBlobUrls`) y se revocan allí cuando se borra el
-  // adjunto o se resetea la sesión, así que no las revocamos localmente.
-  for (const att of next) {
-    if (!blobUrlByAttachmentId.value[att.id]) void loadImageUrl(att.id)
-  }
-  // Mantenemos el espejo local en sintonía con la lista de imágenes vigentes.
-  const stillExists = new Set(next.map(a => a.id))
-  const map = blobUrlByAttachmentId.value
-  const updated: Record<number, string> = {}
-  for (const [idStr, url] of Object.entries(map)) {
-    const id = Number(idStr)
-    if (stillExists.has(id)) updated[id] = url
-  }
-  blobUrlByAttachmentId.value = updated
-}, { immediate: true })
 
 onBeforeUnmount(() => {
   if (errorTimer) clearTimeout(errorTimer)
@@ -201,9 +174,7 @@ const lightboxUrl = ref<string | null>(null)
 const lightboxName = ref('')
 
 function openLightbox(att: PieceAttachmentResponseDto) {
-  const url = blobUrlByAttachmentId.value[att.id]
-  if (!url) return
-  lightboxUrl.value = url
+  lightboxUrl.value = pieces.attachmentContentUrl(props.orgSlug, props.pieceId, att.id)
   lightboxName.value = att.originalFilename
   lightboxOpen.value = true
 }
@@ -338,10 +309,12 @@ async function confirmDelete() {
             @click="openLightbox(att)"
           >
             <img
-              v-if="blobUrlByAttachmentId[att.id]"
-              :src="blobUrlByAttachmentId[att.id]"
+              v-if="!isBroken(thumbnailUrl(att))"
+              :src="srcFor(thumbnailUrl(att))"
               :alt="att.originalFilename"
               loading="lazy"
+              decoding="async"
+              @error="onError(thumbnailUrl(att))"
             >
             <span v-else class="image-placeholder">
               <DashboardIcon name="box" :size="22" />

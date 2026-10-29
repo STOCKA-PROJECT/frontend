@@ -113,7 +113,7 @@ export function useApi() {
     }
   }
 
-  return async <T> (
+  const request = async <T> (
     url: Parameters<typeof baseFetch>[0],
     opts?: Parameters<typeof baseFetch>[1]
   ): Promise<T> => {
@@ -137,4 +137,17 @@ export function useApi() {
       return await baseFetch<T>(url, opts)
     }
   }
+
+  /**
+   * Rotates the session cookies through `/api/auth/refresh` (shared mutex with the requests
+   * above) and sends the user to the login page when that fails. For callers that load `/api`
+   * URLs outside this client, such as `<img src>` (see `useImageRetry`).
+   */
+  async function refresh(): Promise<boolean> {
+    const refreshed = await tryRefresh()
+    if (!refreshed) handleRefreshFailure()
+    return refreshed
+  }
+
+  return Object.assign(request, { refresh })
 }

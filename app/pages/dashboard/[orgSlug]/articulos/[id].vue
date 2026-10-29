@@ -180,25 +180,26 @@ const currentOrgAttributes = computed(() =>
   orgSlug.value ? orgAttributes.listFor(orgSlug.value) : []
 )
 
-// La blob URL de la portada vive en el store, así que cualquier listado o
-// vista anterior la habrá cacheado ya. Aquí sólo derivamos un computed y
-// disparamos la descarga si todavía no estaba. La key del cache usa el slug
-// porque el store ahora indexa por slug (no por id).
-const coverBlobUrl = computed<string | null>(() => {
+// La portada es un <img> contra la miniatura JPEG que sirve el backend
+// (`/thumbnail`, cache inmutable): si venimos del listado el navegador ya la
+// tiene. El lightbox carga el original (`/content`).
+const { srcFor, isBroken, onError } = useImageRetry()
+
+const coverUrl = computed<string | null>(() => {
   const slug = orgSlug.value
   const p = piece.value
   if (!slug || !p || p.coverAttachmentId == null) return null
-  return pieces.attachmentBlobUrls[`${slug}:${p.id}:${p.coverAttachmentId}`] ?? null
+  return pieces.attachmentThumbnailUrl(slug, p.id, p.coverAttachmentId)
 })
 
-watch(
-  [() => piece.value?.id, () => piece.value?.coverAttachmentId, orgSlug],
-  ([pid, cid, slug]) => {
-    if (pid == null || cid == null || !slug) return
-    void pieces.fetchAttachmentBlobUrl(slug, pid, cid)
-  },
-  { immediate: true }
-)
+const coverFullUrl = computed<string | null>(() => {
+  const slug = orgSlug.value
+  const p = piece.value
+  if (!slug || !p || p.coverAttachmentId == null) return null
+  return pieces.attachmentContentUrl(slug, p.id, p.coverAttachmentId)
+})
+
+const showCover = computed(() => !!coverUrl.value && !isBroken(coverUrl.value))
 
 const previewOpen = ref(false)
 const qrOpen = ref(false)
@@ -223,13 +224,13 @@ const qrOpen = ref(false)
       <header class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <div class="flex min-w-0 items-start gap-3">
           <button
-            v-if="coverBlobUrl"
+            v-if="showCover"
             type="button"
             class="cover-thumb cover-thumb-btn"
             :aria-label="t('dashboard.pieces.cover_preview_aria', { name: piece.name })"
             @click="previewOpen = true"
           >
-            <img :src="coverBlobUrl" alt="" class="cover-thumb-img">
+            <img :src="srcFor(coverUrl)" alt="" class="cover-thumb-img" decoding="async" @error="onError(coverUrl)">
           </button>
           <div class="min-w-0">
             <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -339,7 +340,7 @@ const qrOpen = ref(false)
 
       <DashboardImageLightbox
         v-model:open="previewOpen"
-        :url="coverBlobUrl"
+        :url="coverFullUrl"
         :name="piece.name"
       />
 
