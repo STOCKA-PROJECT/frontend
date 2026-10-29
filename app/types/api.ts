@@ -43,8 +43,6 @@ export type SecurityEventType =
   | 'OAUTH_LINKED'
   | 'OAUTH_UNLINKED'
   | 'REFRESH_REUSE_DETECTED'
-  | 'NEW_DEVICE_LOGIN'
-  | 'SESSION_REVOKED'
 
 export interface SecurityActivityEntry {
   id: number
@@ -64,16 +62,6 @@ export interface PagedResponse<T> {
   size: number
   first: boolean
   last: boolean
-}
-
-export interface UserSession {
-  id: number
-  displayName: string
-  userAgent: string | null
-  lastIp: string | null
-  firstSeenAt: string
-  lastSeenAt: string
-  current: boolean
 }
 
 export interface TwoFactorSetupResponse {

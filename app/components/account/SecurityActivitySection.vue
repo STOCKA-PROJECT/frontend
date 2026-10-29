@@ -92,8 +92,6 @@ const EVENT_TONE: Record<SecurityEventType, 'ok' | 'warn' | 'danger' | 'info'> =
   OAUTH_LINKED: 'info',
   OAUTH_UNLINKED: 'info',
   REFRESH_REUSE_DETECTED: 'danger',
-  NEW_DEVICE_LOGIN: 'warn',
-  SESSION_REVOKED: 'info',
   OAUTH_APP_AUTHORIZED: 'info',
   OAUTH_APP_REVOKED: 'info'
 }

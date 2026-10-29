@@ -1307,37 +1307,15 @@
           "code_too_short": "The code must be at least 6 digits."
         }
       },
-      "sessions": {
-        "section_title": "Connected devices",
-        "subtitle": "List of active sessions. Revoke any you don't recognize.",
-        "loading": "Loading sessions…",
-        "empty": "No active sessions.",
-        "current": "This device",
-        "rename": "Rename",
-        "revoke": "Sign out",
-        "revoke_all_others": "Sign out everywhere else",
-        "confirm": "Confirm",
-        "cancel": "Cancel",
-        "save": "Save",
-        "confirm_revoke_all": "You'll be signed out from every other device. Continue?",
-        "renamed": "Name updated.",
-        "revoked": "Session ended.",
-        "revoked_all": "Sessions ended.",
-        "errors": {
-          "load_failed": "Couldn't load the sessions.",
-          "rename_failed": "Couldn't rename the session.",
-          "revoke_failed": "Couldn't end the session."
-        }
-      },
       "security": {
-        "section_title": "Security activity",
-        "subtitle": "History of sign-ins, password changes and other security events on your account.",
+        "section_title": "Sign-ins",
+        "subtitle": "When and from which IP your account was signed in to.",
         "loading": "Loading activity…",
-        "empty": "No activity recorded yet.",
+        "empty": "No sign-ins recorded yet.",
         "previous": "Previous",
         "next": "Next",
         "page_of": "Page {current} of {total}",
-        "pagination_label": "Security history pagination",
+        "pagination_label": "Sign-in pagination",
         "errors": {
           "load_failed": "Couldn't load the history. Please try again."
         },
@@ -1355,8 +1333,6 @@
           "OAUTH_LINKED": "External account linked",
           "OAUTH_UNLINKED": "External account unlinked",
           "REFRESH_REUSE_DETECTED": "Session revoked for security",
-          "NEW_DEVICE_LOGIN": "Sign-in from a new device",
-          "SESSION_REVOKED": "Session revoked",
           "OAUTH_APP_AUTHORIZED": "Application authorized",
           "OAUTH_APP_REVOKED": "Application revoked"
         }
