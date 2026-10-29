@@ -21,6 +21,7 @@ const STATE_COOKIE = 'stocka_oauth_state'
  * regular login flow sets.
  */
 export default defineEventHandler(async (event) => {
+  assertGoogleOAuthEnabled(event)
   const body = await readBody<CallbackBody>(event)
   const base = getBackendBaseUrl()
   const stateCookie = getCookie(event, STATE_COOKIE)

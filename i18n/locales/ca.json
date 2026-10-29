@@ -1836,6 +1836,8 @@
     "go_to_login": "Iniciar sessió",
     "no_account": "Encara no tens compte?",
     "create_account": "Crea'n un",
+    "switch_account": "Entrar amb un altre compte",
+    "logged_in_as": "Has iniciat sessió com a {email}.",
     "errors": {
       "not_found": "Aquesta invitació no existeix o ja s'ha processat.",
       "email_mismatch": "Aquesta invitació és per a un altre correu. Inicia sessió amb el compte correcte.",
@@ -1846,6 +1848,15 @@
   },
   "errors": {
     "title": "Error",
+    "org_not_accessible": "Aquesta organització no existeix o no hi tens accés amb aquest compte. Si t'han compartit l'enllaç, demana que t'hi convidin o entra amb el compte adequat.",
+    "page": {
+      "not_found_title": "Pàgina no trobada",
+      "not_found_message": "La pàgina que cerques ja no existeix o no ha existit mai.",
+      "generic_title": "Alguna cosa ha fallat",
+      "generic_message": "S'ha produït un error inesperat. Torna-ho a intentar.",
+      "home": "Tornar a l'inici",
+      "switch_account": "Entrar amb un altre compte"
+    },
     "generic": "S'ha produït un error inesperat.",
     "network": "No s'ha pogut contactar amb el servidor.",
     "auth": {

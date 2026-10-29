@@ -12,6 +12,10 @@ useSeoMeta({
 const auth = useAuthStore()
 const route = useRoute()
 const apiError = useApiError()
+const googleEnabled = useRuntimeConfig().public.oauthGoogleEnabled
+
+// Where the user was going before being sent here (deep link, invitation, expired session).
+const next = computed(() => safeNextPath(route.query.next))
 
 const email = ref('')
 const password = ref('')
@@ -49,19 +53,6 @@ const showResendVerification = computed(() =>
 const canSubmit = computed(() => email.value.trim() && password.value && !loading.value)
 const canSubmitTotp = computed(() => totpCode.value.replace(/\s+/g, '').length >= 6 && !verifyingTotp.value)
 
-function safeNextPath(): string | null {
-  const raw = route.query.next
-  if (typeof raw !== 'string') return null
-  let decoded: string
-  try {
-    decoded = decodeURIComponent(raw)
-  } catch {
-    return null
-  }
-  if (!decoded.startsWith('/') || decoded.startsWith('//')) return null
-  return decoded
-}
-
 async function submit() {
   if (!canSubmit.value) return
   loading.value = true
@@ -74,14 +65,11 @@ async function submit() {
       password: password.value,
       rememberMe: rememberMe.value
     }
-    const next = safeNextPath()
-    const challenge = next
-      ? await auth.loginNoRedirect(payload)
-      : await auth.login(payload)
+    const challenge = await auth.login(payload)
     if (challenge) {
       mfaToken.value = challenge.mfaToken
-    } else if (next) {
-      await navigateTo(next)
+    } else {
+      await auth.routeAfterAuth(next.value)
     }
   } catch (e) {
     console.error('[login] error:', e)
@@ -99,12 +87,7 @@ async function submitTotp() {
   totpError.value = null
   try {
     await auth.submit2faChallenge(mfaToken.value, totpCode.value.trim(), rememberMe.value)
-    const next = safeNextPath()
-    if (next) {
-      await navigateTo(next)
-    } else {
-      await auth.routeAfterAuth()
-    }
+    await auth.routeAfterAuth(next.value)
   } catch (e) {
     const view = apiError(e)
     totpError.value = view.description
@@ -165,12 +148,14 @@ async function resendVerification() {
         {{ successMsg }}
       </div>
 
-      <AuthGoogleSignInButton />
-      <div class="flex items-center gap-3">
-        <hr class="flex-1 border-line">
-        <span class="text-[11.5px] uppercase tracking-wider text-ink-muted">{{ t('auth.oauth.or_separator') }}</span>
-        <hr class="flex-1 border-line">
-      </div>
+      <template v-if="googleEnabled">
+        <AuthGoogleSignInButton />
+        <div class="flex items-center gap-3">
+          <hr class="flex-1 border-line">
+          <span class="text-[11.5px] uppercase tracking-wider text-ink-muted">{{ t('auth.oauth.or_separator') }}</span>
+          <hr class="flex-1 border-line">
+        </div>
+      </template>
 
       <div v-if="errorMsg" role="alert"
         class="rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger">
@@ -212,7 +197,7 @@ async function resendVerification() {
 
     <template #foot>
       {{ t('auth.login.no_account') }}
-      <NuxtLink :to="localePath('/registro')"
+      <NuxtLink :to="withNext(localePath('/registro'), next)"
         class="font-medium text-ink border-b border-line-strong pb-px transition-colors hover:border-ink">
         {{ t('auth.login.create_free') }}
       </NuxtLink>

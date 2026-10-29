@@ -1836,6 +1836,8 @@
     "go_to_login": "Iniciar sesión",
     "no_account": "¿No tienes cuenta aún?",
     "create_account": "Crea una cuenta",
+    "switch_account": "Entrar con otra cuenta",
+    "logged_in_as": "Has iniciado sesión como {email}.",
     "errors": {
       "not_found": "Esta invitación no existe o ya ha sido procesada.",
       "email_mismatch": "Esta invitación está dirigida a otro email. Inicia sesión con la cuenta correcta.",
@@ -1846,6 +1848,15 @@
   },
   "errors": {
     "title": "Error",
+    "org_not_accessible": "Esta organización no existe o no tienes acceso a ella con esta cuenta. Si te han compartido el enlace, pide que te inviten o entra con la cuenta adecuada.",
+    "page": {
+      "not_found_title": "Página no encontrada",
+      "not_found_message": "La página que buscas ya no existe o nunca existió.",
+      "generic_title": "Algo ha salido mal",
+      "generic_message": "Ha ocurrido un error inesperado. Inténtalo de nuevo.",
+      "home": "Volver al inicio",
+      "switch_account": "Entrar con otra cuenta"
+    },
     "generic": "Ha ocurrido un error inesperado.",
     "network": "No se ha podido contactar con el servidor.",
     "auth": {

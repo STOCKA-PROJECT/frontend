@@ -7,7 +7,9 @@
  * - Loads the org list once if it is empty (deep link, fresh tab).
  * - When the slug is unknown to the loaded list it asks the backend: if it is a
  *   historical slug, redirects 301 to the current one preserving the rest of the path
- *   and the locale prefix. If the backend rejects the slug, surfaces a 404.
+ *   and the locale prefix. If the backend rejects the slug (unknown, or the user is not a
+ *   member: the backend hides which), surfaces a 404 that offers to switch account, since
+ *   QR codes and email links are often opened from a phone signed in with another user.
  * - Remembers the slug in a cookie so the `/dashboard` redirector lands the user back
  *   on this org next time.
  */
@@ -50,6 +52,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
     orgs.rememberSlug(lookup.currentSlug)
   } catch {
-    return showError({ statusCode: 404, statusMessage: 'Organización no encontrada' })
+    const { t } = useNuxtApp().$i18n
+    return showError({
+      statusCode: 404,
+      statusMessage: t('errors.org_not_accessible'),
+      data: { switchAccount: true, next: to.fullPath }
+    })
   }
 })

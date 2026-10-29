@@ -33,7 +33,7 @@ onMounted(async () => {
   try {
     await auth.verifyEmail({ token: token.value })
     status.value = 'success'
-    await navigateTo({ path: localePath('/login'), query: { verified: 'ok' } })
+    await navigateTo({ path: localePath('/login'), query: { verified: 'ok', ...nextQuery(route.query.next) } })
   } catch {
     status.value = 'error'
   }

@@ -35,7 +35,7 @@ onMounted(async () => {
       body: { code, state, rememberMe: isMobileDevice() }
     })
     auth.setSession(data)
-    await auth.routeAfterAuth()
+    await auth.routeAfterAuth(takeOAuthNext())
   } catch (e) {
     const view = apiError(e)
     errorMsg.value = view.description

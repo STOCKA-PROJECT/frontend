@@ -12,6 +12,7 @@ const STATE_COOKIE = 'stocka_oauth_state'
  * browser sends it back on {@code /api/auth/oauth/google/callback}.
  */
 export default defineEventHandler(async (event) => {
+  assertGoogleOAuthEnabled(event)
   const base = getBackendBaseUrl()
 
   let response: Awaited<ReturnType<typeof $fetch.raw<BackendAuthorizeResponse>>>

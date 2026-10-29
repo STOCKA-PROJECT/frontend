@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n()
+const route = useRoute()
 const loading = ref(false)
 const error = ref<string | null>(null)
 
@@ -20,6 +21,7 @@ async function start() {
     const api = useApi()
     const data = await api<AuthorizeResponse>('/auth/oauth/google/authorize')
     if (typeof window !== 'undefined') {
+      rememberOAuthNext(route.query.next)
       window.location.href = data.authorizationUrl
     }
   } catch {

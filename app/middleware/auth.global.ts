@@ -12,10 +12,10 @@ export default defineNuxtRouteMiddleware((to) => {
   const normalized = stripLocalePrefix(to.path) || '/'
 
   if (PROTECTED_SEGMENTS.some(p => normalized === p || normalized.startsWith(`${p}/`)) && !auth.isAuthenticated) {
-    return navigateTo({ path: localePath('/login'), query: { redirect: to.path } })
+    return navigateTo(withNext(localePath('/login'), to.fullPath))
   }
 
   if (GUEST_ONLY_SEGMENTS.includes(normalized) && auth.isAuthenticated) {
-    return navigateTo(localePath('/dashboard'))
+    return navigateTo(safeNextPath(to.query.next) ?? localePath('/dashboard'))
   }
 })

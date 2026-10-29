@@ -11,6 +11,11 @@ useSeoMeta({
 
 const auth = useAuthStore()
 const apiError = useApiError()
+const route = useRoute()
+const googleEnabled = useRuntimeConfig().public.oauthGoogleEnabled
+
+// Carried from the login page or an invitation; follows the user through the verification email.
+const next = computed(() => safeNextPath(route.query.next))
 
 const firstName = ref('')
 const lastName = ref('')
@@ -94,7 +99,7 @@ async function submit() {
       password: password.value,
       repeatPassword: confirmPassword.value,
       language: backendLanguage.value
-    })
+    }, next.value)
   } catch (e) {
     errorMsg.value = apiError(e).description
   } finally {
@@ -108,12 +113,14 @@ async function submit() {
     :title="t('auth.signup.title')"
     :subtitle="t('auth.signup.subtitle')"
   >
-    <AuthGoogleSignInButton :label="t('auth.oauth.signup_with_google')" />
-    <div class="my-3 flex items-center gap-3">
-      <hr class="flex-1 border-line">
-      <span class="text-[11.5px] uppercase tracking-wider text-ink-muted">{{ t('auth.oauth.or_separator') }}</span>
-      <hr class="flex-1 border-line">
-    </div>
+    <template v-if="googleEnabled">
+      <AuthGoogleSignInButton :label="t('auth.oauth.signup_with_google')" />
+      <div class="my-3 flex items-center gap-3">
+        <hr class="flex-1 border-line">
+        <span class="text-[11.5px] uppercase tracking-wider text-ink-muted">{{ t('auth.oauth.or_separator') }}</span>
+        <hr class="flex-1 border-line">
+      </div>
+    </template>
 
     <form class="flex flex-col gap-3.5" novalidate @submit.prevent="submit">
       <div
@@ -209,7 +216,7 @@ async function submit() {
     <template #foot>
       {{ t('auth.signup.have_account') }}
       <NuxtLink
-        :to="localePath('/login')"
+        :to="withNext(localePath('/login'), next)"
         class="font-medium text-ink border-b border-line-strong pb-px transition-colors hover:border-ink"
       >
         {{ t('auth.signup.signin') }}

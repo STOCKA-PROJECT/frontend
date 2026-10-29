@@ -5,7 +5,7 @@ definePageMeta({
   // the user inside a page-level middleware so the redirect happens before page setup
   // runs (this avoids the redirect firing inside <Suspense> and freezing the view).
   middleware: [
-    async function dashboardRootRedirect() {
+    async function dashboardRootRedirect(to) {
       const nuxtApp = useNuxtApp()
       const localePath = useLocalePath()
       const auth = useAuthStore()
@@ -20,7 +20,7 @@ definePageMeta({
         }
       }
       if (!auth.isAuthenticated) {
-        return nuxtApp.runWithContext(() => navigateTo(localePath('/login')))
+        return nuxtApp.runWithContext(() => navigateTo(withNext(localePath('/login'), to.fullPath)))
       }
 
       if (orgs.list.length === 0) {

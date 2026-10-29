@@ -18,7 +18,7 @@ const { error } = await useAsyncData('layout-dashboard-orgs', async () => {
 // bounce to /login. The check in useApi only runs on the client; doing it
 // here lets SSR redirect cleanly too.
 if (error.value && !auth.isAuthenticated) {
-  await navigateTo(localePath('/login'))
+  await navigateTo(withNext(localePath('/login'), useRoute().fullPath))
 }
 </script>
 

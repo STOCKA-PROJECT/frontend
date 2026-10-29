@@ -104,11 +104,11 @@ export function useApi() {
   function handleRefreshFailure(): void {
     auth.clearLocalSession()
     if (import.meta.client) {
-      const raw = useRoute().path
-      const path = stripLocalePrefix(raw)
+      const route = useRoute()
+      const path = stripLocalePrefix(route.path)
       const isPublic = PUBLIC_SEGMENTS.some(p => path.startsWith(p)) || path === '/'
       if (!isPublic) {
-        navigateTo(resolveLocalePath('/login'))
+        navigateTo(withNext(resolveLocalePath('/login'), route.fullPath))
       }
     }
   }

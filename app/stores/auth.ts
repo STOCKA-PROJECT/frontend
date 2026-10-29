@@ -37,9 +37,13 @@ function isChallengeResponse(r: LoginResponse): r is LoginChallengeResponse {
 type LocalePathFn = (path: string) => string
 
 export const useAuthStore = defineStore('auth', () => {
+  // Lives as long as the longest refresh cookie (30 days with "remember me") so a closed
+  // browser does not look logged out while the httpOnly session is still valid; useApi
+  // clears it as soon as a refresh fails.
   const userCookie = useCookie<User | null>('stocka_user', {
     sameSite: 'lax',
-    secure: !import.meta.dev
+    secure: !import.meta.dev,
+    maxAge: 60 * 60 * 24 * 30
   })
 
   const isAuthenticated = computed(() => !!userCookie.value)
@@ -60,16 +64,31 @@ export const useAuthStore = defineStore('auth', () => {
     userCookie.value = payload.user
   }
 
-  async function routeAfterAuth() {
+  /**
+   * Navigates once a session exists: to {@code next} when the caller carries a safe
+   * destination (deep link, invitation…), otherwise to the dashboard or to the
+   * organization wizard when the user has none.
+   *
+   * @param next same-origin path requested before logging in, if any
+   */
+  async function routeAfterAuth(next?: string | null) {
     const orgs = useOrganizationsStore()
     await orgs.fetchList()
-    if (orgs.list.length === 0) {
+    const destination = safeNextPath(next)
+    if (destination) {
+      await navigateTo(destination)
+    } else if (orgs.list.length === 0) {
       await navigateTo(resolveLocalePath('/dashboard/crear-organizacion'))
     } else {
       await navigateTo(resolveLocalePath('/dashboard'))
     }
   }
 
+  /**
+   * Authenticates with email + password. Sets the session and returns {@code null}, or
+   * returns the 2FA challenge without a session. Never navigates: the caller decides
+   * (see {@link routeAfterAuth}).
+   */
   async function login(payload: LoginUserDto): Promise<LoginChallengeResponse | null> {
     const api = useApi()
     const data = await api<LoginResponse>('/auth/login', {
@@ -80,22 +99,6 @@ export const useAuthStore = defineStore('auth', () => {
       return data
     }
     setSession(data)
-    await routeAfterAuth()
-    return null
-  }
-
-  async function loginNoRedirect(payload: LoginUserDto): Promise<LoginChallengeResponse | null> {
-    const api = useApi()
-    const data = await api<LoginResponse>('/auth/login', {
-      method: 'POST',
-      body: payload
-    })
-    if (isChallengeResponse(data)) {
-      return data
-    }
-    setSession(data)
-    const orgs = useOrganizationsStore()
-    await orgs.fetchList()
     return null
   }
 
@@ -116,15 +119,19 @@ export const useAuthStore = defineStore('auth', () => {
     setSession(data)
   }
 
-  async function signup(payload: RegisterUserDto) {
+  /**
+   * Registers the user and sends them to the login page. {@code next} travels to the
+   * backend too, so the verification email brings the user back to it.
+   */
+  async function signup(payload: RegisterUserDto, next?: string | null) {
     const api = useApi()
     await api<User>('/auth/signup', {
       method: 'POST',
-      body: payload
+      body: { ...payload, ...nextQuery(next) }
     })
     await navigateTo({
       path: resolveLocalePath('/login'),
-      query: { registered: 'ok', email: payload.email }
+      query: { registered: 'ok', email: payload.email, ...nextQuery(next) }
     })
   }
 
@@ -197,7 +204,7 @@ export const useAuthStore = defineStore('auth', () => {
     const email = userCookie.value?.email
     await api('/users/me/password', { method: 'PATCH', body: payload })
     if (email) {
-      await loginNoRedirect({ email, password: payload.newPassword })
+      await login({ email, password: payload.newPassword })
     }
   }
 
@@ -206,7 +213,19 @@ export const useAuthStore = defineStore('auth', () => {
     useOrganizationsStore().reset()
   }
 
-  async function logout() {
+  /**
+   * Ends the session and goes to the login page.
+   *
+   * @param next same-origin path to reopen after signing in again (switching accounts
+   *             on an invitation or on a link of another organization)
+   */
+  async function logout(next?: string | null) {
+    await endSession()
+    await navigateTo(withNext(resolveLocalePath('/login'), next))
+  }
+
+  /** Revokes the session on the server (best effort) and forgets it locally, without navigating. */
+  async function endSession() {
     const api = useApi()
     try {
       await api('/auth/logout', { method: 'POST' })
@@ -214,7 +233,6 @@ export const useAuthStore = defineStore('auth', () => {
       // logout is fire-and-forget; clear local session regardless
     }
     clearLocalSession()
-    await navigateTo(resolveLocalePath('/login'))
   }
 
   return {
@@ -222,10 +240,10 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     setSession,
     login,
-    loginNoRedirect,
     submit2faChallenge,
     signup,
     logout,
+    endSession,
     forgotPassword,
     resetPassword,
     verifyEmail,

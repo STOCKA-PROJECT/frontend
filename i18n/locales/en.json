@@ -1836,6 +1836,8 @@
     "go_to_login": "Sign in",
     "no_account": "Don't have an account yet?",
     "create_account": "Create one",
+    "switch_account": "Sign in with another account",
+    "logged_in_as": "You are signed in as {email}.",
     "errors": {
       "not_found": "This invitation doesn't exist or has already been processed.",
       "email_mismatch": "This invitation is for a different email. Sign in with the correct account.",
@@ -1846,6 +1848,15 @@
   },
   "errors": {
     "title": "Error",
+    "org_not_accessible": "This organization does not exist or this account has no access to it. If someone shared the link with you, ask them for an invitation or sign in with the right account.",
+    "page": {
+      "not_found_title": "Page not found",
+      "not_found_message": "The page you are looking for no longer exists or never did.",
+      "generic_title": "Something went wrong",
+      "generic_message": "An unexpected error occurred. Please try again.",
+      "home": "Back to home",
+      "switch_account": "Sign in with another account"
+    },
     "generic": "An unexpected error occurred.",
     "network": "Could not reach the server.",
     "auth": {

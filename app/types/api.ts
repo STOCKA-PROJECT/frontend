@@ -106,6 +106,8 @@ export interface RegisterUserDto {
   password: string
   repeatPassword: string
   language: Language
+  /** Same-origin path to open after verifying the email (carried in the verification link). */
+  next?: string
 }
 
 export interface ForgotPasswordRequestDto {

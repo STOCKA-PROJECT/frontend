@@ -3,15 +3,33 @@ import type { NuxtError } from '#app'
 
 const props = defineProps<{ error: NuxtError }>()
 
+const { t } = useI18n()
+const localePath = useLocalePath()
+const auth = useAuthStore()
+
+/** Set by `resolve-org-slug.global.ts`: the link may belong to another account. */
+interface ErrorData {
+  switchAccount?: boolean
+  next?: string
+}
+const data = computed(() => (props.error.data ?? {}) as ErrorData)
+
 const isNotFound = computed(() => props.error.statusCode === 404)
-const title = computed(() => isNotFound.value ? 'Página no encontrada' : 'Algo ha salido mal')
-const message = computed(() => isNotFound.value
-  ? 'La página que buscas ya no existe o nunca existió.'
-  : props.error.statusMessage || 'Ha ocurrido un error inesperado. Inténtalo de nuevo.')
+const title = computed(() => isNotFound.value ? t('errors.page.not_found_title') : t('errors.page.generic_title'))
+const message = computed(() => props.error.statusMessage
+  || (isNotFound.value ? t('errors.page.not_found_message') : t('errors.page.generic_message')))
+const canSwitchAccount = computed(() => data.value.switchAccount === true && auth.isAuthenticated)
 
 useSeoMeta({ title: title.value, robots: 'noindex' })
 
 const handleHome = () => clearError({ redirect: '/' })
+
+// `clearError` is the only way out of the error page, so the redirect is built by hand.
+async function switchAccount() {
+  await auth.endSession()
+  const { path, query } = withNext(localePath('/login'), data.value.next)
+  clearError({ redirect: query.next ? `${path}?next=${encodeURIComponent(query.next)}` : path })
+}
 </script>
 
 <template>
@@ -26,9 +44,14 @@ const handleHome = () => clearError({ redirect: '/' })
       <p class="mb-8 max-w-[480px] text-base leading-relaxed text-ink-soft">
         {{ message }}
       </p>
-      <button type="button" class="btn btn-primary btn-lg" @click="handleHome">
-        Volver al inicio
-      </button>
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <button type="button" class="btn btn-primary btn-lg" @click="handleHome">
+          {{ t('errors.page.home') }}
+        </button>
+        <button v-if="canSwitchAccount" type="button" class="btn btn-outline btn-lg" @click="switchAccount">
+          {{ t('errors.page.switch_account') }}
+        </button>
+      </div>
     </main>
   </div>
 </template>

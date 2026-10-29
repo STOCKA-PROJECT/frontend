@@ -3,6 +3,9 @@ const SITE_URL = process.env.NUXT_PUBLIC_SITE_URL ?? "https://stocka.es";
 const SITE_NAME = "Stocka";
 const API_BASE_URL = process.env.NUXT_API_BASE_URL ?? "http://localhost:9095";
 const EDITOR_URL = process.env.NUXT_PUBLIC_EDITOR_URL ?? "http://localhost:3010";
+// Sign-in with Google: off unless explicitly enabled (dev/staging). Mirrors the backend's
+// GOOGLE_OAUTH_ENABLED; production signs in with email + password + 2FA only.
+const OAUTH_GOOGLE_ENABLED = process.env.NUXT_PUBLIC_OAUTH_GOOGLE_ENABLED === "true";
 
 const SECURITY_HEADERS = {
   "strict-transport-security": "max-age=31536000; includeSubDomains",
@@ -49,6 +52,7 @@ export default defineNuxtConfig({
       mcpUrl: process.env.NUXT_PUBLIC_MCP_URL ?? `${API_BASE_URL}/mcp`,
       siteName: SITE_NAME,
       editorUrl: EDITOR_URL,
+      oauthGoogleEnabled: OAUTH_GOOGLE_ENABLED,
       // Sentry only reports when a DSN is set: production gets it from the worker vars below;
       // local runs have none, so local errors never reach Sentry.
       sentryDsn: process.env.NUXT_PUBLIC_SENTRY_DSN ?? "",
@@ -131,6 +135,7 @@ export default defineNuxtConfig({
           NUXT_API_BASE_URL: "https://stocka.xeye.es",
           NUXT_PUBLIC_MCP_URL: "https://stocka.xeye.es/mcp",
           NUXT_PUBLIC_EDITOR_URL: "https://timeline.joanmartorellcoll03.workers.dev",
+          NUXT_PUBLIC_OAUTH_GOOGLE_ENABLED: "false",
           NUXT_PUBLIC_SENTRY_DSN: "https://cdfe5037e8b45c2c960a7b4f539ca5b7@o4511302617464832.ingest.de.sentry.io/4511302622511184",
           NUXT_PUBLIC_SENTRY_ENVIRONMENT: "production",
         },

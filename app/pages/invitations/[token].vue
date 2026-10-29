@@ -21,20 +21,20 @@ useSeoMeta({
 type Status = 'idle' | 'accepting' | 'rejecting' | 'accepted' | 'rejected'
 const status = ref<Status>('idle')
 const errorMsg = ref<string | null>(null)
+// The invitation is for another email: offer to sign in with the right account and come back here.
+const wrongAccount = ref(false)
 
-function loginUrl(): string {
-  return localePath('/login') + '?next=' + encodeURIComponent(route.fullPath)
-}
-
-function signupUrl(): string {
-  return localePath('/registro') + '?next=' + encodeURIComponent(route.fullPath)
-}
+const loginUrl = computed(() => withNext(localePath('/login'), route.fullPath))
+const signupUrl = computed(() => withNext(localePath('/registro'), route.fullPath))
 
 function mapError(e: unknown): string {
   if (e instanceof FetchError) {
     const s = e.response?.status
     if (s === 404) return t('invitations.errors.not_found')
-    if (s === 403) return t('invitations.errors.email_mismatch')
+    if (s === 403) {
+      wrongAccount.value = true
+      return t('invitations.errors.email_mismatch')
+    }
     if (s === 410) return t('invitations.errors.expired')
     if (s === 400) return t('invitations.errors.already_used')
     const data = e.data as { message?: unknown } | undefined
@@ -56,6 +56,10 @@ async function accept() {
     errorMsg.value = mapError(e)
     status.value = 'idle'
   }
+}
+
+function switchAccount() {
+  return auth.logout(route.fullPath)
 }
 
 async function reject() {
@@ -88,7 +92,18 @@ async function reject() {
       role="alert"
       class="mb-4 rounded-lg border border-danger/30 bg-danger-soft px-3 py-2 text-[13px] text-danger"
     >
-      {{ errorMsg }}
+      <p>{{ errorMsg }}</p>
+      <p v-if="wrongAccount && auth.user?.email" class="mt-1 text-ink-soft">
+        {{ t('invitations.logged_in_as', { email: auth.user.email }) }}
+      </p>
+      <button
+        v-if="wrongAccount"
+        type="button"
+        class="mt-1 inline-flex font-medium underline underline-offset-2 hover:opacity-80"
+        @click="switchAccount"
+      >
+        {{ t('invitations.switch_account') }}
+      </button>
     </div>
 
     <template v-if="status === 'accepted' || status === 'rejected'">
@@ -103,14 +118,14 @@ async function reject() {
     <template v-else-if="!auth.isAuthenticated">
       <div class="flex flex-col gap-3">
         <NuxtLink
-          :to="loginUrl()"
+          :to="loginUrl"
           class="inline-flex h-11 w-full items-center justify-center rounded-[10px] bg-ink px-4 text-[14px] font-medium text-bg-card transition-[background] hover:bg-ink/90"
         >
           {{ t('invitations.go_to_login') }}
         </NuxtLink>
         <p class="text-center text-[13px] text-ink-soft">
           {{ t('invitations.no_account') }}
-          <NuxtLink :to="signupUrl()" class="ml-1 font-medium text-ink border-b border-line-strong pb-px transition-colors hover:border-ink">
+          <NuxtLink :to="signupUrl" class="ml-1 font-medium text-ink border-b border-line-strong pb-px transition-colors hover:border-ink">
             {{ t('invitations.create_account') }}
           </NuxtLink>
         </p>
