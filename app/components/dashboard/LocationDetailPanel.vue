@@ -2,6 +2,7 @@
 import type { LocationResponseDto, LocationTreeNodeDto, OrganizationRole, PieceListItemDto } from '~/types/api'
 
 const props = defineProps<{
+  orgSlug: string
   selectedId: number | null
   isUnassignedFocus: boolean
   detail: LocationResponseDto | null
@@ -22,6 +23,21 @@ const { t } = useI18n()
 
 const canManageLocations = computed(() => props.role === 'OWNER' || props.role === 'MANAGER')
 const canMovePieces = computed(() => props.role === 'OWNER' || props.role === 'MANAGER' || props.role === 'USER')
+
+const piecesStore = usePiecesStore()
+
+// Lightbox of a piece's cover, opened from its thumbnail: loads the original
+// (`/content`), like the pieces table.
+const previewOpen = ref(false)
+const previewUrl = ref<string | null>(null)
+const previewName = ref('')
+
+function openPreview(piece: PieceListItemDto) {
+  if (!piece.coverAttachmentId) return
+  previewUrl.value = piecesStore.attachmentContentUrl(props.orgSlug, piece.id, piece.coverAttachmentId)
+  previewName.value = piece.name
+  previewOpen.value = true
+}
 
 const piecesCount = computed(() => props.pieces.length)
 const childCount = computed(() => props.childLocations.length)
@@ -135,11 +151,18 @@ const showEmptyState = computed(() =>
 
           <div v-else class="flex flex-col gap-2">
             <DashboardPieceDraggableRow v-for="p in pieces" :key="p.id"
-              :piece="p" :draggable="canMovePieces" />
+              :piece="p" :org-slug="orgSlug" :draggable="canMovePieces"
+              @preview="openPreview" />
           </div>
         </section>
       </div>
     </template>
+
+    <DashboardImageLightbox
+      v-model:open="previewOpen"
+      :url="previewUrl"
+      :name="previewName"
+    />
   </section>
 </template>
 

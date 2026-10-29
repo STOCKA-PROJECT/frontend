@@ -334,6 +334,7 @@ function onDetailDelete() {
       />
 
       <DashboardLocationDetailPanel
+        :org-slug="orgSlug"
         :selected-id="selectedId"
         :is-unassigned-focus="isUnassignedFocus"
         :detail="detail"

@@ -3,10 +3,16 @@ import type { PieceListItemDto } from '~/types/api'
 
 const props = defineProps<{
   piece: PieceListItemDto
+  orgSlug: string
   draggable?: boolean
 }>()
 
+const emit = defineEmits<{
+  preview: [piece: PieceListItemDto]
+}>()
+
 const { t, locale } = useI18n()
+const piecesStore = usePiecesStore()
 
 const { onDragStart, onDragEnd, dragging } = useDragSource(
   () => ({ kind: 'piece', id: props.piece.id }),
@@ -17,6 +23,16 @@ const thumbVariant = computed(() => {
   const seed = props.piece.pieceTypes[0]?.id ?? props.piece.id
   return `t-${(seed % 5) + 1}`
 })
+
+// Same thumbnail as the pieces table: the backend's 512 px JPEG (`/thumbnail`,
+// immutable cache). The panel opens the original (`/content`) in its lightbox.
+const { srcFor, isBroken, onError } = useImageRetry()
+
+const coverUrl = computed(() => props.piece.coverAttachmentId
+  ? piecesStore.attachmentThumbnailUrl(props.orgSlug, props.piece.id, props.piece.coverAttachmentId)
+  : null)
+
+const hasCover = computed(() => !!coverUrl.value && !isBroken(coverUrl.value))
 
 const typeLabel = computed(() => {
   const types = props.piece.pieceTypes
@@ -71,9 +87,30 @@ const updatedAtLabel = computed(() => {
       </svg>
     </span>
 
-    <div :class="['piece-thumb flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-lg text-bg-card', thumbVariant]">
-      <DashboardIcon name="box" :size="14" />
-    </div>
+    <button
+      type="button"
+      class="thumb-btn"
+      :disabled="!hasCover"
+      :aria-label="t('dashboard.pieces_table.preview_cover_aria', { name: piece.name })"
+      @click.stop="emit('preview', piece)"
+    >
+      <img
+        v-if="hasCover"
+        :src="srcFor(coverUrl)"
+        :alt="piece.name"
+        class="thumb-img"
+        draggable="false"
+        loading="lazy"
+        decoding="async"
+        @error="onError(coverUrl)"
+      >
+      <span
+        v-else
+        :class="['piece-thumb flex h-full w-full items-center justify-center rounded-lg text-bg-card', thumbVariant]"
+      >
+        <DashboardIcon name="box" :size="14" />
+      </span>
+    </button>
 
     <div class="min-w-0 flex-1">
       <div class="truncate text-[13.5px] font-medium text-ink">{{ piece.name }}</div>
@@ -99,6 +136,27 @@ const updatedAtLabel = computed(() => {
   .grip { display: none; }
   .piece-row.is-draggable { cursor: default; }
 }
+
+/* Native button reset so the thumbnail keeps its look (as in PiecesTable). */
+.thumb-btn {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--c-bg-soft);
+  cursor: zoom-in;
+  display: block;
+  transition: box-shadow .15s;
+}
+.thumb-btn:disabled { cursor: inherit; }
+.thumb-btn:not(:disabled):hover {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--c-accent) 35%, transparent);
+}
+.thumb-btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .piece-thumb.t-1 { background: linear-gradient(135deg, #dccfb8, #c8b89c); }
 .piece-thumb.t-2 { background: linear-gradient(135deg, #cdd9c8, #a8baa3); }
