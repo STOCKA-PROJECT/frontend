@@ -62,7 +62,8 @@ async function persist(next: NotificationPreferenceResponseDto) {
     pieces: next.pieces,
     pieceScope: next.pieceScope,
     locations: next.locations,
-    pieceTypes: next.pieceTypes
+    pieceTypes: next.pieceTypes,
+    delivery: next.delivery ?? 'BATCHED'
   }
   try {
     const saved = await update(next.organizationId, payload)

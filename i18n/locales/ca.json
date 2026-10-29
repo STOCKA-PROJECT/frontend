@@ -1261,6 +1261,17 @@
           "ALL": "Tots els articles",
           "OWNED_ONLY": "Només els que posseeixo"
         },
+        "delivery_label": "Com rebre-les",
+        "delivery": {
+          "BATCHED": "Quan acabi l'activitat",
+          "DAILY": "Resum diari",
+          "INSTANT": "A l'instant"
+        },
+        "delivery_hint": {
+          "BATCHED": "Un sol correu quan l'organització porti 30 minuts sense canvis.",
+          "DAILY": "Un sol correu cada dia a les 20:00 amb tot el que ha passat.",
+          "INSTANT": "Un correu per cada article, ubicació o tipus."
+        },
         "saved": "Preferències desades.",
         "errors": {
           "load": "No s'han pogut carregar les preferències.",

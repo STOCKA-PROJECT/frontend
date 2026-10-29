@@ -1261,6 +1261,17 @@
           "ALL": "All items",
           "OWNED_ONLY": "Only items I own"
         },
+        "delivery_label": "How to receive them",
+        "delivery": {
+          "BATCHED": "When the activity stops",
+          "DAILY": "Daily summary",
+          "INSTANT": "Instantly"
+        },
+        "delivery_hint": {
+          "BATCHED": "A single email once the organization has had no changes for 30 minutes.",
+          "DAILY": "A single email every day at 20:00 with everything that happened.",
+          "INSTANT": "One email per item, location or type."
+        },
         "saved": "Preferences saved.",
         "errors": {
           "load": "Couldn't load the preferences.",

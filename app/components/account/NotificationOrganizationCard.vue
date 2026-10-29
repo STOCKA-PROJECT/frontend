@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { LifecycleAction, NotificationPreferenceResponseDto, PieceScope } from '~/types/api'
+import type { LifecycleAction, NotificationDelivery, NotificationPreferenceResponseDto, PieceScope } from '~/types/api'
 
 const props = defineProps<{
   preference: NotificationPreferenceResponseDto
@@ -21,6 +21,7 @@ const RESOURCES: Array<{
   { key: 'pieceTypes', labelKey: 'dashboard.account.notifications.resource.pieceTypes' }
 ]
 const ACTIONS: LifecycleAction[] = ['CREATED', 'EDITED', 'DELETED']
+const DELIVERIES: NotificationDelivery[] = ['BATCHED', 'DAILY', 'INSTANT']
 
 function has(actions: LifecycleAction[], action: LifecycleAction): boolean {
   return actions.includes(action)
@@ -38,7 +39,16 @@ function setScope(scope: PieceScope) {
   emit('update', { ...props.preference, pieceScope: scope })
 }
 
+function setDelivery(delivery: NotificationDelivery) {
+  emit('update', { ...props.preference, delivery })
+}
+
 const piecesEnabled = computed(() => (props.preference.pieces?.length ?? 0) > 0)
+const anyEnabled = computed(() =>
+  piecesEnabled.value
+  || (props.preference.locations?.length ?? 0) > 0
+  || (props.preference.pieceTypes?.length ?? 0) > 0
+)
 </script>
 
 <template>
@@ -66,6 +76,26 @@ const piecesEnabled = computed(() => (props.preference.pieces?.length ?? 0) > 0)
           </label>
         </div>
       </div>
+    </div>
+
+    <div v-if="anyEnabled"
+         class="mt-3 flex flex-col gap-1.5 border-t border-line/70 pt-3 max-sm:items-start sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[12.5px] text-ink-soft">
+          {{ t('dashboard.account.notifications.delivery_label') }}
+        </span>
+        <span class="text-[12px] text-ink-muted">
+          {{ t(`dashboard.account.notifications.delivery_hint.${preference.delivery ?? 'BATCHED'}`) }}
+        </span>
+      </div>
+      <select :value="preference.delivery ?? 'BATCHED'"
+              :disabled="saving"
+              class="h-9 rounded-[8px] border border-line bg-field px-2.5 text-[13px] text-ink outline-none transition-[border-color,background,box-shadow] duration-150 hover:border-line-strong focus:border-accent focus:bg-field-focus disabled:cursor-progress"
+              @change="setDelivery(($event.target as HTMLSelectElement).value as NotificationDelivery)">
+        <option v-for="delivery in DELIVERIES" :key="delivery" :value="delivery">
+          {{ t(`dashboard.account.notifications.delivery.${delivery}`) }}
+        </option>
+      </select>
     </div>
 
     <div v-if="piecesEnabled"

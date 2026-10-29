@@ -843,6 +843,9 @@ export type LifecycleAction = 'CREATED' | 'EDITED' | 'DELETED'
 
 export type PieceScope = 'ALL' | 'OWNED_ONLY'
 
+/** How the notifications of an organization reach the user. */
+export type NotificationDelivery = 'INSTANT' | 'BATCHED' | 'DAILY'
+
 export interface NotificationPreferenceResponseDto {
   organizationId: number
   organizationName: string
@@ -851,6 +854,7 @@ export interface NotificationPreferenceResponseDto {
   pieceScope: PieceScope
   locations: LifecycleAction[]
   pieceTypes: LifecycleAction[]
+  delivery: NotificationDelivery
 }
 
 export interface UpdateNotificationPreferenceDto {
@@ -858,6 +862,7 @@ export interface UpdateNotificationPreferenceDto {
   pieceScope: PieceScope
   locations: LifecycleAction[]
   pieceTypes: LifecycleAction[]
+  delivery: NotificationDelivery
 }
 
 // ---- Piece import / export ----------------------------------------------

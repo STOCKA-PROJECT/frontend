@@ -1261,6 +1261,17 @@
           "ALL": "Todos los artículos",
           "OWNED_ONLY": "Solo los que poseo"
         },
+        "delivery_label": "Cómo recibirlas",
+        "delivery": {
+          "BATCHED": "Cuando termine la actividad",
+          "DAILY": "Resumen diario",
+          "INSTANT": "Al instante"
+        },
+        "delivery_hint": {
+          "BATCHED": "Un solo correo cuando la organización lleve 30 minutos sin cambios.",
+          "DAILY": "Un solo correo cada día a las 20:00 con todo lo ocurrido.",
+          "INSTANT": "Un correo por cada artículo, ubicación o tipo."
+        },
         "saved": "Preferencias guardadas.",
         "errors": {
           "load": "No se han podido cargar las preferencias.",
