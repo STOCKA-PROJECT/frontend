@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type {
   CreateTimelineDto,
+  DuplicateTimelineDto,
   TimelineResponseDto,
   UpdateTimelineDto
 } from '~/types/api'
@@ -53,6 +54,20 @@ export const useTimelinesStore = defineStore('timelines', () => {
     })
     await fetchList(orgSlug)
     return updated
+  }
+
+  /**
+   * Copies a timeline and its scene. Without a name the backend picks the first free
+   * "<name> (còpia N)" in the request language.
+   */
+  async function duplicate(orgSlug: string, id: number, payload: DuplicateTimelineDto = {}) {
+    const api = useApi()
+    const created = await api<TimelineResponseDto>(`/organizations/${orgSlug}/timelines/${id}/duplicate`, {
+      method: 'POST',
+      body: payload
+    })
+    await fetchList(orgSlug)
+    return created
   }
 
   async function softDelete(orgSlug: string, id: number) {
@@ -119,6 +134,7 @@ export const useTimelinesStore = defineStore('timelines', () => {
     fetchList,
     create,
     update,
+    duplicate,
     softDelete,
     downloadBundle,
     downloadShow,

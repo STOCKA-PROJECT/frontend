@@ -376,6 +376,9 @@
       "actions": {
         "new": "New timeline",
         "modify": "Modify",
+        "duplicate": "Duplicate",
+        "duplicating": "Duplicating…",
+        "duplicate_hint": "Make a copy with the same scene",
         "rename": "Rename",
         "delete": "Delete",
         "download": "Download",
@@ -407,6 +410,7 @@
         "save": "Could not save the timeline.",
         "delete": "Could not delete the timeline.",
         "open_editor": "Could not open the editor.",
+        "duplicate": "Could not duplicate the timeline.",
         "download_bundle": "Could not download the bundle.",
         "download_show": "Could not download the show."
       }

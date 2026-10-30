@@ -168,6 +168,34 @@ async function submitFormDialog() {
   }
 }
 
+// ---- duplicate ----
+// One click: the backend copies the timeline and its scene and names it "<name> (còpia N)".
+// The new row is tinted for a moment so it is easy to spot in the list.
+const NEW_ROW_HIGHLIGHT_MS = 2500
+
+const duplicatingId = ref<number | null>(null)
+const highlightId = ref<number | null>(null)
+let highlightTimer: ReturnType<typeof setTimeout> | null = null
+
+async function onDuplicate(timeline: TimelineResponseDto) {
+  if (duplicatingId.value != null) return
+  duplicatingId.value = timeline.id
+  try {
+    const copy = await timelines.duplicate(props.orgSlug, timeline.id)
+    highlightId.value = copy.id
+    if (highlightTimer) clearTimeout(highlightTimer)
+    highlightTimer = setTimeout(() => { highlightId.value = null }, NEW_ROW_HIGHLIGHT_MS)
+  } catch (e) {
+    showError(extractErrorMessage(e, t('dashboard.timelines.errors.duplicate')))
+  } finally {
+    duplicatingId.value = null
+  }
+}
+
+onBeforeUnmount(() => {
+  if (highlightTimer) clearTimeout(highlightTimer)
+})
+
 // ---- delete confirm ----
 const confirmDialog = ref<{ open: boolean; id: number | null; name: string; loading: boolean }>({
   open: false,
@@ -237,7 +265,8 @@ async function confirmDelete() {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="tl in timelines.list" :key="tl.id" class="border-b border-line/60 last:border-0">
+          <tr v-for="tl in timelines.list" :key="tl.id" class="row border-b border-line/60 last:border-0"
+            :class="{ 'row-new': tl.id === highlightId }">
             <td class="px-4 py-3 font-medium text-ink">{{ tl.name }}</td>
             <td class="px-4 py-3 text-ink-soft">{{ fmtDate(tl.createdAt) }}</td>
             <td class="px-4 py-3 text-ink-soft">{{ fmtDate(tl.updatedAt) }}</td>
@@ -253,6 +282,14 @@ async function confirmDelete() {
                   <button type="button" class="row-btn" @click="onModify(tl)">
                     <DashboardIcon name="external" :size="14" />
                     {{ t('dashboard.timelines.actions.modify') }}
+                  </button>
+                  <button type="button" class="row-btn" :disabled="duplicatingId != null"
+                    :aria-busy="duplicatingId === tl.id" :title="t('dashboard.timelines.actions.duplicate_hint')"
+                    @click="onDuplicate(tl)">
+                    <DashboardIcon name="copy" :size="14" />
+                    {{ duplicatingId === tl.id
+                      ? t('dashboard.timelines.actions.duplicating')
+                      : t('dashboard.timelines.actions.duplicate') }}
                   </button>
                   <button type="button" class="row-btn" @click="onRename(tl)">
                     <DashboardIcon name="edit" :size="14" />
@@ -350,7 +387,10 @@ async function confirmDelete() {
   color: var(--c-ink);
   transition: background .15s, border-color .15s, color .15s;
 }
-.row-btn:hover { background: var(--c-bg-soft); }
+.row-btn:hover:not(:disabled) { background: var(--c-bg-soft); }
+.row-btn:disabled { opacity: .5; cursor: not-allowed; }
+.row { transition: background-color .6s; }
+.row-new { background: var(--c-accent-soft); }
 .row-btn-danger { color: var(--c-danger); border-color: color-mix(in oklab, var(--c-danger) 30%, var(--c-line)); }
 .row-btn-danger:hover { background: var(--c-danger-soft); }
 

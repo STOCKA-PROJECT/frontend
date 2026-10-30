@@ -376,6 +376,9 @@
       "actions": {
         "new": "Nueva timeline",
         "modify": "Modificar",
+        "duplicate": "Duplicar",
+        "duplicating": "Duplicando…",
+        "duplicate_hint": "Crea una copia con la misma escena",
         "rename": "Renombrar",
         "delete": "Eliminar",
         "download": "Descargar",
@@ -407,6 +410,7 @@
         "save": "No se ha podido guardar la línea de tiempo.",
         "delete": "No se ha podido eliminar la línea de tiempo.",
         "open_editor": "No se ha podido abrir el editor.",
+        "duplicate": "No se ha podido duplicar la línea de tiempo.",
         "download_bundle": "No se ha podido descargar el paquete.",
         "download_show": "No se ha podido descargar el show."
       }

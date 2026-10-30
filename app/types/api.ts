@@ -692,6 +692,11 @@ export interface UpdateTimelineDto {
   name?: string
 }
 
+/** Body of `POST /timelines/{id}/duplicate`; without `name` the backend picks "<name> (còpia N)". */
+export interface DuplicateTimelineDto {
+  name?: string
+}
+
 /**
  * A validation finding on a timeline scene, as returned by the scene endpoints and inside the
  * 422 body of the bundle/show downloads when the scene has blocking errors.

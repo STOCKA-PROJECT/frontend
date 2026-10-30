@@ -376,6 +376,9 @@
       "actions": {
         "new": "Nova timeline",
         "modify": "Modificar",
+        "duplicate": "Duplicar",
+        "duplicating": "Duplicant…",
+        "duplicate_hint": "Crea una còpia amb la mateixa escena",
         "rename": "Reanomenar",
         "delete": "Eliminar",
         "download": "Descarrega",
@@ -407,6 +410,7 @@
         "save": "No s'ha pogut desar la línia de temps.",
         "delete": "No s'ha pogut eliminar la línia de temps.",
         "open_editor": "No s'ha pogut obrir l'editor.",
+        "duplicate": "No s'ha pogut duplicar la línia de temps.",
         "download_bundle": "No s’ha pogut descarregar el paquet.",
         "download_show": "No s’ha pogut descarregar el show."
       }
