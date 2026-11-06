@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import QRCode from 'qrcode'
+/**
+ * Loaded only in the browser, when a code is drawn: the package's Node entry pulls pngjs, whose
+ * `util.inherits(…, Stream)` breaks while the page chunk is evaluated on the Cloudflare Worker
+ * (SSR of a direct load answered 500).
+ */
+const loadQRCode = () => import('qrcode').then(m => m.default)
 
 const props = defineProps<{
   open: boolean
@@ -36,6 +41,7 @@ watch(() => props.open, async (open) => {
   shareUrl.value = `${window.location.origin}/dashboard/${props.orgSlug}/articulos/${props.pieceId}`
   await nextTick()
   if (canvasRef.value) {
+    const QRCode = await loadQRCode()
     await QRCode.toCanvas(canvasRef.value, shareUrl.value, {
       width: 256,
       margin: 2,
@@ -75,6 +81,7 @@ async function renderCompositeCanvas() {
   const qrSize = 288
   const qrY = props.serialNumber ? 80 : 60
   const tmp = document.createElement('canvas')
+  const QRCode = await loadQRCode()
   await QRCode.toCanvas(tmp, shareUrl.value, {
     width: qrSize,
     margin: 2,

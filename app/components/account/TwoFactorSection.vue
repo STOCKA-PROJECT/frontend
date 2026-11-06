@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import QRCode from 'qrcode'
+/**
+ * Loaded only in the browser, when a code is drawn: the package's Node entry pulls pngjs, whose
+ * `util.inherits(…, Stream)` breaks while the page chunk is evaluated on the Cloudflare Worker
+ * (SSR of a direct load answered 500).
+ */
+const loadQRCode = () => import('qrcode').then(m => m.default)
 
 const { t } = useI18n()
 const auth = useAuthStore()
@@ -21,6 +26,7 @@ async function startEnrollment() {
   errorMsg.value = null
   try {
     const data = await tfa.startSetup()
+    const QRCode = await loadQRCode()
     qrDataUrl.value = await QRCode.toDataURL(data.otpAuthUri, { margin: 1, width: 220 })
     stage.value = 'qr'
   } catch (e) {
