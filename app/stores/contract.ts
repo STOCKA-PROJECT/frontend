@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { CatalogAction, CatalogKind, CatalogParam, OutputCatalog, OutputKind, SensorProfile } from '~/types/contract'
+import type { CatalogAction, CatalogKind, CatalogParam, FixtureProfile, OutputCatalog, OutputKind, SensorProfile } from '~/types/contract'
 
 /**
  * The output catalog (kinds, config schemas and actions), fetched once from the backend. Read-only:
@@ -56,6 +56,13 @@ export const useContractStore = defineStore('contract', () => {
     return Object.entries(kind(k)?.config ?? {}).map(([key, spec]) => ({ key, spec }))
   }
 
+  /** DMX fixture profiles (`profiles.moving_head`), by id. */
+  const movingHeadProfiles = computed<Record<string, FixtureProfile>>(() => catalog.value?.profiles?.moving_head ?? {})
+
+  function movingHeadProfile(id: unknown): FixtureProfile | null {
+    return typeof id === 'string' ? movingHeadProfiles.value[id] ?? null : null
+  }
+
   /** Measured-sensor models (`profiles.sensor`), by id. */
   const sensorProfiles = computed<Record<string, SensorProfile>>(() => catalog.value?.profiles?.sensor ?? {})
 
@@ -63,5 +70,5 @@ export const useContractStore = defineStore('contract', () => {
     return typeof id === 'string' ? sensorProfiles.value[id] ?? null : null
   }
 
-  return { catalog, loading, error, kinds, pieceKinds, load, kind, actionsOf, action, configFieldsOf, sensorProfiles, sensorProfile }
+  return { catalog, loading, error, kinds, pieceKinds, load, kind, actionsOf, action, configFieldsOf, sensorProfiles, sensorProfile, movingHeadProfiles, movingHeadProfile }
 })

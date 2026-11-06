@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AttributeType, PortResponseDto } from '~/types/api'
+import { headPositionsOf } from '~/types/contract'
 
 const props = defineProps<{
   port: PortResponseDto
@@ -75,8 +76,10 @@ const address = computed<string | null>(() => {
       return props.port.pin == null ? null : `GPIO ${props.port.pin}${c.activeLow ? ` · ${t('dashboard.ports.list.active_low')}` : ''}`
     case 'gpio_expander':
       return `${String(c.chip ?? 'mcp23017')} · I2C 0x${typeof c.address === 'number' ? c.address.toString(16) : '?'} · bus ${String(c.bus ?? 1)}${c.activeLow ? ` · ${t('dashboard.ports.list.active_low')}` : ''}`
-    case 'moving_head':
-      return `DMX ${String(c.address ?? '?')} · ${String(c.profile ?? '?')}`
+    case 'moving_head': {
+      const positions = headPositionsOf(c).length
+      return `DMX ${String(c.address ?? '?')} · ${String(c.profile ?? '?')}${positions ? ` · ${t('dashboard.ports.list.positions_count', positions)}` : ''}`
+    }
     default:
       return props.port.pin == null ? null : `GPIO ${props.port.pin}`
   }

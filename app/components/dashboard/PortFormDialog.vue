@@ -5,7 +5,7 @@ import type {
   PortResponseDto,
   UpdatePortDto
 } from '~/types/api'
-import { pinModeOf, type CatalogParam, type OutputKind, type SensorWiring } from '~/types/contract'
+import { HEAD_POSITION_KEYS, headPositionsOf, pinModeOf, sameHeadPositionName, type CatalogParam, type OutputKind, type SensorWiring } from '~/types/contract'
 import { ACTION_NAME_PATTERN } from '~/utils/attributeValidators'
 
 // Create/edit a port. The kind drives the rest of the form: which piece types can be chosen (those
@@ -315,8 +315,30 @@ const outputsDistinct = computed(() => {
   return first === undefined || second === undefined || first !== second
 })
 
+/** The positions of a head as the backend accepts them: unique non-blank names, at least one value, values in range. */
+const positionsValid = computed(() => {
+  if (kind.value !== 'moving_head') return true
+  const list = headPositionsOf(config.value)
+  const raw = config.value.positions
+  if (Array.isArray(raw) && raw.length !== list.length) return false
+  const profile = contract.movingHeadProfile(config.value.profile)
+  const max: Record<string, [number, number]> = {
+    pan: [0, profile?.pan.max ?? 540], tilt: [0, profile?.tilt.max ?? 270],
+    zoom: [profile?.zoom.min ?? 0, profile?.zoom.max ?? 100], intensity: [0, 100], white: [0, 255]
+  }
+  return list.every((p, i) => {
+    if (p.name.trim() === '' || list.some((o, j) => j !== i && sameHeadPositionName(o.name, p.name))) return false
+    if (!HEAD_POSITION_KEYS.some(key => p[key] !== undefined && p[key] !== null)) return false
+    return (['pan', 'tilt', 'zoom', 'intensity', 'white'] as const).every((key) => {
+      const v = p[key]
+      return v === undefined || v === null || (typeof v === 'number' && Number.isFinite(v) && v >= max[key]![0] && v <= max[key]![1])
+    })
+  })
+})
+
 const configValid = computed(() => {
   if (!outputsDistinct.value) return false
+  if (!positionsValid.value) return false
   for (const { key, spec } of configFields.value) {
     const value = config.value[key]
     if (value === undefined || value === '') {

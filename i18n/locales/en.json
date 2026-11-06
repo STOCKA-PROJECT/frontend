@@ -742,7 +742,8 @@
         "active_low": "active-low",
         "max": "max",
         "limit": "limit",
-        "lock": "lock"
+        "lock": "lock",
+        "positions_count": "{n} positions | {n} position | {n} positions"
       },
       "form": {
         "new_title": "New port",
@@ -792,6 +793,28 @@
         "advanced_help": "Legacy typed parameters are kept for compatibility; the player only uses the configuration.",
         "catalog_error": "The output catalog could not be loaded.",
         "field_type_none": "None (infrastructure port)"
+      },
+      "positions": {
+        "help": "Each position saves only the values it has: one with pan and tilt only aims without changing the colour; one with zoom only opens or closes the beam. The name is unique on the head and is what the clip picks.",
+        "name": "Name",
+        "default_name": "Position",
+        "pan": "Pan (°)",
+        "tilt": "Tilt (°)",
+        "zoom": "Zoom (°)",
+        "intensity": "Intensity (%)",
+        "white": "White (0–255)",
+        "color": "Colour",
+        "color_on": "Save the colour",
+        "unchanged": "—",
+        "add": "Add a position",
+        "remove": "Remove the position",
+        "up": "Move up",
+        "down": "Move down",
+        "empty": "This head has no saved positions yet.",
+        "problem_name": "The position needs a name.",
+        "problem_duplicate": "There is already a position with this name.",
+        "problem_empty": "Save at least one value (pan and tilt, zoom, intensity, colour or white).",
+        "problem_range": "{field} must be between {min} and {max}."
       },
       "delete": {
         "confirm_title": "Delete port",
@@ -844,7 +867,8 @@
         "sensor": { "channel": "Expander channel (0–15)", "activeLow": "Active low", "bus": "I2C bus", "address": "I2C address" },
         "motor": { "activeLow": "Active-low outputs" },
         "gpio_expander": { "address": "I2C address (32–39 = 0x20–0x27)" },
-        "moving_head": { "address": "DMX address (first channel)" }
+        "moving_head": { "address": "DMX address (first channel)" },
+        "positions": "Saved positions"
       },
       "config_help": {
         "first": "Segments may run backwards (first > last).",
@@ -878,7 +902,8 @@
         "pollMs": "How often the value is read.",
         "sensor": { "expander": "Expander port that owns the input channel.", "activeLow": "Active when the input is low (contact to ground with pull-up). Untick it for sensors that drive the line high.", "address": "One of the addresses the model accepts, in decimal (0x29 = 41, 0x76 = 118, 0x77 = 119). Unique per bus with the expanders; with any I2C device, GPIO 2 and 3 are reserved.", "bus": "Almost always 1 (GPIO 2 and 3)." },
         "motor": { "expander": "Expander of both H-bridge outputs.", "activeLow": "Both outputs switch on at low level." },
-        "moving_head": { "profile": "Fixture model: channels, pan/tilt/zoom ranges and DMX conversion." }
+        "moving_head": { "profile": "Fixture model: channels, pan/tilt/zoom ranges and DMX conversion." },
+        "positions": "Named positions of this head (where it points, zoom, intensity, colour). They are usually saved from the device page by moving the head with the controls; here they can be adjusted. A “set” clip picks one by name and every head goes to its own."
       },
       "config_values": {
         "quantity": { "distance": "Distance", "temperature": "Temperature", "humidity": "Humidity", "pressure": "Pressure" },
@@ -1104,7 +1129,32 @@
           "stop": "Stop",
           "no_sounds": "The Raspberry has no sounds",
           "active": "{n} under test",
-          "off_all": "Switch every test off"
+          "off_all": "Switch every test off",
+          "head": {
+            "pan": "Pan",
+            "tilt": "Tilt",
+            "zoom": "Zoom",
+            "intensity": "Intensity",
+            "white": "White",
+            "positions": "Positions:",
+            "positions_none": "none saved yet.",
+            "no_port": "this head is not a port of the organization.",
+            "goto_title": "Send the head to “{name}”",
+            "save": "Save as position…",
+            "cancel": "Cancel",
+            "save_help": "Saved on this head’s port in Stocka with the values of the controls; the editor lists it in the clip’s dropdown.",
+            "name": "Position name",
+            "name_placeholder": "Portal, Star, Shepherds…",
+            "confirm": "Save",
+            "replace": "Replace",
+            "include_aim": "Where it points (pan and tilt)",
+            "include_zoom": "Zoom",
+            "include_intensity": "Intensity",
+            "include_color": "Colour and white",
+            "saved": "Position “{name}” saved on “{port}”.",
+            "replaced": "Position “{name}” of “{port}” updated.",
+            "save_failed": "The position could not be saved"
+          }
         },
         "motor": {
           "forward": "Turning",
@@ -1953,7 +2003,27 @@
       "expander_in_use": "The expander has ports that depend on it: {relays}.",
       "i2c_pin_reserved": "GPIO {pin} belongs to the I2C bus and is reserved while an expander or an I2C sensor exists.",
       "dmx_address_range": "The head at address {address} needs {channels} channels and leaves the DMX universe (up to {last}).",
-      "dmx_address_conflict": "DMX channels overlap with head “{port}” ({first}–{last})."
+      "dmx_address_conflict": "DMX channels overlap with head “{port}” ({first}–{last}).",
+      "position_invalid": {
+        "default": "The head positions are not valid.",
+        "not_list": "Positions must be a list.",
+        "not_object": "Position {index} is not an object with a name and values.",
+        "name_required": "Position {index} needs a name.",
+        "name_duplicate": "Two positions are named “{name}”.",
+        "empty": "Position “{name}” saves no value.",
+        "unknown_key": "Position “{name}” has an unknown value: {key}.",
+        "pan_invalid": "The pan of “{name}” must be a number.",
+        "tilt_invalid": "The tilt of “{name}” must be a number.",
+        "zoom_invalid": "The zoom of “{name}” must be a number.",
+        "intensity_invalid": "The intensity of “{name}” must be a number.",
+        "white_invalid": "The white of “{name}” must be an integer.",
+        "color_invalid": "The colour of “{name}” must be [r, g, b] with values from 0 to 255.",
+        "pan_out_of_range": "The pan of “{name}” must be between {min} and {max}.",
+        "tilt_out_of_range": "The tilt of “{name}” must be between {min} and {max}.",
+        "zoom_out_of_range": "The zoom of “{name}” must be between {min} and {max}.",
+        "intensity_out_of_range": "The intensity of “{name}” must be between {min} and {max}.",
+        "white_out_of_range": "The white of “{name}” must be an integer between {min} and {max}."
+      }
     },
     "devices": {
       "name_taken": "A device with this name already exists in the organization.",

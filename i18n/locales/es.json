@@ -742,7 +742,8 @@
         "active_low": "activo a nivel bajo",
         "max": "máx",
         "limit": "final",
-        "lock": "bloqueo"
+        "lock": "bloqueo",
+        "positions_count": "{n} posiciones | {n} posición | {n} posiciones"
       },
       "form": {
         "new_title": "Nuevo puerto",
@@ -792,6 +793,28 @@
         "advanced_help": "Los parámetros tipados antiguos se conservan por compatibilidad; el reproductor solo usa la configuración.",
         "catalog_error": "No se ha podido cargar el catálogo de salidas.",
         "field_type_none": "Ninguno (puerto de infraestructura)"
+      },
+      "positions": {
+        "help": "Cada posición guarda solo los valores que tenga: una con solo pan y tilt apunta sin cambiar el color; una con solo zoom abre o cierra el haz. El nombre es único en el cabezal y es el que elige el clip.",
+        "name": "Nombre",
+        "default_name": "Posición",
+        "pan": "Pan (°)",
+        "tilt": "Tilt (°)",
+        "zoom": "Zoom (°)",
+        "intensity": "Intensidad (%)",
+        "white": "Blanco (0–255)",
+        "color": "Color",
+        "color_on": "Guarda el color",
+        "unchanged": "—",
+        "add": "Añadir una posición",
+        "remove": "Quitar la posición",
+        "up": "Subir",
+        "down": "Bajar",
+        "empty": "Este cabezal aún no tiene posiciones guardadas.",
+        "problem_name": "La posición necesita un nombre.",
+        "problem_duplicate": "Ya hay una posición con este nombre.",
+        "problem_empty": "Guarda al menos un valor (pan y tilt, zoom, intensidad, color o blanco).",
+        "problem_range": "{field} debe estar entre {min} y {max}."
       },
       "delete": {
         "confirm_title": "Eliminar puerto",
@@ -844,7 +867,8 @@
         "sensor": { "channel": "Canal del expansor (0–15)", "activeLow": "Activo a nivel bajo", "bus": "Bus I2C", "address": "Dirección I2C" },
         "motor": { "activeLow": "Salidas activas a nivel bajo" },
         "gpio_expander": { "address": "Dirección I2C (32–39 = 0x20–0x27)" },
-        "moving_head": { "address": "Dirección DMX (primer canal)" }
+        "moving_head": { "address": "Dirección DMX (primer canal)" },
+        "positions": "Posiciones guardadas"
       },
       "config_help": {
         "first": "Los segmentos pueden ir al revés (primero > último).",
@@ -878,7 +902,8 @@
         "pollMs": "Cada cuánto se lee el valor.",
         "sensor": { "expander": "Puerto de tipo Expansor del que es el canal de entrada.", "activeLow": "Activo cuando la entrada está a nivel bajo (contacto a masa con pull-up). Desmárcalo para sensores que dan nivel alto.", "address": "Una de las direcciones que admite el modelo, en decimal (0x29 = 41, 0x76 = 118, 0x77 = 119). Única por bus con los expansores; con un dispositivo I2C, los GPIO 2 y 3 quedan reservados.", "bus": "Casi siempre el 1 (GPIO 2 y 3)." },
         "motor": { "expander": "Expansor de las dos salidas del puente H.", "activeLow": "Las dos salidas se activan con nivel bajo." },
-        "moving_head": { "profile": "Modelo del cabezal: canales, rangos de pan/tilt/zoom y conversión a DMX." }
+        "moving_head": { "profile": "Modelo del cabezal: canales, rangos de pan/tilt/zoom y conversión a DMX." },
+        "positions": "Posiciones con nombre de este cabezal (dónde apunta, zoom, intensidad, color). Normalmente se guardan desde la página del dispositivo, moviendo el cabezal con los controles; aquí se pueden retocar. Un clip de «set» las elige por el nombre y cada cabezal va a la suya."
       },
       "config_values": {
         "quantity": { "distance": "Distancia", "temperature": "Temperatura", "humidity": "Humedad", "pressure": "Presión" },
@@ -1104,7 +1129,32 @@
           "stop": "Parar",
           "no_sounds": "La Raspberry no tiene ningún sonido",
           "active": "{n} en prueba",
-          "off_all": "Apagar todas las pruebas"
+          "off_all": "Apagar todas las pruebas",
+          "head": {
+            "pan": "Pan",
+            "tilt": "Tilt",
+            "zoom": "Zoom",
+            "intensity": "Intensidad",
+            "white": "Blanco",
+            "positions": "Posiciones:",
+            "positions_none": "ninguna guardada aún.",
+            "no_port": "este cabezal no es ningún puerto de la organización.",
+            "goto_title": "Lleva el cabezal a «{name}»",
+            "save": "Guardar como posición…",
+            "cancel": "Cancelar",
+            "save_help": "Se guarda en el puerto de este cabezal en Stocka con los valores de los controles; el editor la muestra en el desplegable del clip.",
+            "name": "Nombre de la posición",
+            "name_placeholder": "Portal, Estrella, Pastores…",
+            "confirm": "Guardar",
+            "replace": "Reemplazar",
+            "include_aim": "Dónde apunta (pan y tilt)",
+            "include_zoom": "Zoom",
+            "include_intensity": "Intensidad",
+            "include_color": "Color y blanco",
+            "saved": "Posición «{name}» guardada en «{port}».",
+            "replaced": "Posición «{name}» de «{port}» actualizada.",
+            "save_failed": "No se ha podido guardar la posición"
+          }
         },
         "motor": {
           "forward": "Girando",
@@ -1953,7 +2003,27 @@
       "expander_in_use": "El expansor tiene puertos que dependen de él: {relays}.",
       "i2c_pin_reserved": "El GPIO {pin} es del bus I2C y queda reservado mientras haya un expansor o un sensor I2C.",
       "dmx_address_range": "El cabezal en la dirección {address} necesita {channels} canales y sale del universo DMX (hasta {last}).",
-      "dmx_address_conflict": "Los canales DMX se solapan con el cabezal «{port}» ({first}–{last})."
+      "dmx_address_conflict": "Los canales DMX se solapan con el cabezal «{port}» ({first}–{last}).",
+      "position_invalid": {
+        "default": "Las posiciones del cabezal no son válidas.",
+        "not_list": "Las posiciones deben ser una lista.",
+        "not_object": "La posición {index} no es un objeto con nombre y valores.",
+        "name_required": "La posición {index} necesita un nombre.",
+        "name_duplicate": "Hay dos posiciones llamadas «{name}».",
+        "empty": "La posición «{name}» no guarda ningún valor.",
+        "unknown_key": "La posición «{name}» tiene un valor desconocido: {key}.",
+        "pan_invalid": "El pan de «{name}» debe ser un número.",
+        "tilt_invalid": "El tilt de «{name}» debe ser un número.",
+        "zoom_invalid": "El zoom de «{name}» debe ser un número.",
+        "intensity_invalid": "La intensidad de «{name}» debe ser un número.",
+        "white_invalid": "El blanco de «{name}» debe ser un entero.",
+        "color_invalid": "El color de «{name}» debe ser [r, g, b] con valores de 0 a 255.",
+        "pan_out_of_range": "El pan de «{name}» debe estar entre {min} y {max}.",
+        "tilt_out_of_range": "El tilt de «{name}» debe estar entre {min} y {max}.",
+        "zoom_out_of_range": "El zoom de «{name}» debe estar entre {min} y {max}.",
+        "intensity_out_of_range": "La intensidad de «{name}» debe estar entre {min} y {max}.",
+        "white_out_of_range": "El blanco de «{name}» debe ser un entero entre {min} y {max}."
+      }
     },
     "devices": {
       "name_taken": "Ya existe un dispositivo con este nombre en la organización.",

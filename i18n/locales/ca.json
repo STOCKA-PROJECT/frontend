@@ -742,7 +742,8 @@
         "active_low": "actiu a nivell baix",
         "max": "màx",
         "limit": "final",
-        "lock": "bloqueig"
+        "lock": "bloqueig",
+        "positions_count": "{n} posicions | {n} posició | {n} posicions"
       },
       "form": {
         "new_title": "Nou port",
@@ -792,6 +793,28 @@
         "advanced_help": "Els paràmetres tipats antics es conserven per compatibilitat; el reproductor només fa servir la configuració.",
         "catalog_error": "No s’ha pogut carregar el catàleg de sortides.",
         "field_type_none": "Cap (port d’infraestructura)"
+      },
+      "positions": {
+        "help": "Cada posició desa només els valors que tingui: una amb només pan i tilt apunta sense canviar el color; una amb només zoom obre o tanca el feix. El nom és únic al cap i és el que tria el clip.",
+        "name": "Nom",
+        "default_name": "Posició",
+        "pan": "Pan (°)",
+        "tilt": "Tilt (°)",
+        "zoom": "Zoom (°)",
+        "intensity": "Intensitat (%)",
+        "white": "Blanc (0–255)",
+        "color": "Color",
+        "color_on": "Desa el color",
+        "unchanged": "—",
+        "add": "Afegeix una posició",
+        "remove": "Treu la posició",
+        "up": "Puja",
+        "down": "Baixa",
+        "empty": "Aquest cap encara no té posicions desades.",
+        "problem_name": "La posició necessita un nom.",
+        "problem_duplicate": "Ja hi ha una posició amb aquest nom.",
+        "problem_empty": "Desa com a mínim un valor (pan i tilt, zoom, intensitat, color o blanc).",
+        "problem_range": "{field} ha d’estar entre {min} i {max}."
       },
       "delete": {
         "confirm_title": "Eliminar port",
@@ -844,7 +867,8 @@
         "sensor": { "channel": "Canal de l’expansor (0–15)", "activeLow": "Actiu a nivell baix", "bus": "Bus I2C", "address": "Adreça I2C" },
         "motor": { "activeLow": "Sortides actives a nivell baix" },
         "gpio_expander": { "address": "Adreça I2C (32–39 = 0x20–0x27)" },
-        "moving_head": { "address": "Adreça DMX (primer canal)" }
+        "moving_head": { "address": "Adreça DMX (primer canal)" },
+        "positions": "Posicions desades"
       },
       "config_help": {
         "first": "Els segments poden anar al revés (primer > últim).",
@@ -878,7 +902,8 @@
         "pollMs": "Cada quant es llegeix el valor.",
         "sensor": { "expander": "Port de tipus Expansor del qual és el canal d’entrada.", "activeLow": "Actiu quan l’entrada és a nivell baix (contacte a massa amb pull-up). Desmarca-ho per a sensors que donen nivell alt.", "address": "Una de les adreces que admet el model, en decimal (0x29 = 41, 0x76 = 118, 0x77 = 119). Única per bus amb els expansors; amb un dispositiu I2C, els GPIO 2 i 3 queden reservats.", "bus": "Gairebé sempre l’1 (GPIO 2 i 3)." },
         "motor": { "expander": "Expansor de les dues sortides del pont H.", "activeLow": "Les dues sortides s’activen amb nivell baix." },
-        "moving_head": { "profile": "Model del cap: canals, rangs de pan/tilt/zoom i conversió a DMX." }
+        "moving_head": { "profile": "Model del cap: canals, rangs de pan/tilt/zoom i conversió a DMX." },
+        "positions": "Posicions amb nom d’aquest cap (on apunta, zoom, intensitat, color). Normalment es desen des de la pàgina del dispositiu, movent el cap amb els controls; aquí es poden retocar. Un clip de «set» les tria pel nom i cada cap va a la seva."
       },
       "config_values": {
         "quantity": { "distance": "Distància", "temperature": "Temperatura", "humidity": "Humitat", "pressure": "Pressió" },
@@ -1104,7 +1129,32 @@
           "stop": "Para",
           "no_sounds": "La Raspberry no té cap so",
           "active": "{n} en prova",
-          "off_all": "Apaga totes les proves"
+          "off_all": "Apaga totes les proves",
+          "head": {
+            "pan": "Pan",
+            "tilt": "Tilt",
+            "zoom": "Zoom",
+            "intensity": "Intensitat",
+            "white": "Blanc",
+            "positions": "Posicions:",
+            "positions_none": "cap de desada encara.",
+            "no_port": "aquest cap no és cap port de l’organització.",
+            "goto_title": "Porta el cap a «{name}»",
+            "save": "Desa com a posició…",
+            "cancel": "Cancel·la",
+            "save_help": "Es desa al port d’aquest cap a Stocka amb els valors dels controls; l’editor la mostra al desplegable del clip.",
+            "name": "Nom de la posició",
+            "name_placeholder": "Portal, Estrella, Pastors…",
+            "confirm": "Desa",
+            "replace": "Reemplaça",
+            "include_aim": "On apunta (pan i tilt)",
+            "include_zoom": "Zoom",
+            "include_intensity": "Intensitat",
+            "include_color": "Color i blanc",
+            "saved": "Posició «{name}» desada a «{port}».",
+            "replaced": "Posició «{name}» de «{port}» actualitzada.",
+            "save_failed": "No s’ha pogut desar la posició"
+          }
         },
         "motor": {
           "forward": "Girant",
@@ -1953,7 +2003,27 @@
       "expander_in_use": "L’expansor té ports que en depenen: {relays}.",
       "i2c_pin_reserved": "El GPIO {pin} és del bus I2C i queda reservat mentre hi hagi un expansor o un sensor I2C.",
       "dmx_address_range": "El cap a l’adreça {address} necessita {channels} canals i surt de l’univers DMX (fins a {last}).",
-      "dmx_address_conflict": "Els canals DMX solapen amb el cap «{port}» ({first}–{last})."
+      "dmx_address_conflict": "Els canals DMX solapen amb el cap «{port}» ({first}–{last}).",
+      "position_invalid": {
+        "default": "Les posicions del cap no són vàlides.",
+        "not_list": "Les posicions han de ser una llista.",
+        "not_object": "La posició {index} no és un objecte amb nom i valors.",
+        "name_required": "La posició {index} necessita un nom.",
+        "name_duplicate": "Hi ha dues posicions que es diuen «{name}».",
+        "empty": "La posició «{name}» no desa cap valor.",
+        "unknown_key": "La posició «{name}» té un valor desconegut: {key}.",
+        "pan_invalid": "El pan de «{name}» ha de ser un número.",
+        "tilt_invalid": "El tilt de «{name}» ha de ser un número.",
+        "zoom_invalid": "El zoom de «{name}» ha de ser un número.",
+        "intensity_invalid": "La intensitat de «{name}» ha de ser un número.",
+        "white_invalid": "El blanc de «{name}» ha de ser un enter.",
+        "color_invalid": "El color de «{name}» ha de ser [r, g, b] amb valors de 0 a 255.",
+        "pan_out_of_range": "El pan de «{name}» ha d’estar entre {min} i {max}.",
+        "tilt_out_of_range": "El tilt de «{name}» ha d’estar entre {min} i {max}.",
+        "zoom_out_of_range": "El zoom de «{name}» ha d’estar entre {min} i {max}.",
+        "intensity_out_of_range": "La intensitat de «{name}» ha d’estar entre {min} i {max}.",
+        "white_out_of_range": "El blanc de «{name}» ha de ser un enter entre {min} i {max}."
+      }
     },
     "devices": {
       "name_taken": "Ja existeix un dispositiu amb aquest nom a l’organització.",

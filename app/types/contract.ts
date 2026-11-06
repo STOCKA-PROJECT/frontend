@@ -5,7 +5,8 @@ import type { AttributeType } from '~/types/api'
 // and the actions (with typed parameters) a piece type of that kind may define.
 
 export type OutputKind = 'relay' | 'gpio_expander' | 'led_strip' | 'led_segment' | 'motor' | 'audio' | 'moving_head' | 'sensor'
-export type CatalogType = 'int' | 'number' | 'bool' | 'string' | 'rgb' | 'rgb_list' | 'enum'
+/** `position`: the name of a saved position of the `moving_head` port a clip drives; `positions`: that list (config only). */
+export type CatalogType = 'int' | 'number' | 'bool' | 'string' | 'rgb' | 'rgb_list' | 'enum' | 'position' | 'positions'
 
 export const OUTPUT_KINDS: readonly OutputKind[] = ['relay', 'gpio_expander', 'led_strip', 'led_segment', 'motor', 'audio', 'moving_head', 'sensor']
 
@@ -186,8 +187,40 @@ export function attributeTypeFor(type: CatalogType): AttributeType {
     case 'string':
     case 'rgb':
     case 'rgb_list':
+    case 'position':
+    case 'positions':
       return 'TEXT'
   }
+}
+
+/**
+ * A named position of a moving head (`config.positions` of a `moving_head` port): the values a
+ * `set` clip applies when it names it, in the units of `set` (degrees, percent, RGB 0–255). Every
+ * value is optional; a position with only `zoom` opens or closes the beam without moving the head.
+ */
+export interface HeadPosition {
+  name: string
+  pan?: number
+  tilt?: number
+  zoom?: number
+  intensity?: number
+  color?: [number, number, number]
+  white?: number
+}
+
+/** Keys of a head position besides `name`, in the order the backend writes them. */
+export const HEAD_POSITION_KEYS = ['pan', 'tilt', 'zoom', 'intensity', 'color', 'white'] as const
+
+/** The positions declared in a port config, skipping anything that is not an object with a name. */
+export function headPositionsOf(config: Record<string, unknown> | null | undefined): HeadPosition[] {
+  const raw = config?.positions
+  if (!Array.isArray(raw)) return []
+  return raw.filter((p): p is HeadPosition => !!p && typeof p === 'object' && typeof (p as HeadPosition).name === 'string' && (p as HeadPosition).name.trim() !== '')
+}
+
+/** Whether two position names are the same for the backend (trimmed, case-insensitive). */
+export function sameHeadPositionName(a: string, b: string): boolean {
+  return a.trim().toLowerCase() === b.trim().toLowerCase()
 }
 
 /** Name of the parameter that receives the clip length, if the action has one. */

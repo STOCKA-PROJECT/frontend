@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { CatalogParam, OutputKind } from '~/types/contract'
+import type { CatalogParam, HeadPosition, OutputKind } from '~/types/contract'
+import { headPositionsOf } from '~/types/contract'
 
 // Renders the kind-specific config of a port from the catalog schema: one input per key, typed by
 // the catalog (`int`/`number` → number, `bool` → checkbox, `enum` → select of the catalog values,
@@ -122,16 +123,29 @@ function enumLabel(key: string, value: string): string {
 }
 
 const inputId = (key: string) => `port-config-${props.kind}-${key}`
+
+// ---- moving head positions (catalog type `positions`): a dedicated editor with the profile's ranges ----
+const contract = useContractStore()
+const headProfile = computed(() => contract.movingHeadProfile(config.value.profile))
+const positions = computed<HeadPosition[]>(() => headPositionsOf(config.value))
+function setPositions(next: HeadPosition[]) {
+  setValue('positions', next)
+}
 </script>
 
 <template>
   <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-    <div v-for="{ key, spec } in fields" :key="key" class="flex flex-col gap-1" :class="{ 'sm:col-span-2': refKind(spec) !== null }">
+    <div v-for="{ key, spec } in fields" :key="key" class="flex flex-col gap-1" :class="{ 'sm:col-span-2': refKind(spec) !== null || spec.type === 'positions' }">
       <label :for="inputId(key)" class="cfg-label">
         {{ label(key) }}<span v-if="isRequired(key, spec)" class="text-danger" aria-hidden="true"> *</span>
       </label>
 
-      <select v-if="refKind(spec) !== null" :id="inputId(key)" class="cfg-input" :disabled="disabled"
+      <DashboardPortHeadPositions
+        v-if="spec.type === 'positions'"
+        :model-value="positions" :profile="headProfile" :disabled="disabled"
+        @update:model-value="setPositions($event)" />
+
+      <select v-else-if="refKind(spec) !== null" :id="inputId(key)" class="cfg-input" :disabled="disabled"
         :value="(config[key] as string | undefined) ?? ''"
         @change="setValue(key, ($event.target as HTMLSelectElement).value)">
         <option v-if="isRequired(key, spec)" value="" disabled>{{ refPlaceholder(spec) }}</option>
@@ -165,7 +179,7 @@ const inputId = (key: string) => `port-config-${props.kind}-${key}`
       <p v-if="refKind(spec) !== null && !refList(spec).length" class="cfg-help" :class="{ 'text-danger': isRequired(key, spec) }">
         {{ refEmpty(spec) }}
       </p>
-      <p v-else-if="help(key, spec)" class="cfg-help">{{ help(key, spec) }}</p>
+      <p v-else-if="spec.type !== 'positions' && help(key, spec)" class="cfg-help">{{ help(key, spec) }}</p>
       <p v-if="valueHelp(key, spec)" class="cfg-help cfg-value-help">{{ valueHelp(key, spec) }}</p>
     </div>
   </div>
