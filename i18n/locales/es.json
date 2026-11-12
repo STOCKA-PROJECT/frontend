@@ -1104,7 +1104,7 @@
         },
         "ports": {
           "title": "Puertos",
-          "hint": "Debajo de cada puerto, las piezas de Stocka conectadas a él. Un puerto cortado queda apagado e ignora el show hasta que lo restablezcas.",
+          "hint": "Cada puerto lleva el nombre de las piezas de Stocka que mueve en este show. Un puerto cortado queda apagado e ignora el show hasta que lo restablezcas; los cortes se conservan al reiniciar.",
           "cut": "Cortar",
           "restore": "Restablecer",
           "cut_badge": "Cortado",
@@ -1112,7 +1112,20 @@
           "none": "Sin show cargado no hay puertos.",
           "cut_count": "{n} cortados",
           "sensor_no_cut": "Sensor de seguridad: no se puede cortar.",
-          "cut_first": "Restablécelo para probarlo."
+          "cut_first": "Restablécelo para probarlo.",
+          "other_cuts": "Cortes de puertos que este show no tiene",
+          "other_cuts_hint": "Siguen guardados en el belén: si el puerto vuelve en otro show, saldrá cortado.",
+          "test_open": "Prueba",
+          "group": {
+            "relay": "Relés",
+            "motor": "Motores",
+            "leds": "Tiras LED",
+            "moving_head": "Cabezales",
+            "audio": "Audio",
+            "sensor": "Sensores",
+            "gpio_expander": "Expansores",
+            "other": "Otros"
+          }
         },
         "test": {
           "hint": "Mientras no se ejecuta ningún show puedes encender cada puerto para comprobar que está bien conectado. Queda encendido hasta que lo apagues.",

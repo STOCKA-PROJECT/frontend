@@ -1104,7 +1104,7 @@
         },
         "ports": {
           "title": "Ports",
-          "hint": "Under each port, the Stocka pieces connected to it. A cut port stays off and ignores the show until you restore it.",
+          "hint": "Each port is named after the Stocka pieces it drives in this show. A cut port stays off and ignores the show until you restore it; cuts survive a restart.",
           "cut": "Cut",
           "restore": "Restore",
           "cut_badge": "Cut",
@@ -1112,7 +1112,20 @@
           "none": "Without a show loaded there are no ports.",
           "cut_count": "{n} cut",
           "sensor_no_cut": "Safety sensor: it cannot be cut.",
-          "cut_first": "Restore it to test it."
+          "cut_first": "Restore it to test it.",
+          "other_cuts": "Cuts of ports this show does not have",
+          "other_cuts_hint": "They are still stored on the player: if the port comes back in another show, it will be cut.",
+          "test_open": "Test",
+          "group": {
+            "relay": "Relays",
+            "motor": "Motors",
+            "leds": "LED strips",
+            "moving_head": "Moving heads",
+            "audio": "Audio",
+            "sensor": "Sensors",
+            "gpio_expander": "Expanders",
+            "other": "Other"
+          }
         },
         "test": {
           "hint": "While no show runs you can switch each port on to check it is wired right. It stays on until you switch it off.",

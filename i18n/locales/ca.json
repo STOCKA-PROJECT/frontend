@@ -1104,7 +1104,7 @@
         },
         "ports": {
           "title": "Ports",
-          "hint": "Sota cada port, les peces de Stocka que hi estan connectades. Un port tallat queda apagat i ignora el show fins que el restableixis.",
+          "hint": "Cada port porta el nom de les peces de Stocka que mou en aquest show. Un port tallat queda apagat i ignora el show fins que el restableixis; els talls es conserven en reiniciar.",
           "cut": "Talla",
           "restore": "Restableix",
           "cut_badge": "Tallat",
@@ -1112,7 +1112,20 @@
           "none": "Sense show carregat no hi ha ports.",
           "cut_count": "{n} tallats",
           "sensor_no_cut": "Sensor de seguretat: no es pot tallar.",
-          "cut_first": "Restableix-lo per provar-lo."
+          "cut_first": "Restableix-lo per provar-lo.",
+          "other_cuts": "Talls de ports que aquest show no té",
+          "other_cuts_hint": "Segueixen desats al pessebre: si el port torna en un altre show, sortirà tallat.",
+          "test_open": "Prova",
+          "group": {
+            "relay": "Relés",
+            "motor": "Motors",
+            "leds": "Tires LED",
+            "moving_head": "Capçals",
+            "audio": "Àudio",
+            "sensor": "Sensors",
+            "gpio_expander": "Expansors",
+            "other": "Altres"
+          }
         },
         "test": {
           "hint": "Mentre no s'executa cap show pots encendre cada port per comprovar que està ben connectat. Queda encès fins que l'apaguis.",

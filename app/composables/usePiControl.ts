@@ -269,6 +269,11 @@ export function usePiControl(device: MaybeRefOrGetter<DeviceResponseDto | null>)
     await requireClient().setOverride(hw.name, hw.off ? 'normal' : 'off')
     await refreshStatus()
   })
+  /** Lifts the cut of a port by name, also one the loaded show does not have. */
+  const restoreOverride = (name: string) => guarded(async () => {
+    await requireClient().setOverride(name, 'normal')
+    await refreshStatus()
+  })
   const clearOverrides = () => guarded(async () => {
     await requireClient().clearOverrides()
     await refreshStatus()
@@ -525,6 +530,7 @@ export function usePiControl(device: MaybeRefOrGetter<DeviceResponseDto | null>)
     rollback,
     deleteBundle,
     toggleOverride,
+    restoreOverride,
     clearOverrides,
     clearAlerts,
     unlockMotor,

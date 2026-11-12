@@ -121,6 +121,8 @@ export interface PiStatus {
   cyclesTarget: number | null
   cycleMs: number
   overrides: string[]
+  /** Cuts stored for ports the loaded show does not have (absent on older players). */
+  overridesOther?: string[]
   hardware: PiHardware[]
   active: string | null
   previous: string | null
